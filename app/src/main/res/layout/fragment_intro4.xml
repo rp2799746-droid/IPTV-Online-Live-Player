@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/spbg3">
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayout5"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <ImageView
+            android:id="@+id/ivPointer"
+            android:layout_width="@dimen/_50sdp"
+            android:layout_height="@dimen/_15sdp"
+            android:layout_centerInParent="true"
+            android:padding="@dimen/_6sdp"
+            android:scaleType="centerCrop"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="UseAppTint" />
+
+        <TextView
+            android:id="@+id/tvTitle"
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/_12sdp"
+            android:fontFamily="@font/sf_pro_text_semibold"
+            android:maxLines="2"
+            android:paddingHorizontal="@dimen/_15sdp"
+            android:text="@string/smooth_to_use"
+            android:textColor="@color/black"
+            android:textColorLink="@color/black"
+            android:textSize="@dimen/_19sdp"
+            app:layout_constraintBottom_toTopOf="@+id/tvDesc"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/tvDesc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:layout_marginBottom="@dimen/_10sdp"
+            android:fontFamily="@font/sf_pro_text_medium"
+            android:gravity="center"
+            android:paddingHorizontal="@dimen/_15sdp"
+            android:text="@string/experience_fluid_controls_and_smooth_performance_every_time"
+
+            android:textColor="@color/hinttext"
+            android:textSize="@dimen/_11sdp"
+            app:layout_constraintBottom_toTopOf="@id/layoutNext"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <LinearLayout
+            android:id="@+id/layoutNext"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/_15sdp"
+            android:layout_marginBottom="@dimen/_10sdp"
+            app:layout_constraintBottom_toTopOf="@id/layoutAds"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <ImageView
+                android:id="@+id/dots_indicator"
+                android:layout_width="@dimen/_60sdp"
+                android:layout_height="@dimen/_60sdp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_inro_dot_4" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="@dimen/_1sdp"
+                android:layout_weight="1" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/btnNext"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginHorizontal="@dimen/_10sdp"
+                android:background="@drawable/ic_intro_button_bg">
+
+                <TextView
+                    android:id="@+id/tvNext"
+                    android:layout_width="110dp"
+                    android:layout_height="@dimen/_35sdp"
+                    android:layout_marginEnd="@dimen/_20sdp"
+                    android:background="@drawable/bg_spent_card1"
+                    android:fontFamily="@font/sf_pro_text_bold"
+                    android:gravity="center"
+                    android:text="@string/get_start"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_14ssp" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </LinearLayout>
+
+        <FrameLayout
+            android:id="@+id/layoutAds"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <FrameLayout
+                android:id="@+id/fr_ads"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="parent">
+
+                <include
+                    android:id="@+id/adShimmer"
+                    layout="@layout/ad_shimmer_native_ad_large" />
+            </FrameLayout>
+        </FrameLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

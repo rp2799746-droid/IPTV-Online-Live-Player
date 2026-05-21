@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <application
+        android:name="com.iptv.online.smart.liveplayer.tv.App"
+        android:allowBackup="false"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:hardwareAccelerated="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name3"
+        android:largeHeap="true"
+        android:requestLegacyExternalStorage="true"
+        android:roundIcon="@mipmap/ic_launcher"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme"
+        android:usesCleartextTraffic="true">
+        <activity
+            android:name="com.iptv.online.smart.liveplayer.tv.Activity.UninstallScreenActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name="com.iptv.online.smart.liveplayer.tv.Activity.UninstallSurveyActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name="com.iptv.online.smart.liveplayer.tv.Activity.SettingsActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-2864154863223892~5949416584" />
+<!--
+
+//tested
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-3940256099942544~3347511713" />
+-->
+
+
+
+
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id" />
+
+        <activity
+            android:name="com.iptv.online.smart.liveplayer.tv.Activity.SplashActivity"
+            android:exported="true"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+        </activity>
+
+        <activity
+            android:name="com.iptv.online.smart.liveplayer.tv.Activity.MainActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.iptv.online.smart.liveplayer.tv.Activity.FileSelectActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.iptv.online.smart.liveplayer.tv.Activity.PlayerActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.iptv.online.smart.liveplayer.tv.Activity.ChannelListActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.iptv.online.smart.liveplayer.tv.Activity.CategoryActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.iptv.online.smart.liveplayer.tv.Activity.MirrorStepsActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.iptv.online.smart.liveplayer.tv.Activity.Language_Activity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <service
+            android:name="com.iptv.online.smart.liveplayer.tv.FirebaseMessageReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
+
+        <activity
+            android:name="com.iptv.online.smart.liveplayer.tv.Activity.IntroActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+    </application>
+
+</manifest>

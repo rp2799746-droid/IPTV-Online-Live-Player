@@ -1,0 +1,6 @@
+com.itg.iaumodule
+color black
+color color_button_green
+color color_text_update_content
+color white
+string text_update_content

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.facebook.shimmer.ShimmerFrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/shimmer_native_ad"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="@dimen/_4sdp"
+    app:shimmer_auto_start="true"
+    app:shimmer_duration="1000">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/ads_bg"
+        android:padding="@dimen/_8sdp">
+
+        <!-- App icon placeholder -->
+        <View
+            android:id="@+id/shimmer_ad_icon"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:background="@color/gray"
+            android:layout_marginStart="8dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- "Ad" label placeholder -->
+        <View
+            android:id="@+id/shimmer_ad_label"
+            android:layout_width="30dp"
+            android:layout_height="15dp"
+            android:layout_marginStart="5dp"
+            android:background="@color/gray"
+            app:layout_constraintStart_toEndOf="@id/shimmer_ad_icon"
+            app:layout_constraintTop_toTopOf="@id/shimmer_ad_icon" />
+
+        <!-- Headline placeholder -->
+        <View
+            android:id="@+id/shimmer_ad_headline"
+            android:layout_width="0dp"
+            android:layout_height="12dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="8dp"
+            android:background="@color/gray"
+            app:layout_constraintStart_toEndOf="@id/shimmer_ad_label"
+            app:layout_constraintEnd_toStartOf="@id/shimmer_ad_media"
+            app:layout_constraintTop_toTopOf="@id/shimmer_ad_label" />
+
+        <!-- Advertiser placeholder -->
+        <View
+            android:id="@+id/shimmer_advertiser"
+            android:layout_width="60dp"
+            android:layout_height="10dp"
+            android:layout_marginTop="4dp"
+            android:background="@color/gray"
+            app:layout_constraintStart_toStartOf="@id/shimmer_ad_label"
+            app:layout_constraintTop_toBottomOf="@id/shimmer_ad_headline" />
+
+        <!-- Media (image/video) placeholder -->
+        <View
+            android:id="@+id/shimmer_ad_media"
+            android:layout_width="160dp"
+            android:layout_height="120dp"
+            android:layout_marginEnd="8dp"
+            android:background="@color/gray"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/shimmer_ad_icon" />
+
+        <!-- Body text placeholder -->
+        <View
+            android:id="@+id/shimmer_ad_body"
+            android:layout_width="0dp"
+            android:layout_height="10dp"
+            android:layout_marginTop="4dp"
+            android:background="@color/gray"
+            app:layout_constraintStart_toStartOf="@id/shimmer_ad_icon"
+            app:layout_constraintEnd_toStartOf="@id/shimmer_ad_media"
+            app:layout_constraintTop_toBottomOf="@id/shimmer_advertiser" />
+
+        <!-- CTA button placeholder -->
+        <View
+            android:id="@+id/shimmer_ad_cta"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="8dp"
+            android:background="@color/gray"
+            android:backgroundTint="@color/gray"
+            app:layout_constraintStart_toStartOf="@id/shimmer_ad_body"
+            app:layout_constraintEnd_toEndOf="@id/shimmer_ad_media"
+            app:layout_constraintTop_toBottomOf="@id/shimmer_ad_media"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.facebook.shimmer.ShimmerFrameLayout>

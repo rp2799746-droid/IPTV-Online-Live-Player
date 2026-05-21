@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_50sdp"
+        android:layout_marginHorizontal="@dimen/_10sdp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:weightSum="3">
+
+        <ImageView
+            android:id="@+id/back"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:padding="@dimen/_4sdp"
+            android:src="@drawable/back" />
+
+        <TextView
+            android:id="@+id/textheader"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_weight="3"
+            android:fontFamily="@font/sf_pro_text_bold"
+            android:text="@string/player_video"
+            android:textColor="@color/black"
+            android:textSize="@dimen/_13sdp" />
+
+        <ImageView
+            android:id="@+id/Share"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:padding="@dimen/_5sdp"
+            android:src="@drawable/share" />
+
+        <ImageView
+            android:id="@+id/Favorite"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:padding="@dimen/_4sdp"
+            android:src="@drawable/ic_fav_off" />
+
+        <ImageView
+            android:id="@+id/History"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:padding="@dimen/_5sdp"
+            android:src="@drawable/his" />
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="250dp">
+
+        <com.google.android.exoplayer2.ui.StyledPlayerView
+            android:id="@+id/playerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#000000" />
+
+        <ProgressBar
+            android:id="@+id/playerProgressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:indeterminateTint="@color/HoverColor"
+            android:indeterminateTintMode="src_atop"
+            android:visibility="gone" />
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#FFFFFF"
+        android:elevation="4dp"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/tvPlayerChannelName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/sf_pro_text_bold"
+            android:text="@string/channel_name"
+            android:textColor="@color/black"
+            android:textSize="20sp" />
+
+        <TextView
+            android:id="@+id/tvPlaylistInfo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:fontFamily="@font/sf_pro_text_medium"
+            android:text="@string/playlist_category_name"
+            android:textColor="@color/subcolor"
+            android:textSize="14sp" />
+
+
+    </LinearLayout>
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginHorizontal="@dimen/_5sdp"
+        android:padding="12dp">
+
+        <ImageView
+            android:id="@+id/ivIcon"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/television"
+            app:tint="@color/Hover71" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_marginStart="@dimen/_15sdp"
+            android:layout_toEndOf="@id/ivIcon"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/sf_pro_text_bold"
+                android:text="@string/streaming_status"
+                android:textColor="@color/black"
+                android:textSize="@dimen/_13sdp" />
+
+            <TextView
+                android:id="@+id/tvStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/sf_pro_text_medium"
+                android:text="@string/live_high_quality"
+                android:textColor="@color/subcolor"
+                android:textSize="@dimen/_10sdp" />
+        </LinearLayout>
+
+    </RelativeLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:text="@string/up_next"
+        android:textColor="@color/Hover71"
+        android:textSize="16sp"
+     android:fontFamily="@font/sf_pro_text_bold"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvUpNext"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingBottom="20dp" />
+</LinearLayout>

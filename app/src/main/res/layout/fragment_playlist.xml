@@ -1,0 +1,236 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="20dp">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/sf_pro_text_bold"
+                    android:text="@string/app_name3"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_17sdp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/sf_pro_text_medium"
+                    android:text="@string/smart_live_tv"
+                    android:textColor="@color/secondhovercolor"
+                    android:textSize="16sp" />
+            </LinearLayout>
+
+
+            <ImageView
+                android:id="@+id/btnSettings"
+                android:layout_width="40dp"
+                android:layout_height="@dimen/_40sdp"
+                android:padding="@dimen/_5sdp"
+                android:src="@drawable/settings" />
+        </LinearLayout>
+
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:overScrollMode="never"
+            android:scrollbars="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/_10sdp"
+                    android:orientation="vertical">
+
+                    <androidx.viewpager2.widget.ViewPager2
+                        android:id="@+id/bannerViewPager"
+                        android:layout_width="match_parent"
+                        android:layout_height="180dp"
+                        android:layout_marginHorizontal="12dp"
+                        android:visibility="visible" />
+
+                    <com.tbuonomo.viewpagerdotsindicator.DotsIndicator
+                        android:id="@+id/dots_indicator"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginTop="12dp"
+                        app:dotsColor="#D5D5D5"
+                        app:dotsCornerRadius="8dp"
+                        app:dotsSize="10dp"
+                        app:dotsSpacing="4dp"
+                        app:dotsWidthFactor="2.5"
+                        app:selectedDotColor="@color/black" />
+
+                </LinearLayout>
+
+                <FrameLayout
+                    android:id="@+id/layoutAds"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/_5sdp"
+                    app:layout_constraintBottom_toBottomOf="parent">
+
+                    <FrameLayout
+                        android:id="@+id/fr_ads"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintBottom_toBottomOf="parent">
+
+                        <include
+                            android:id="@+id/adShimmer"
+                            layout="@layout/ad_shimmer_native_ad_large" />
+                    </FrameLayout>
+                </FrameLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/_10sdp"
+                    android:layout_marginTop="10dp"
+                    android:orientation="horizontal"
+                    android:weightSum="2">
+
+
+                    <LinearLayout
+                        android:id="@+id/cardIptvSmart"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:id="@+id/icon1"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:adjustViewBounds="true"
+                            android:src="@drawable/ic_tv_blue" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginTop="-40dp"
+                            android:fontFamily="@font/sf_pro_text_bold"
+                            android:text="@string/iptv_smart"
+                            android:textColor="@color/white"
+                            android:textSize="@dimen/_14sdp"
+
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="@dimen/_10sdp"
+                        android:layout_height="0dp" />
+
+                    <LinearLayout
+
+                        android:id="@+id/cardCast"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:adjustViewBounds="true"
+                            android:src="@drawable/ic_cast_purple" />
+
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginTop="-40dp"
+                            android:fontFamily="@font/sf_pro_text_bold"
+                            android:gravity="center"
+                            android:text="@string/cast_to_tv"
+                            android:textColor="@color/white"
+                            android:textSize="@dimen/_14sdp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/_20sdp"
+                    android:layout_marginVertical="@dimen/_10sdp"
+                    android:fontFamily="@font/sf_pro_text_bold"
+                    android:text="@string/playlist_channel_uri"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_13sdp" />
+
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rvPlaylists"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:clipToPadding="false"
+                        android:padding="8dp"
+                        android:visibility="gone" />
+
+                    <LinearLayout
+                        android:id="@+id/layoutNoData"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="@dimen/_20sdp"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="20dp"
+                        android:visibility="visible">
+
+                        <ImageView
+                            android:layout_width="@dimen/_30sdp"
+                            android:layout_height="@dimen/_30sdp"
+                            android:src="@drawable/tv" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
+                            android:fontFamily="@font/sf_pro_text_bold"
+                            android:text="@string/no_playlist_found"
+                            android:textColor="#4E4E4E"
+                            android:textSize="@dimen/_13sdp" />
+
+
+                    </LinearLayout>
+                </RelativeLayout>
+
+
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+
+
+    </LinearLayout>
+</FrameLayout>

@@ -1,0 +1,126 @@
+package com.iptv.online.smart.liveplayer.tv.Activity
+
+import android.content.Context
+import android.content.Intent
+import android.content.res.Configuration
+import android.os.Build
+import android.os.Bundle
+import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.FragmentActivity
+import androidx.viewbinding.ViewBinding
+import com.ads.module.ads.ERainAd
+import com.ads.module.ads.wrapper.ApInterstitialAd
+import com.ads.module.funtion.AdCallback
+import com.iptv.online.smart.liveplayer.tv.Ads.InfinityAdsManager.showInterAds
+import com.iptv.online.smart.liveplayer.tv.adsutils.AdsId
+import com.iptv.online.smart.liveplayer.tv.adsutils.RemoteConfigdata
+import com.iptv.online.smart.liveplayer.tv.adsutils.isInternetAvailable
+import com.iptv.online.smart.liveplayer.tv.utils.CustomLoader
+import java.util.Locale
+
+
+abstract class Base__Activity<actBinding : ViewBinding> : AppCompatActivity() {
+
+    lateinit var binding: actBinding
+    lateinit var mActivity: FragmentActivity
+    lateinit var TAG: String
+    private var _progressDialog: CustomLoader? = null
+
+    private var mInterstitialAd: ApInterstitialAd? = null
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        Log.d("ffff", "Main onNewIntent called")
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = setViewBinding()
+        setContentView(binding.root)
+
+        mActivity = this
+        TAG = "_${this::class.simpleName}"
+
+        _progressDialog =
+            CustomLoader(mActivity)
+
+
+
+        bindObjects()
+        bindListener()
+        bindMethod()
+        bindObserver()
+        loadInterAds()
+    }
+
+    private fun loadInterAds() {
+
+        if (isInternetAvailable() && RemoteConfigdata(this@Base__Activity).isNeedToShowADs && RemoteConfigdata(
+                this@Base__Activity
+            ).interback
+        ) {
+            ERainAd.getInstance()
+                .getInterstitialAds(this, AdsId.interback, object : AdCallback() {
+                    override fun onApInterstitialLoad(apInterstitialAd: ApInterstitialAd?) {
+                        super.onApInterstitialLoad(apInterstitialAd)
+                        mInterstitialAd = apInterstitialAd
+                        Log.i("AdManager123", "Inter Load : $localClassName")
+                    }
+                })
+        }
+
+
+    }
+
+
+    abstract fun setViewBinding(): actBinding
+    abstract fun bindObjects()
+    abstract fun bindListener()
+    abstract fun bindMethod()
+    open fun bindObserver() {}
+    override fun onBackPressed() {
+        val config = RemoteConfigdata(this)
+
+        if (isInternetAvailable() &&
+            config.isNeedToShowADs &&
+            config.interback &&
+            mInterstitialAd != null
+        ) {
+
+            showInterAds(mInterstitialAd) {
+                finish()
+            }
+        } else {
+
+            finish()
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+    }
+
+
+    override fun attachBaseContext(newBase: Context) {
+        val sp = newBase.getSharedPreferences(newBase.packageName, MODE_PRIVATE)
+        val langCode = sp.getString("selected_language_code", "en") ?: "en"
+
+        val locale = Locale(langCode)
+        Locale.setDefault(locale)
+
+        val configuration = Configuration(newBase.resources.configuration)
+
+        val context = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            configuration.setLocale(locale)
+            configuration.setLayoutDirection(locale)
+            newBase.createConfigurationContext(configuration)
+        } else {
+            configuration.locale = locale
+            newBase.resources.updateConfiguration(configuration, newBase.resources.displayMetrics)
+            newBase
+        }
+        super.attachBaseContext(context)
+    }
+
+}

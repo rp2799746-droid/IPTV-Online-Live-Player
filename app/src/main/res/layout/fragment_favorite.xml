@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_50sdp"
+        android:layout_marginHorizontal="@dimen/_10sdp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/back"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:padding="@dimen/_4sdp"
+            android:src="@drawable/back"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/textheader"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:fontFamily="@font/sf_pro_text_bold"
+            android:text="@string/favorite"
+            android:textColor="@color/black"
+            android:textSize="@dimen/_16sdp" />
+    </LinearLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvFavorite"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:padding="8dp"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:id="@+id/layoutNoData"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="20dp"
+            android:visibility="visible">
+
+            <ImageView
+                android:layout_width="@dimen/_50sdp"
+                android:layout_height="@dimen/_50sdp"
+                android:src="@drawable/no_fav" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="16dp"
+                android:fontFamily="@font/sf_pro_text_bold"
+                android:gravity="center"
+                android:text="@string/no_favorite_found"
+                android:textColor="#4E4E4E"
+                android:textSize="@dimen/_13sdp" />
+        </LinearLayout>
+    </FrameLayout>
+
+</LinearLayout>

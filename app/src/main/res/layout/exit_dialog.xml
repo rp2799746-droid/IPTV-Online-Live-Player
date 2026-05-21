@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="@dimen/_20sdp"
+
+    android:background="@color/transparent"
+    android:orientation="vertical">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_340sdp"
+        android:background="@drawable/dailog_bg"
+        android:orientation="vertical">
+
+        <ImageView
+            android:layout_width="@dimen/_120sdp"
+            android:layout_height="@dimen/_120sdp"
+            android:layout_gravity="center"
+            android:layout_marginVertical="@dimen/_10sdp"
+            android:adjustViewBounds="true"
+            android:src="@drawable/exit" />
+
+        <TextView
+            android:id="@+id/txt_rate_1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+
+            android:text="@string/exit"
+            android:textColor="@color/black"
+            android:textSize="@dimen/_15sdp"
+            android:textStyle="bold"
+            app:fontFamily="@font/sf_pro_text_medium" />
+
+        <TextView
+            android:id="@+id/txt_rate3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+
+            android:text="@string/have_a_nice_day"
+            android:textColor="@color/black"
+            android:textSize="@dimen/_15sdp"
+            app:fontFamily="@font/sf_pro_text_medium" />
+
+        <TextView
+            android:id="@+id/txt_rate_2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:lineSpacingExtra="@dimen/_2sdp"
+            android:text="@string/are_you_sure_you_want_to_close_the_app"
+            android:textColor="#666666"
+            android:textSize="@dimen/_12sdp"
+            app:fontFamily="@font/sf_pro_text_medium" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="26dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="26dp"
+            android:layout_marginBottom="24dp"
+            android:orientation="vertical">
+
+
+            <TextView
+                android:id="@+id/btn_exit_yes"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:text="@string/exit12"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:fontFamily="@font/sf_pro_text_bold"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_14sdp"
+                android:background="@drawable/round_borderfill_box_hover"
+                />
+
+            <TextView
+                android:id="@+id/btn_exit_not"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginVertical="@dimen/_10sdp"
+                android:layout_weight="1"
+                android:stateListAnimator="@null"
+                android:text="@string/cancel"
+                android:textColor="#888888"
+                android:textSize="@dimen/_13sdp"
+                app:fontFamily="@font/sf_pro_text_medium" />
+
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

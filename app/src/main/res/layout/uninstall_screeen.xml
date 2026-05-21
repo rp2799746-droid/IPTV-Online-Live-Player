@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_50sdp"
+        android:layout_marginHorizontal="@dimen/_10sdp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+      >
+
+        <ImageView
+            android:id="@+id/back"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:padding="@dimen/_4sdp"
+            android:src="@drawable/back" />
+
+
+    </LinearLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:scrollbars="vertical"
+
+        android:overScrollMode="never">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/img_tv"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:layout_gravity="center"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_tv_image"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/btn_back" />
+
+            <TextView
+                android:id="@+id/txt_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="20dp"
+                android:fontFamily="@font/sf_pro_text_medium"
+                android:gravity="center"
+                android:text="@string/performance_excellence_n_certified"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/img_tv" />
+
+            <TextView
+                android:id="@+id/txt_body"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="12dp"
+                android:fontFamily="@font/sf_pro_text_regular"
+                android:gravity="center"
+                android:text="@string/uninterrupted_streaming_instantly_n_restored"
+                android:textColor="#6B6B6B"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/txt_title" />
+
+            <TextView
+                android:id="@+id/btn_try_again"
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:layout_gravity="center"
+                android:layout_marginHorizontal="@dimen/_20sdp"
+                android:layout_marginVertical="@dimen/_10sdp"
+                android:background="@drawable/round_borderfill_box_hover"
+                android:fontFamily="@font/sf_pro_text_semibold"
+                android:gravity="center"
+                android:text="@string/try_again"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/txt_body" />
+
+            <TextView
+                android:id="@+id/btn_uninstall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:fontFamily="@font/sf_pro_text_semibold"
+                android:padding="10dp"
+                android:text="@string/still_want_to_uninstall"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/btn_try_again" />
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+    <FrameLayout
+        android:id="@+id/layoutAds"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/_5sdp"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <FrameLayout
+            android:id="@+id/fr_ads"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <include
+                android:id="@+id/adShimmer"
+                layout="@layout/ad_shimmer_native_ad_large" />
+        </FrameLayout>
+    </FrameLayout>
+
+</LinearLayout>

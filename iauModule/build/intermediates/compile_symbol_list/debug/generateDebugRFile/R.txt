@@ -1,0 +1,5 @@
+int color black 0x0
+int color color_button_green 0x0
+int color color_text_update_content 0x0
+int color white 0x0
+int string text_update_content 0x0

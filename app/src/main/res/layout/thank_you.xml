@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="@dimen/_20sdp"
+    android:background="@color/transparent"
+    android:orientation="vertical">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_370sdp"
+        android:background="@drawable/dailog_bg"
+        android:orientation="vertical">
+
+        <ImageView
+            android:layout_width="@dimen/_120sdp"
+            android:layout_height="@dimen/_100sdp"
+            android:layout_gravity="center"
+            android:layout_marginVertical="@dimen/_14sdp"
+            android:adjustViewBounds="true"
+            android:src="@drawable/thank_u" />
+
+        <TextView
+            android:id="@+id/txt_rate_1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="-25dp"
+            android:text="@string/thank_you"
+            android:textColor="@color/black"
+            android:textSize="@dimen/_15sdp"
+            android:textStyle="bold"
+            app:fontFamily="@font/sf_pro_text_medium" />
+
+        <TextView
+            android:id="@+id/txt_rate_2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:lineSpacingExtra="@dimen/_2sdp"
+            android:text="@string/we_truly_appreciate_you_using_our_app"
+            android:textColor="#666666"
+            android:textSize="@dimen/_12sdp"
+            app:fontFamily="@font/sf_pro_text_medium" />
+
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/textInputLayout"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            app:boxCornerRadiusBottomEnd="20dp"
+            app:boxCornerRadiusBottomStart="20dp"
+            app:boxCornerRadiusTopEnd="20dp"
+            app:boxCornerRadiusTopStart="20dp"
+            app:boxStrokeColor="#CCCCCC"
+            app:counterEnabled="true"
+            app:counterMaxLength="1000"
+            app:hintEnabled="false">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editText"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:gravity="top"
+                android:hint="@string/describe_your_thought"
+                android:inputType="textMultiLine"
+                android:padding="16dp"
+                android:textColorHint="#999999" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="26dp"
+            android:layout_marginEnd="26dp"
+            android:layout_marginBottom="24dp"
+            android:orientation="vertical">
+
+
+            <TextView
+                android:id="@+id/btn_rate_yes"
+
+                android:layout_width="match_parent"
+                android:layout_height="50sp"
+                android:layout_gravity="center"
+                android:background="@drawable/round_borderfill_box_hover"
+                android:fontFamily="@font/sf_pro_text_bold"
+                android:gravity="center"
+                android:text="Submit"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_14sdp" />
+
+
+            <TextView
+                android:id="@+id/btn_rate_not"
+                android:layout_width="match_parent"
+                android:layout_height="50sp"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:stateListAnimator="@null"
+                android:text="@string/cancel"
+                android:textColor="#888888"
+                android:textSize="@dimen/_13sdp"
+                app:fontFamily="@font/sf_pro_text_medium" />
+
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

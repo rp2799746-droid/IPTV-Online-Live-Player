@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="@dimen/_10sdp"
+    app:cardCornerRadius="30dp"
+    app:cardElevation="10dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="20dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:src="@drawable/no_internet_img" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:fontFamily="@font/sf_pro_text_semibold"
+                android:gravity="center"
+                android:text="@string/no_internet_connection"
+                android:textColor="@color/black"
+                android:textSize="20sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="8dp"
+                android:fontFamily="@font/sf_pro_text_medium"
+                android:gravity="center"
+                android:text="@string/please_check_your_internet_connection"
+                android:textColor="@color/textcolor"
+                android:textSize="15sp" />
+
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btn_settings"
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:layout_alignParentBottom="true"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:background="@drawable/round_borderfill_box_hover"
+                android:text="@string/open_wi_fi_setting"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </RelativeLayout>
+
+</androidx.cardview.widget.CardView>

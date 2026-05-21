@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "245278692729",
+    "project_id": "pa-web-1-iptv",
+    "storage_bucket": "pa-web-1-iptv.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:245278692729:android:7c905ec0346504401ccba8",
+        "android_client_info": {
+          "package_name": "com.iptv.online.smart.liveplayer.tv"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBMI8KhXCYr_fuSVG8eqLdS0cvRRTTIP4I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

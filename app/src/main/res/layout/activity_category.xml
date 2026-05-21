@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_50sdp"
+        android:layout_marginHorizontal="@dimen/_10sdp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:weightSum="3">
+
+        <ImageView
+            android:id="@+id/back"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:padding="@dimen/_4sdp"
+            android:src="@drawable/back" />
+
+        <TextView
+            android:id="@+id/textheader"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_weight="2"
+            android:fontFamily="@font/sf_pro_text_bold"
+            android:text="@string/category"
+            android:textColor="@color/black"
+            android:textSize="@dimen/_13sdp" />
+
+
+    </LinearLayout>
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="12dp"
+        app:cardCornerRadius="25dp"
+        app:cardElevation="4dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="@color/cardbg"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="16dp">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_search" />
+
+            <EditText
+                android:id="@+id/etSearchChannel"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@color/cardbg"
+                android:fontFamily="@font/sf_pro_text_medium"
+                android:hint="@string/search_channel_name"
+                android:imeOptions="actionSearch"
+                android:inputType="text"
+                android:paddingStart="10dp"
+                android:textColor="@color/black"
+                android:textSize="15sp" />
+
+            <ImageView
+                android:id="@+id/ivClearSearchChannel"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:src="@drawable/ic_close"
+                android:visibility="gone" />
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:overScrollMode="never"
+        android:scrollbars="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <FrameLayout
+                android:id="@+id/layoutAds"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/_5sdp"
+                app:layout_constraintBottom_toBottomOf="parent">
+
+                <FrameLayout
+                    android:id="@+id/fr_ads"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintBottom_toBottomOf="parent">
+
+                    <include
+                        android:id="@+id/adShimmer"
+                        layout="@layout/ad_shimmer_native_ad_large" />
+                </FrameLayout>
+            </FrameLayout>
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvCategories"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:clipToPadding="false"
+                    android:padding="8dp" />
+
+                <LinearLayout
+                    android:id="@+id/layoutNoData"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <ImageView
+                        android:layout_width="@dimen/_40sdp"
+                        android:layout_height="@dimen/_40sdp"
+                        android:src="@drawable/tv" />
+
+                    <TextView
+                        android:id="@+id/tvNoDataTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="@string/no_channel_found"
+                        android:textColor="@color/black"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <ProgressBar
+                    android:id="@+id/pbLoading"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:indeterminateTint="@color/HoverColor"
+                    android:indeterminateTintMode="src_atop"
+                    android:visibility="gone" />
+
+            </FrameLayout>
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+
+</LinearLayout>

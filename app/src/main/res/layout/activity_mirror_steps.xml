@@ -1,0 +1,361 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/actionbar_faq" />
+
+    <LinearLayout
+        android:id="@+id/aa"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_50sdp"
+        android:layout_below="@+id/toolbar"
+        android:layout_marginHorizontal="@dimen/_10sdp"
+        android:background="@drawable/tab_bg"
+        android:orientation="horizontal"
+        android:padding="@dimen/_5sdp">
+
+        <TextView
+            android:id="@+id/tvSmartTVTab"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/round_borderfill_box_hover"
+            android:fontFamily="@font/sf_pro_text_medium"
+            android:gravity="center"
+            android:text="@string/smart_tv"
+            android:textColor="@color/white"
+            android:textSize="@dimen/_12sdp" />
+
+        <TextView
+            android:id="@+id/tvDirectTab"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:fontFamily="@font/sf_pro_text_medium"
+            android:gravity="center"
+            android:text="@string/direct"
+            android:textColor="@color/darker_gray"
+            android:textSize="@dimen/_12sdp" />
+    </LinearLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/layoutAds"
+        android:layout_below="@+id/aa">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+
+            <LinearLayout
+                android:id="@+id/smart_ln"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="visible">
+
+                <TextView
+
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginVertical="@dimen/_5sdp"
+                    android:fontFamily="@font/sf_pro_text_bold"
+                    android:text="@string/step_1_connect_to_same_wifi"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_13sdp" />
+
+                <TextView
+
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/_5sdp"
+                    android:fontFamily="@font/sf_pro_text_regular"
+                    android:text="@string/make_sure_your_phone_and_smart_tv_are_connected_to_the_same_wifi_network"
+                    android:textColor="@color/subcolor"
+                    android:textSize="@dimen/_10sdp" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/_5sdp" />
+
+                <TextView
+
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginVertical="@dimen/_5sdp"
+
+                    android:fontFamily="@font/sf_pro_text_bold"
+                    android:text="@string/step_2_open_cast_app"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_13sdp" />
+
+                <TextView
+
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/_5sdp"
+                    android:fontFamily="@font/sf_pro_text_regular"
+                    android:text="@string/open_your_cast_to_tv_screen_mirroring_app_on_your_phone"
+                    android:textColor="@color/subcolor"
+                    android:textSize="@dimen/_10sdp" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/_5sdp" />
+
+                <TextView
+
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginVertical="@dimen/_5sdp"
+                    android:fontFamily="@font/sf_pro_text_bold"
+                    android:text="@string/step_3_tap_start_mirroring_or_cast"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_13sdp" />
+
+                <TextView
+
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/_5sdp"
+                    android:fontFamily="@font/sf_pro_text_regular"
+                    android:text="@string/tap_on_start_mirroring_cast_screen_connect_button"
+                    android:textColor="@color/subcolor"
+                    android:textSize="@dimen/_10sdp" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/_5sdp" />
+
+                <TextView
+
+                    android:layout_width="wrap_content"
+                    android:layout_height="21dp"
+                    android:layout_marginVertical="@dimen/_5sdp"
+                    android:fontFamily="@font/sf_pro_text_bold"
+                    android:text="@string/step_4_select_your_tv"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_13sdp" />
+
+                <TextView
+
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/_5sdp"
+                    android:fontFamily="@font/sf_pro_text_regular"
+                    android:text="@string/your_app_will_scan_and_show_available_devices_n_tap_your_smart_tv_name_from_the_list"
+                    android:textColor="@color/subcolor"
+                    android:textSize="@dimen/_10sdp" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/_5sdp" />
+
+                <TextView
+
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginVertical="@dimen/_5sdp"
+                    android:fontFamily="@font/sf_pro_text_bold"
+                    android:text="@string/step_5_allow_permission_on_tv"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_13sdp" />
+
+                <TextView
+
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/_5sdp"
+                    android:fontFamily="@font/sf_pro_text_regular"
+                    android:text="@string/some_tvs_will_show_a_popup_n_click_allow_accept_on_your_tv"
+                    android:textColor="@color/subcolor"
+                    android:textSize="@dimen/_10sdp" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/_5sdp" />
+
+                <TextView
+
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginVertical="@dimen/_5sdp"
+                    android:fontFamily="@font/sf_pro_text_bold"
+                    android:text="@string/step_6_start_casting"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_13sdp" />
+
+                <TextView
+
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/_5sdp"
+                    android:fontFamily="@font/sf_pro_text_regular"
+                    android:text="@string/your_phone_screen_or_content_will_now_appear_on_the_tv"
+                    android:textColor="@color/subcolor"
+                    android:textSize="@dimen/_10sdp" />
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/direct_ln"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginVertical="@dimen/_5sdp"
+                    android:fontFamily="@font/sf_pro_text_bold"
+                    android:text="@string/step_1_connect_to_same_wifi"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_13sdp" />
+
+                <TextView
+
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/_5sdp"
+                    android:fontFamily="@font/sf_pro_text_regular"
+                    android:text="@string/make_sure_your_phone_and_smart_tv_are_connected_to_the_same_wifi_network"
+                    android:textColor="@color/subcolor"
+                    android:textSize="@dimen/_10sdp" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/_5sdp" />
+
+                <TextView
+
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginVertical="@dimen/_5sdp"
+
+                    android:fontFamily="@font/sf_pro_text_bold"
+                    android:text="@string/step_2_open_cast_app"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_13sdp" />
+
+                <TextView
+
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/_5sdp"
+                    android:fontFamily="@font/sf_pro_text_regular"
+                    android:text="@string/please_connect_to_your_tv"
+                    android:textColor="@color/subcolor"
+                    android:textSize="@dimen/_10sdp" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/_5sdp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginVertical="@dimen/_5sdp"
+                    android:fontFamily="@font/sf_pro_text_bold"
+                    android:text="@string/step_3_tap_start_mirroring_or_cast"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_13sdp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/_5sdp"
+                    android:fontFamily="@font/sf_pro_text_regular"
+                    android:text="@string/tap_the_start_mirroring_button_to_begin_screen_mirroring"
+                    android:textColor="@color/subcolor"
+                    android:textSize="@dimen/_10sdp" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/_5sdp" />
+
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginVertical="@dimen/_10sdp"
+                    android:background="@drawable/bg_spent_card1"
+                    android:paddingHorizontal="25dp"
+                    android:paddingVertical="20dp">
+
+                    <TextView
+                        android:id="@+id/tvSound"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:fontFamily="@font/sf_pro_text_bold"
+                        android:text="@string/sound"
+                        android:textColor="@color/black"
+                        android:textSize="15dp" />
+
+                    <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/switchSound"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:checked="true"
+                        app:thumbTint="@color/thumb_selector"
+                        app:trackTint="@color/track_selector" />
+                </RelativeLayout>
+
+
+            </LinearLayout>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <FrameLayout
+        android:id="@+id/layoutAds"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/btnStartMirroring"
+        android:layout_margin="@dimen/_5sdp"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <FrameLayout
+            android:id="@+id/fr_ads"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <include
+                android:id="@+id/adShimmer"
+                layout="@layout/ad_shimmer_native_ad_large" />
+        </FrameLayout>
+    </FrameLayout>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnStartMirroring"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="20dp"
+        android:layout_marginStart="19dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="21dp"
+        android:background="@drawable/round_borderfill_box_hover"
+        android:text="@string/start_mirroring"
+        android:textAllCaps="false"
+        android:textColor="#FFFFFF"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+</RelativeLayout>

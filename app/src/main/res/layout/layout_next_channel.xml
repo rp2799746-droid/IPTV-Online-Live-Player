@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="320dp"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    app:cardBackgroundColor="#FFFFFF"
+    app:cardCornerRadius="28dp"
+    app:cardElevation="12dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/sf_pro_text_bold"
+            android:letterSpacing="0.1"
+            android:text="UP NEXT"
+            android:textAllCaps="true"
+            android:textColor="#9E9E9E"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/tvNextChannelName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:fontFamily="@font/sf_pro_text_bold"
+            android:text="Star Sports 1"
+            android:textAlignment="center"
+            android:textColor="#212121"
+            android:textSize="22sp" />
+
+        <FrameLayout
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp">
+
+            <ProgressBar
+                android:id="@+id/pbCountdown"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:indeterminate="false"
+                android:max="5"
+                android:progress="5"
+                android:progressDrawable="@drawable/circular_progress_bar" />
+
+            <TextView
+                android:id="@+id/tvTimerCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:fontFamily="@font/sf_pro_text_bold"
+                android:text="5"
+                android:textColor="#212121"
+                android:textSize="32sp" />
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal">
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnCancelNext"
+                android:layout_width="0dp"
+                android:layout_height="52dp"
+                android:layout_marginEnd="8dp"
+                android:layout_weight="1"
+                android:background="@drawable/round_borderfill_box_hover"
+                android:backgroundTint="@color/cardbg"
+                android:fontFamily="@font/sf_pro_text_semibold"
+                android:text="Cancel"
+                android:textAllCaps="false"
+                android:textColor="@color/black"
+                android:textSize="16sp" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnPlayNow"
+                android:layout_width="0dp"
+                android:layout_height="52dp"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:background="@drawable/round_borderfill_box_hover"
+                android:fontFamily="@font/sf_pro_text_semibold"
+                android:text="Play Now"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:textSize="16sp" />
+        </LinearLayout>
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

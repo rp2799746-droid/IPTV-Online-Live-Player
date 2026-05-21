@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingHorizontal="@dimen/_15sdp">
+
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingBottom="@dimen/_10sdp">
+
+            <ImageView
+                android:id="@+id/image"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_margin="@dimen/_20sdp"
+                android:adjustViewBounds="true" />
+
+            <TextView
+                android:id="@+id/hint_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/_13sdp"
+                android:fontFamily="@font/sf_pro_text_semibold"
+                android:gravity="center"
+                android:text="ascads"
+                android:textColor="@color/black"
+                android:textSize="@dimen/_16ssp" />
+
+            <TextView
+                android:id="@+id/hint_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/_10sdp"
+                android:fontFamily="@font/sf_pro_text_medium"
+                android:gravity="center"
+                android:lineSpacingExtra="4dp"
+                android:text="zdsaadas"
+                android:textColor="@color/hinttext"
+                android:textSize="@dimen/_10ssp" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+
+</RelativeLayout>
