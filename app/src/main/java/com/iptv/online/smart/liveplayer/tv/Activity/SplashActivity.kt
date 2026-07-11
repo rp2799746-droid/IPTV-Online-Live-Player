@@ -66,7 +66,10 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
     private var isUpdateChecked = false
     private var noInternetDialog: Dialog? = null
     private var networkCallback: ConnectivityManager.NetworkCallback? = null
-
+    private var isRemoteConfigLoading = false
+    companion object {
+        var screenCount = 1     // 👈 static thai gayu
+    }
 
     override fun setViewBinding() = ActivitySplashBinding.inflate(layoutInflater)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -359,7 +362,7 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
 
             override fun onConsentError(formError: FormError) {
                 canPersonalized = true
-                loadingRemoteConfig()
+//                loadingRemoteConfig()
                 Log.i(TAG, "checkNeedToLoadConsent: onConsentError")
                 startAppFlow()
 
@@ -404,6 +407,7 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
                     if (isPurchased(this)) {
                         remoteData.isNeedToShowADs = false
                     }
+
                     goNextScreen()
                 }
             }
@@ -451,38 +455,11 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
                 binding.bannerAdLayout.gone
             }
 
-            if (remoteData.nativeLang1On || remoteData.nativeLang2On) {
-                val languageNativeId = if (isIntroFlowDone()) AdsId.nativeLanguage2
-                else AdsId.nativeLanguage1
-
-                val tagName = "native_lang_tag"
-
-                InfinityAdsManager.loadAd(
-                    this,
-                    languageNativeId,
-                    R.layout.layout_native_ad_large,
-                    tagName
-                )
-                Log.d("PreloadAd", "Language Native Preloading started with tag: $tagName")
-            }
-            if (remoteData.interOnboardingOn) {
-                ERainAd.getInstance().getInterstitialAds(
-                    this,
-                    AdsId.interOnboarding,
-                    object : AdCallback() {
-                        override fun onApInterstitialLoad(apInterstitialAd: ApInterstitialAd?) {
-                            super.onApInterstitialLoad(apInterstitialAd)
-                            Log.d("PreloadAd", "Inter Onboarding Preloaded Success")
-                        }
-                    }
-                )
-            }
-
 
             if (widgetFlow == "flow_uninstall") {
                 if (remoteData.interSplashUninstall) {
                     ERainAd.getInstance().loadSplashInterstitialAds(
-                        this, AdsId.INTER_SPLASH_UNINSTALL, 25000, 5000, object : AdCallback() {
+                        this, AdsId.INTER_SPLASH_UNINSTALL, 30000, 5000, object : AdCallback() {
                             override fun onNextAction() {
                                 goNextScreen()
                             }
@@ -500,7 +477,7 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
 
             if (widgetFlow != null && remoteData.interSplashOn) {
                 ERainAd.getInstance().loadSplashInterstitialAds(
-                    this, AdsId.interSplash, 25000, 5000, object : AdCallback() {
+                    this, AdsId.interSplash, 30000, 5000, object : AdCallback() {
                         override fun onNextAction() {
                             goNextScreen()
                         }
@@ -520,7 +497,7 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
                 )
                 if (remoteData.isInterOnSplash) {
                     ERainAd.getInstance().loadSplashInterstitialAds(
-                        this, AdsId.interSplash, 25000, 5000, object : AdCallback() {
+                        this, AdsId.interSplash, 30000, 5000, object : AdCallback() {
                             override fun onNextAction() {
                                 super.onNextAction()
                                 Log.w(TAG, "loadInfinityFlow: onNextAction")
@@ -536,7 +513,7 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
                     AppOpenManager.getInstance().loadOpenAppAdSplash(
                         this,
                         AdsId.openSplash,
-                        25000, 25000, true, object : AdCallback() {
+                        30000, 30000, true, object : AdCallback() {
                             override fun onNextAction() {
                                 super.onNextAction()
                                 Log.w(TAG, "loadInfinityFlow: onNextAction-else")
@@ -598,6 +575,7 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
                 if (isPurchased(this)) {
                     Intent(this, MainActivity::class.java)
                 } else {
+                    preloadLanguageAdInApp()
                     Intent(this, Language_Activity::class.java).apply {
                         putExtra("isFromSplash", true)
                     }
@@ -634,14 +612,41 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
     private val remoteData: RemoteConfigdata by lazy {
         RemoteConfigdata(this)
     }
+    private fun preloadLanguageAdInApp() {
 
+var configScript: RemoteConfigdata? = remoteData
+
+        val currentAdId = if (screenCount == 1) AdsId.nativeLanguage1 else AdsId.nativeLanguage2
+        val tag = "native_lang_tag"
+        configScript = RemoteConfigdata(this@SplashActivity)
+        InfinityAdsManager.loadAd(
+            this,
+            currentAdId,
+            R.layout.layout_native_ad_large,
+            tag
+        )
+
+//        startAdFlow(tag)
+
+        val clickAdId =
+            if (screenCount == 1) AdsId.nativeLanguage1Click else AdsId.nativeLanguage2Click
+        val clickTag = "native_lang_click_tag"
+
+        val isClickAdEnabled = if (screenCount == 1)
+            configScript!!.nativeLang1ClickOn
+        else
+            configScript!!.nativeLang2ClickOn
+
+        if (configScript!!.isNeedToShowADs && isClickAdEnabled) {
+            InfinityAdsManager.loadAd(this, clickAdId, R.layout.layout_native_ad_lang_click, clickTag)
+            Log.d("AdManager123", "Click tag preloaded in onCreate: $clickTag")
+        }
+    }
     private fun setConfigData(config: FirebaseRemoteConfig) {
         Log.i(TAG, "setConfigData: $config")
         remoteData.delayButtonDoneLanguage = config.getBoolean("delay_button_done_language")
         remoteData.privacyLink = config.getString("privacy_policy")
         remoteData.height_button_cta = config.getString("height_button_cta")
-//        remoteData.terms_of_uses = config.getString("terms_of_uses")
-//        remoteData.aboutUsLink = config.getString("about_us")
         remoteData.isNeedToShowADs = config.getBoolean("is_need_to_show_ads")
 
 
@@ -666,7 +671,6 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
         remoteData.interOnboardingOn = config.getBoolean("ad_inter_onb_on")
 
         // ---------- Home ----------
-        remoteData.nativeHomeOn = config.getBoolean("ad_native_home_on")
         remoteData.interHomeOn = config.getBoolean("ad_inter_home_on")
 
         // ---------- Collapsible Banner ----------
@@ -677,9 +681,7 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
 
         //Add
         remoteData.interback = config.getBoolean("inter_back")
-        remoteData.nativeChannel = config.getBoolean("native_channel")
-        remoteData.nativeFavorite = config.getBoolean("native_favorite")
-        remoteData.nativeHistory = config.getBoolean("native_history")
+
         remoteData.nativePlaylist = config.getBoolean("native_playlist")
         remoteData.interMirroring = config.getBoolean("inter_mirroring")
         remoteData.nativeMirroring = config.getBoolean("native_mirroring")
@@ -690,31 +692,25 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
         remoteData.nativeUninstall = config.getBoolean("native_uninstall")
         remoteData.nativesurveyUninstall = config.getBoolean("native_survey_uninstall")
 
+        remoteData.nativehome2005 = config.getBoolean("native_home_2005")
+        remoteData.nativechannel2005 = config.getBoolean("native_channel_2005")
+        remoteData.nativefavorite2005 = config.getBoolean("native_favorite_2005")
+        remoteData.nativehistory2005 = config.getBoolean("native_history_2005")
+
+        //welcome
+        remoteData.interwelcomeback = config.getBoolean("interwelcomeback")
+
+
         remoteData.isInterOnSplash = config.getBoolean("is_inter_on_splash")
 
         if (isPurchased(this)) {
             remoteData.isNeedToShowADs = false
         }
 
-        if (RemoteConfigdata(this).appOpenOn && RemoteConfigdata(this).isNeedToShowADs) AppOpenManager.getInstance()
-            .enableAppResume()
-        else AppOpenManager.getInstance().disableAppResume()
+        // App resume par Welcome Screen flow use thay che, etle App-Open resume ad
+        // disable j rakhiye (WelcomeScreen pote welcome-back interstitial batave che).
+        AppOpenManager.getInstance().disableAppResume()
 
-        if ((remoteData.nativeLang1ClickOn || remoteData.nativeLang2ClickOn) && remoteData.isNeedToShowADs) {
-            val languageNativeId = if (isIntroFlowDone())
-                AdsId.nativeLanguage2Click
-            else AdsId.nativeLanguage1Click
-
-            val tagName = "native_lang_click_tag"
-
-            InfinityAdsManager.loadAd(
-                this,
-                languageNativeId,
-                R.layout.layout_native_ad_large,
-                tagName
-            )
-            Log.d("PreloadAd", "Language Click Native Preloading started")
-        }
 
         loadInfinityFlow()
     }

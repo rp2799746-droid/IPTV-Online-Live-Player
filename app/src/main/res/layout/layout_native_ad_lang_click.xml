@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Language screen 2 (CLICK) nu native ad design.
+    GpsTracker na layout_native_ad_medium_lang jevu - alag file rakhi
+    jethi click ad nu design normal ad thi independent-ly change kari sakay.
+    (CTA button no lilo #4ADA34 color code ma screenCount==1 mate set thay chhe.)
+-->
+<com.google.android.gms.ads.nativead.NativeAdView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:ignore="HardcodedText,SpUsage">
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        app:cardBackgroundColor="#EDEDED"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="5dp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="8dp">
+
+            <ImageView
+                android:id="@+id/ad_app_icon"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:layout_marginStart="@dimen/_10sdp"
+                android:adjustViewBounds="true"
+                android:contentDescription="@null"
+                android:src="@color/Hover71"
+                android:visibility="visible"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/ad_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/_10sdp"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:background="@drawable/bg_ad_icon"
+                android:paddingHorizontal="5dp"
+                android:paddingVertical="2dp"
+                android:text="Ad"
+                android:textColor="#ffffff"
+                android:textSize="11dp"
+                app:layout_constraintStart_toEndOf="@id/ad_app_icon"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/ad_headline"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="2dp"
+                android:layout_marginEnd="8dp"
+                android:textColor="@color/black"
+                android:textSize="15dp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="@id/ad_icon"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/ad_icon"
+                app:layout_constraintTop_toTopOf="@id/ad_icon"
+                tools:text="Headline" />
+
+            <TextView
+                android:id="@+id/ad_advertiser"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="2dp"
+                android:layout_marginTop="5dp"
+                android:textColor="@color/black"
+                android:textSize="13dp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="@id/ad_headline"
+                app:layout_constraintStart_toStartOf="@id/ad_icon"
+                app:layout_constraintTop_toBottomOf="@id/ad_headline"
+                tools:text="Ad advertiser" />
+
+            <TextView
+                android:id="@+id/ad_body"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/_5sdp"
+                android:layout_marginTop="6dp"
+                android:textColor="@color/black"
+                android:textSize="13dp"
+                app:layout_constraintEnd_toEndOf="@id/ad_advertiser"
+                app:layout_constraintStart_toStartOf="@id/ad_app_icon"
+                app:layout_constraintTop_toBottomOf="@id/ad_advertiser"
+                tools:text="ad body" />
+
+            <!-- GPS na ad_native_big jevu ratio: media height 130dp, margin 8dp -->
+            <com.google.android.gms.ads.nativead.MediaView
+                android:id="@+id/ad_media"
+                android:layout_width="0dp"
+                android:layout_height="130dp"
+                android:layout_marginHorizontal="8dp"
+                android:layout_marginTop="8dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/ad_body" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/ad_call_to_action"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="4dp"
+                android:background="@drawable/bg_btn_native_cta"
+                android:textAllCaps="false"
+                android:textColor="#ffffff"
+                android:textSize="16dp"
+                android:layout_marginHorizontal="8dp"
+
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/ad_media"
+                tools:text="Install" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
+</com.google.android.gms.ads.nativead.NativeAdView>
