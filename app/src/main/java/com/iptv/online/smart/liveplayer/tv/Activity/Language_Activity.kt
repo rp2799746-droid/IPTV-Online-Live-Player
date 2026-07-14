@@ -149,23 +149,7 @@ class Language_Activity : Base__Activity<ActivityLanguageBinding>(),
         }
     }
 
-    private fun preloadIntroAds() {
-        val isFromSettings = intent.getBooleanExtra("settingss", false)
-        if (isFromSettings) return
 
-        val isDone = isIntroFlowDone()
-        val config = RemoteConfigdata(this)
-
-        if (config.isNeedToShowADs) {
-            Log.d("AdManager123", "Preloading Intro Native Ads in Language Activity...")
-
-            // ૧. Native Onboarding 1_1 / 2_1
-            val adId1 = if (isDone) AdsId.nativeOnboarding2_1 else AdsId.nativeOnboarding1_1
-            val tag1 = if (isDone) "native_onboarding_2_1" else "native_onboarding_1_1"
-            InfinityAdsManager.loadAd(this, adId1, R.layout.layout_native_ad_large, tag1)
-
-        }
-    }
 
     private fun startAdFlow(tag: String) {
         configScript?.let { config ->

@@ -16,7 +16,6 @@ import com.iptv.online.smart.liveplayer.tv.activities.forIntro.IntroFragment3
 import com.iptv.online.smart.liveplayer.tv.activities.forIntro.IntroFragment4
 import com.iptv.online.smart.liveplayer.tv.adsutils.AdsId
 import com.iptv.online.smart.liveplayer.tv.Ads.InfinityAdsManager
-import com.iptv.online.smart.liveplayer.tv.Ads.InfinityAdsManager.showInterAds
 import com.iptv.online.smart.liveplayer.tv.adsutils.LazyShowAds
 import com.iptv.online.smart.liveplayer.tv.adsutils.RemoteConfigdata
 import com.iptv.online.smart.liveplayer.tv.adsutils.getShouldDisplayInterOnboarding
@@ -39,11 +38,6 @@ class IntroActivity : Base__Activity<ActivityIntroBinding>() {
 
     override fun setViewBinding() = ActivityIntroBinding.inflate(layoutInflater)
 
-    private var mInterstitialAd: ApInterstitialAd? = null
-    // Show-rate: inter_onboarding ne intro START ma load na karo. User onboarding ma agal
-    // vadhe (2ja page e) tyare load karo -> show point (onboarding end) ni najik -> ochi
-    // drop-off -> uncho show rate. Ek j var trigger thay eno guard.
-    private var interOnbLoadTriggered = false
     var fragments = emptyList<Fragment>()
 
     private val configScript: RemoteConfigdata by lazy {
@@ -52,10 +46,9 @@ class IntroActivity : Base__Activity<ActivityIntroBinding>() {
 
 
     override fun bindObjects() {
-        // inter_onboarding ne have ahiya (intro start) load nathi karta -> te bahu vehlu hatu
-        // (show onboarding-end e thay -> vachche ghana exit -> show rate 19%). Have onPageSelected
-        // ma user later page e pohonche tyare load thay che (show-rate optimization).
-        // loadInterAds()
+        // Demo jevu CENTRALIZED: inter_onboarding ne Intro (onboarding) START ma load karo.
+        // Load ane show banne centralized InfinityAdsManager ma chhe (demo na AdsManager jevu).
+        InfinityAdsManager.loadInterOnboarding(this)
         val isDone = isIntroFlowDone()
 
         val isFullAdEnabled =
@@ -134,26 +127,6 @@ class IntroActivity : Base__Activity<ActivityIntroBinding>() {
           binding.pagerIntro.offscreenPageLimit = 5
       }
     */
-    private fun loadInterAds() {
-        Log.i(
-            "AdManager123",
-            "shouldDisplayInterOnboarding  Load: ${getShouldDisplayInterOnboarding()}"
-        )
-        if (getShouldDisplayInterOnboarding() && isInternetAvailable() && RemoteConfigdata(this@IntroActivity).isNeedToShowADs && RemoteConfigdata(
-                this@IntroActivity
-            ).interOnboardingOn
-        ) {
-            ERainAd.getInstance()
-                .getInterstitialAds(this, AdsId.interOnboarding, object : AdCallback() {
-                    override fun onApInterstitialLoad(apInterstitialAd: ApInterstitialAd?) {
-                        super.onApInterstitialLoad(apInterstitialAd)
-                        mInterstitialAd = apInterstitialAd
-                        Log.i("AdManager123", "Inter Load : $localClassName")
-                    }
-                })
-        }
-    }
-
     fun getNextFragment() {
         if (binding.pagerIntro.currentItem == fragments.size - 1) {
             callNext()
@@ -163,13 +136,9 @@ class IntroActivity : Base__Activity<ActivityIntroBinding>() {
     }
 
     private fun callNext() {
-
         setIntroFlowDone()
-        if (getShouldDisplayInterOnboarding()) {
-            showInterAds(mInterstitialAd) {
-                redirectToNextActivity()
-            }
-        } else {
+        // Demo jevu: centralized showInterOnboarding -> gating + forceShowInterstitial andar j.
+        InfinityAdsManager.showInterOnboarding(this) {
             redirectToNextActivity()
         }
     }
@@ -189,13 +158,6 @@ class IntroActivity : Base__Activity<ActivityIntroBinding>() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
                 updateButtonStyles(position)
-                // Show-rate: user onboarding ma agal vadhe (page >= 1) tyare J inter_onboarding
-                // load karo. Je users 1st page e j chhodi de emna mate request nathi thato ->
-                // ane load show point (end) ni najik thay -> show rate uncho (target 19% -> 30%+).
-                if (position >= 1 && !interOnbLoadTriggered) {
-                    interOnbLoadTriggered = true
-                    loadInterAds()
-                }
             }
         })
 

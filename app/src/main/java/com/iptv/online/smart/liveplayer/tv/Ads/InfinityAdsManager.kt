@@ -14,6 +14,7 @@ import com.iptv.online.smart.liveplayer.tv.adsutils.AdsId
 import com.iptv.online.smart.liveplayer.tv.adsutils.NativeAdUiState
 import com.iptv.online.smart.liveplayer.tv.adsutils.RemoteConfigdata
 import com.iptv.online.smart.liveplayer.tv.adsutils.getSHouldDisplayHighCTA
+import com.iptv.online.smart.liveplayer.tv.adsutils.getShouldDisplayInterOnboarding
 import com.iptv.online.smart.liveplayer.tv.adsutils.isInternetAvailable
 import com.iptv.online.smart.liveplayer.tv.utils.gone
 import com.iptv.online.smart.liveplayer.tv.utils.visible
@@ -96,28 +97,106 @@ object InfinityAdsManager {
         }
     }
 
-    // Be interstitial ni vachche 30 second no gap App.kt ma
-    // mERainAdConfig.intervalInterstitialAd = 30 thi centralized rite enforce
-    // thay chhe (ERainAd.forceShowInterstitial ni andar). Etle ahiya alag
-    // gap-manager ni jarur nathi — welcome-back ne pan e j gap lagu padshe.
-    fun Activity.showInterAds(
-        mInterstitialAd: ApInterstitialAd?,
-        onComplete: () -> Unit,
-    ) {
-        if (RemoteConfigdata(this).isNeedToShowADs && isInternetAvailable()) {
-            Log.i("AdManager123", "Show Inter : ${this.localClassName}")
-            ERainAd.getInstance().forceShowInterstitial(
-                this, mInterstitialAd, object : AdCallback() {
+
+
+    // ── Interstitial: Onboarding — demo na AdsManager jevu CENTRALIZED load + show ──
+    // Demo ma: AdsManager.loadInterOnboarding / showInterOnboarding. Ad reference ahiya
+    // ek j centralized member (interOnboarding) ma rahe -> screen pote field na rakhe,
+    // badhi jagya aa j method vaapre.
+    private var interOnboarding: ApInterstitialAd? = null
+
+    fun loadInterOnboarding(activity: Activity, ignoreLimit: Boolean = false) {
+        val config = RemoteConfigdata(activity)
+        if (!config.isNeedToShowADs
+            || !config.interOnboardingOn
+            || !activity.isInternetAvailable()
+            || (!ignoreLimit && !activity.getShouldDisplayInterOnboarding())
+        ) {
+            interOnboarding = null
+            return
+        }
+        interOnboarding = ERainAd.getInstance()
+            .getInterstitialAds(activity, AdsId.interOnboarding, object : AdCallback() {})
+        Log.d("AdManager123", "Inter Onboarding Loaded (centralized)")
+    }
+
+    fun showInterOnboarding(activity: Activity, ignoreLimit: Boolean = false, onAction: () -> Unit) {
+        val interstitial = interOnboarding
+        if (interstitial != null
+            && RemoteConfigdata(activity).isNeedToShowADs
+            && (ignoreLimit || activity.getShouldDisplayInterOnboarding())
+        ) {
+            ERainAd.getInstance()
+                .forceShowInterstitial(activity, interstitial, object : AdCallback() {
                     override fun onNextAction() {
                         super.onNextAction()
-                        onComplete.invoke()
+                        onAction()
                     }
-                }, true
-            )
+                }, true)
         } else {
-            onComplete.invoke()
+            onAction()
         }
     }
+
+    // ── Bija badha interstitials — CENTRALIZED (demo na AdsManager jevu) ──
+    // Badha inter nu reference ahiya ek jagya (interAdMap) ma rahe. Screen pote field na rakhe.
+    private val interAdMap = mutableMapOf<String, ApInterstitialAd?>()
+
+    private fun loadInterCentralized(activity: Activity, key: String, adId: String, enabled: Boolean) {
+        val config = RemoteConfigdata(activity)
+        if (!config.isNeedToShowADs || !enabled || !activity.isInternetAvailable()) {
+            interAdMap[key] = null
+            return
+        }
+        interAdMap[key] = ERainAd.getInstance()
+            .getInterstitialAds(activity, adId, object : AdCallback() {})
+        Log.i("AdManager123", "Inter Loaded (centralized): $key")
+    }
+
+    private fun showInterCentralized(
+        activity: Activity, key: String, enabled: Boolean, onAction: () -> Unit
+    ) {
+        val ad = interAdMap[key]
+        if (ad != null && RemoteConfigdata(activity).isNeedToShowADs && enabled) {
+            ERainAd.getInstance().forceShowInterstitial(activity, ad, object : AdCallback() {
+                override fun onNextAction() {
+                    super.onNextAction()
+                    onAction()
+                }
+            }, true)
+        } else {
+            onAction()
+        }
+    }
+
+    // interback — Base (back-press) ane MirrorSteps vaapre
+    fun loadInterBack(activity: Activity) =
+        loadInterCentralized(activity, "interback", AdsId.interback, RemoteConfigdata(activity).interback)
+
+    fun showInterBack(activity: Activity, onAction: () -> Unit) =
+        showInterCentralized(activity, "interback", RemoteConfigdata(activity).interback, onAction)
+
+    // interHome — PlaylistFragment na home clicks
+    fun loadInterHome(activity: Activity) =
+        loadInterCentralized(activity, "interHome", AdsId.interHome, RemoteConfigdata(activity).interHomeOn)
+
+    fun showInterHome(activity: Activity, onAction: () -> Unit) =
+        showInterCentralized(activity, "interHome", RemoteConfigdata(activity).interHomeOn, onAction)
+
+    // interMirroring — PlaylistFragment cast click
+    fun loadInterMirroring(activity: Activity) =
+        loadInterCentralized(activity, "interMirroring", AdsId.INTER_MIRRORING, RemoteConfigdata(activity).interMirroring)
+
+    fun showInterMirroring(activity: Activity, onAction: () -> Unit) =
+        showInterCentralized(activity, "interMirroring", RemoteConfigdata(activity).interMirroring, onAction)
+
+    // interAddPlaylist — MainActivity / FileSelectActivity
+    fun loadInterAddPlaylist(activity: Activity) =
+        loadInterCentralized(activity, "interAddPlaylist", AdsId.INTER_ADD_PLAYLIST, RemoteConfigdata(activity).interAddPlaylist)
+
+    fun showInterAddPlaylist(activity: Activity, onAction: () -> Unit) =
+        showInterCentralized(activity, "interAddPlaylist", RemoteConfigdata(activity).interAddPlaylist, onAction)
+
     fun Activity.loadAndShowCollapsingBanner(adLayout: View) {
         val config = RemoteConfigdata(this)
         val adId = AdsId.banner_collap_home

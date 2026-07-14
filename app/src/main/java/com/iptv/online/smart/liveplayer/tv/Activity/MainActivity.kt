@@ -32,7 +32,6 @@ import com.google.android.material.textfield.TextInputEditText
 import com.iptv.online.smart.liveplayer.tv.Adapter.MyViewPagerAdapter
 import com.iptv.online.smart.liveplayer.tv.Ads.InfinityAdsManager
 import com.iptv.online.smart.liveplayer.tv.Ads.InfinityAdsManager.loadAndShowCollapsingBanner
-import com.iptv.online.smart.liveplayer.tv.Ads.InfinityAdsManager.showInterAds
 import com.iptv.online.smart.liveplayer.tv.R
 import com.iptv.online.smart.liveplayer.tv.adsutils.AdsId
 
@@ -43,7 +42,6 @@ import com.iptv.online.smart.liveplayer.tv.databinding.ActivityMainBinding
 class MainActivity : Base__Activity<ActivityMainBinding>() {
     private var RATE = 0
     private var isLaterClicked = false
-    private var mInterstitialAd_addplaylist: ApInterstitialAd? = null
     private val NOTIFICATION_PERMISSION_CODE = 101
 
     companion object {
@@ -121,23 +119,6 @@ class MainActivity : Base__Activity<ActivityMainBinding>() {
         }
     }
 
-    private fun loadInteraddplaylit() {
-
-        if (isInternetAvailable() && RemoteConfigdata(this@MainActivity).isNeedToShowADs && RemoteConfigdata(
-                this@MainActivity
-            ).interAddPlaylist
-        ) {
-            ERainAd.getInstance()
-                .getInterstitialAds(this, AdsId.INTER_ADD_PLAYLIST, object : AdCallback() {
-                    override fun onApInterstitialLoad(apInterstitialAd: ApInterstitialAd?) {
-                        super.onApInterstitialLoad(apInterstitialAd)
-                        mInterstitialAd_addplaylist = apInterstitialAd
-                        Log.i("AdManager123", "Inter Load : $localClassName")
-                    }
-                })
-        }
-
-    }
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
@@ -159,7 +140,8 @@ class MainActivity : Base__Activity<ActivityMainBinding>() {
             binding.bannerAdLayout.setVisibility(View.GONE)
         }
 
-        loadInteraddplaylit()
+        // Demo jevu CENTRALIZED: interAddPlaylist ne InfinityAdsManager thi load.
+        InfinityAdsManager.loadInterAddPlaylist(this)
         binding.viewPager.setAdapter(MyViewPagerAdapter(this))
         binding.viewPager.setOffscreenPageLimit(3)
 
@@ -240,18 +222,7 @@ class MainActivity : Base__Activity<ActivityMainBinding>() {
         binding.fabAdd.setOnClickListener({ v ->
 
 
-            if (isInternetAvailable() &&
-                configScript?.isNeedToShowADs == true &&
-                configScript?.interAddPlaylist == true &&
-                mInterstitialAd_addplaylist != null
-            ) {
-
-                showInterAds(mInterstitialAd_addplaylist) {
-                    val intent = Intent(this@MainActivity, FileSelectActivity::class.java)
-                    startActivity(intent)
-                }
-            } else {
-
+            InfinityAdsManager.showInterAddPlaylist(this) {
                 val intent = Intent(this@MainActivity, FileSelectActivity::class.java)
                 startActivity(intent)
             }

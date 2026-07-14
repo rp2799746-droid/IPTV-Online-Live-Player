@@ -26,7 +26,6 @@ import com.iptv.online.smart.liveplayer.tv.Model.PlaylistGroup
 import com.iptv.online.smart.liveplayer.tv.R
 import com.iptv.online.smart.liveplayer.tv.adsutils.AdsId
 import com.iptv.online.smart.liveplayer.tv.Ads.InfinityAdsManager
-import com.iptv.online.smart.liveplayer.tv.Ads.InfinityAdsManager.showInterAds
 import com.iptv.online.smart.liveplayer.tv.adsutils.NativeAdUiState
 import com.iptv.online.smart.liveplayer.tv.adsutils.RemoteConfigdata
 import com.iptv.online.smart.liveplayer.tv.adsutils.getShouldDisplayNativeHome
@@ -41,8 +40,6 @@ class PlaylistFragment : Fragment() {
     private var binding: FragmentPlaylistBinding? = null
     private var adapter: PlaylistAdapter? = null
     private val playlistList: MutableList<PlaylistGroup?> = ArrayList<PlaylistGroup?>()
-    private var mInterstitialAd: ApInterstitialAd? = null
-    private var mInterstitialAd_mirror: ApInterstitialAd? = null
     private var configScript: RemoteConfigdata? = null
 
     private val sliderHandler = Handler()
@@ -81,47 +78,6 @@ class PlaylistFragment : Fragment() {
         })
     }
 
-    private fun loadInterAds() {
-
-
-        if (requireActivity().isInternetAvailable() && RemoteConfigdata(requireActivity()).isNeedToShowADs && RemoteConfigdata(
-                requireActivity()
-            ).interHomeOn
-        ) {
-            ERainAd.getInstance()
-                .getInterstitialAds(requireActivity(), AdsId.interHome, object : AdCallback() {
-                    override fun onApInterstitialLoad(apInterstitialAd: ApInterstitialAd?) {
-                        super.onApInterstitialLoad(apInterstitialAd)
-                        mInterstitialAd = apInterstitialAd
-                        Log.i("AdManager123", "Inter Load :")
-                    }
-                })
-        }
-
-    }
-
-    private fun loadIntermirrring() {
-
-
-        if (requireActivity().isInternetAvailable() && RemoteConfigdata(requireActivity()).isNeedToShowADs && RemoteConfigdata(
-                requireActivity()
-            ).interMirroring
-        ) {
-            ERainAd.getInstance()
-                .getInterstitialAds(
-                    requireActivity(),
-                    AdsId.INTER_MIRRORING,
-                    object : AdCallback() {
-                        override fun onApInterstitialLoad(apInterstitialAd: ApInterstitialAd?) {
-                            super.onApInterstitialLoad(apInterstitialAd)
-                            mInterstitialAd_mirror = apInterstitialAd
-                            Log.i("AdManager123", "Inter Load :")
-                        }
-                    })
-        }
-    }
-
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -129,8 +85,9 @@ class PlaylistFragment : Fragment() {
     ): View? {
         binding = FragmentPlaylistBinding.inflate(inflater, container, false)
         setupBanner()
-        loadInterAds()
-        loadIntermirrring()
+        // Demo jevu CENTRALIZED: interHome ane interMirroring InfinityAdsManager thi load.
+        InfinityAdsManager.loadInterHome(requireActivity())
+        InfinityAdsManager.loadInterMirroring(requireActivity())
         configScript = RemoteConfigdata(requireActivity())
 
         nativeAds()
@@ -144,19 +101,7 @@ class PlaylistFragment : Fragment() {
             PlaylistAdapter.OnPlaylistClickListener { playlistName: String? ->
 
 
-                if (requireActivity().isInternetAvailable() &&
-                    configScript?.isNeedToShowADs == true &&
-                    configScript?.interHomeOn == true &&
-                    mInterstitialAd != null
-                ) {
-
-                    requireActivity().showInterAds(mInterstitialAd) {
-                        val intent = Intent(getActivity(), CategoryActivity::class.java)
-                        intent.putExtra("PLAYLIST_NAME", playlistName)
-                        startActivity(intent)
-                    }
-                } else {
-
+                InfinityAdsManager.showInterHome(requireActivity()) {
                     val intent = Intent(getActivity(), CategoryActivity::class.java)
                     intent.putExtra("PLAYLIST_NAME", playlistName)
                     startActivity(intent)
@@ -169,22 +114,9 @@ class PlaylistFragment : Fragment() {
             override fun onClick(v: View?) {
 
 
-                if (requireActivity().isInternetAvailable() &&
-                    configScript?.isNeedToShowADs == true &&
-                    configScript?.interMirroring == true &&
-                    mInterstitialAd_mirror != null
-                ) {
-
-                    requireActivity().showInterAds(mInterstitialAd_mirror) {
-                        val intent = Intent(getActivity(), MirrorStepsActivity::class.java)
-                        startActivity(intent)
-
-                    }
-                } else {
-
+                InfinityAdsManager.showInterMirroring(requireActivity()) {
                     val intent = Intent(getActivity(), MirrorStepsActivity::class.java)
                     startActivity(intent)
-
                 }
 
             }
@@ -204,35 +136,11 @@ class PlaylistFragment : Fragment() {
             override fun onClick(v: View?) {
 
 
-                if (requireActivity().isInternetAvailable() &&
-                    configScript?.isNeedToShowADs == true &&
-                    configScript?.interHomeOn == true &&
-                    mInterstitialAd != null
-                ) {
-
-                    requireActivity().showInterAds(mInterstitialAd) {
-                        if (getActivity() is MainActivity) {
-                            val mainActivity = getActivity() as MainActivity?
-
-
-                            if (mainActivity!!.viewPager != null) {
-                                mainActivity.viewPager.setCurrentItem(1, true)
-
-
-                                mainActivity.updateNavUI(1)
-                            }
-                        }
-                    }
-                } else {
-
+                InfinityAdsManager.showInterHome(requireActivity()) {
                     if (getActivity() is MainActivity) {
                         val mainActivity = getActivity() as MainActivity?
-
-
                         if (mainActivity!!.viewPager != null) {
                             mainActivity.viewPager.setCurrentItem(1, true)
-
-
                             mainActivity.updateNavUI(1)
                         }
                     }

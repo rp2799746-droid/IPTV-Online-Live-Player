@@ -14,7 +14,6 @@ import com.ads.module.funtion.AdCallback
 import com.iptv.online.smart.liveplayer.tv.R
 import com.iptv.online.smart.liveplayer.tv.adsutils.AdsId
 import com.iptv.online.smart.liveplayer.tv.Ads.InfinityAdsManager
-import com.iptv.online.smart.liveplayer.tv.Ads.InfinityAdsManager.showInterAds
 import com.iptv.online.smart.liveplayer.tv.adsutils.NativeAdUiState
 import com.iptv.online.smart.liveplayer.tv.adsutils.RemoteConfigdata
 import com.iptv.online.smart.liveplayer.tv.adsutils.isInternetAvailable
@@ -27,7 +26,6 @@ class MirrorStepsActivity : Base__Activity<ActivityMirrorStepsBinding>() {
     private var isSmartTV = true
     private var audioManager: AudioManager? = null
     private var configScript: RemoteConfigdata? = null
-    private var mInterstitialAd: ApInterstitialAd? = null
 
     override fun setViewBinding(): ActivityMirrorStepsBinding {
         return ActivityMirrorStepsBinding.inflate(layoutInflater)
@@ -36,30 +34,14 @@ class MirrorStepsActivity : Base__Activity<ActivityMirrorStepsBinding>() {
     override fun onBackPressed() {
         if (isTaskRoot) {
             MainActivity.triggerFromMirroring = true
-            if (isInternetAvailable() &&
-                configScript?.isNeedToShowADs == true &&
-                configScript?.interback == true &&
-                mInterstitialAd != null) {
-                showInterAds(mInterstitialAd) {
-                    Log.d("kk", "1: ")
-                    val intent = Intent(this, MainActivity::class.java)
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
-                    startActivity(intent)
-                    finish()
-                }
-
-                return
-            } else {
-                Log.d("kk", "2: ")
-
+            // Demo jevu: centralized showInterBack -> ad ready hoy to show, nahi to sidhu navigate.
+            InfinityAdsManager.showInterBack(this) {
                 val intent = Intent(this, MainActivity::class.java)
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
                 startActivity(intent)
                 finish()
-                return
             }
-            Log.d("kk", "3 ")
-
+            return
         }
         MainActivity.triggerFromMirroring = true
 
@@ -73,26 +55,8 @@ class MirrorStepsActivity : Base__Activity<ActivityMirrorStepsBinding>() {
         configScript = RemoteConfigdata(this@MirrorStepsActivity)
 
         nativeAds()
-        loadInterAds()
-    }
-
-    private fun loadInterAds() {
-
-        if (isInternetAvailable() && RemoteConfigdata(this@MirrorStepsActivity).isNeedToShowADs && RemoteConfigdata(
-                this@MirrorStepsActivity
-            ).interback
-        ) {
-            ERainAd.getInstance()
-                .getInterstitialAds(this, AdsId.interback, object : AdCallback() {
-                    override fun onApInterstitialLoad(apInterstitialAd: ApInterstitialAd?) {
-                        super.onApInterstitialLoad(apInterstitialAd)
-                        mInterstitialAd = apInterstitialAd
-                        Log.i("AdManager123", "Inter Load : $localClassName")
-                    }
-                })
-        }
-
-
+        // Demo jevu CENTRALIZED: interback ne InfinityAdsManager thi load karo.
+        InfinityAdsManager.loadInterBack(this)
     }
 
     private fun nativeAds() {

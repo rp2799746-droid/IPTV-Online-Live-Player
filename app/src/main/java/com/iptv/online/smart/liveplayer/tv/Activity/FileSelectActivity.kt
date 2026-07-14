@@ -25,7 +25,6 @@ import com.iptv.online.smart.liveplayer.tv.R
 import com.iptv.online.smart.liveplayer.tv.ReadFile.FileReader
 import com.iptv.online.smart.liveplayer.tv.adsutils.AdsId
 import com.iptv.online.smart.liveplayer.tv.Ads.InfinityAdsManager
-import com.iptv.online.smart.liveplayer.tv.Ads.InfinityAdsManager.showInterAds
 import com.iptv.online.smart.liveplayer.tv.adsutils.NativeAdUiState
 import com.iptv.online.smart.liveplayer.tv.adsutils.RemoteConfigdata
 import com.iptv.online.smart.liveplayer.tv.adsutils.isInternetAvailable
@@ -38,7 +37,6 @@ class FileSelectActivity : Base__Activity<ActivityFileSelectBinding>() {
     private lateinit var selectFileLauncher: ActivityResultLauncher<String>
     private var selectedFileUri: Uri? = null
     private var configScript: RemoteConfigdata? = null
-    private var mInterstitialAd_addplaylist: ApInterstitialAd? = null
 
     override fun onBackPressed() {
         super.onBackPressed()
@@ -53,25 +51,8 @@ class FileSelectActivity : Base__Activity<ActivityFileSelectBinding>() {
         configScript = RemoteConfigdata(this@FileSelectActivity)
 
         nativeAds()
-        loadInteraddplaylit()
-    }
-
-    private fun loadInteraddplaylit() {
-
-        if (isInternetAvailable() && RemoteConfigdata(this@FileSelectActivity).isNeedToShowADs && RemoteConfigdata(
-                this@FileSelectActivity
-            ).interAddPlaylist
-        ) {
-            ERainAd.getInstance()
-                .getInterstitialAds(this, AdsId.INTER_ADD_PLAYLIST, object : AdCallback() {
-                    override fun onApInterstitialLoad(apInterstitialAd: ApInterstitialAd?) {
-                        super.onApInterstitialLoad(apInterstitialAd)
-                        mInterstitialAd_addplaylist = apInterstitialAd
-                        Log.i("AdManager123", "Inter Load : $localClassName")
-                    }
-                })
-        }
-
+        // Demo jevu CENTRALIZED: interAddPlaylist ne InfinityAdsManager thi load.
+        InfinityAdsManager.loadInterAddPlaylist(this)
     }
 
     override fun bindListener() {
@@ -219,26 +200,7 @@ class FileSelectActivity : Base__Activity<ActivityFileSelectBinding>() {
         reader.setOnFileReadListener(object : FileReader.OnFileReadListener {
             override fun onFinish(playlistName: String?, playlistUrl: String?) {
                 MainActivity.triggerFromPlaylist = true
-                if (isInternetAvailable() && configScript?.isNeedToShowADs == true && configScript?.interAddPlaylist == true && mInterstitialAd_addplaylist != null) {
-                    showInterAds(mInterstitialAd_addplaylist) {
-                        Toast.makeText(
-                            this@FileSelectActivity,
-                            getString(R.string.playlist_added_successfully),
-                            Toast.LENGTH_SHORT
-                        ).show()
-
-
-                        val intent =
-                            Intent(this@FileSelectActivity, MainActivity::class.java).apply {
-                                putExtra("playlist_name", playlistName)
-                                putExtra("playlist_url", playlistUrl)
-                                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
-                            }
-                        startActivity(intent)
-                        finish()
-                    }
-                } else {
-
+                InfinityAdsManager.showInterAddPlaylist(this@FileSelectActivity) {
                     Toast.makeText(
                         this@FileSelectActivity,
                         getString(R.string.playlist_added_successfully),
@@ -249,7 +211,6 @@ class FileSelectActivity : Base__Activity<ActivityFileSelectBinding>() {
                         putExtra("playlist_name", playlistName)
                         putExtra("playlist_url", playlistUrl)
                         addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
-
                     }
                     startActivity(intent)
                     finish()

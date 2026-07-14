@@ -15,7 +15,7 @@ import androidx.viewbinding.ViewBinding
 import com.ads.module.ads.ERainAd
 import com.ads.module.ads.wrapper.ApInterstitialAd
 import com.ads.module.funtion.AdCallback
-import com.iptv.online.smart.liveplayer.tv.Ads.InfinityAdsManager.showInterAds
+import com.iptv.online.smart.liveplayer.tv.Ads.InfinityAdsManager
 import com.iptv.online.smart.liveplayer.tv.adsutils.AdsId
 import com.iptv.online.smart.liveplayer.tv.adsutils.RemoteConfigdata
 import com.iptv.online.smart.liveplayer.tv.adsutils.isInternetAvailable
@@ -30,7 +30,6 @@ abstract class Base__Activity<actBinding : ViewBinding> : AppCompatActivity() {
     lateinit var TAG: String
     private var _progressDialog: CustomLoader? = null
 
-    private var mInterstitialAd: ApInterstitialAd? = null
     open val needBackInterAd: Boolean = false
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
@@ -64,24 +63,8 @@ abstract class Base__Activity<actBinding : ViewBinding> : AppCompatActivity() {
         bindListener()
         bindMethod()
         bindObserver()
-        if (needBackInterAd) loadInterAds()
-    }
-
-    private fun loadInterAds() {
-
-        val config = RemoteConfigdata(this@Base__Activity)
-        if (isInternetAvailable() && config.isNeedToShowADs && config.interback) {
-            ERainAd.getInstance()
-                .getInterstitialAds(this, AdsId.interback, object : AdCallback() {
-                    override fun onApInterstitialLoad(apInterstitialAd: ApInterstitialAd?) {
-                        super.onApInterstitialLoad(apInterstitialAd)
-                        mInterstitialAd = apInterstitialAd
-                        Log.i("AdManager123", "Inter Load : $localClassName")
-                    }
-                })
-        }
-
-
+        // Demo jevu CENTRALIZED: interback ne InfinityAdsManager thi load karo (opt-in screen).
+        if (needBackInterAd) InfinityAdsManager.loadInterBack(this)
     }
 
 
@@ -91,19 +74,9 @@ abstract class Base__Activity<actBinding : ViewBinding> : AppCompatActivity() {
     abstract fun bindMethod()
     open fun bindObserver() {}
     override fun onBackPressed() {
-        val config = RemoteConfigdata(this)
-
-        if (isInternetAvailable() &&
-            config.isNeedToShowADs &&
-            config.interback &&
-            mInterstitialAd != null
-        ) {
-
-            showInterAds(mInterstitialAd) {
-                finish()
-            }
-        } else {
-
+        // Demo jevu: centralized showInterBack -> gating + forceShowInterstitial andar j.
+        // Ad ready na hoy to sidhu finish() thay (showInterBack andar handle).
+        InfinityAdsManager.showInterBack(this) {
             finish()
         }
     }
