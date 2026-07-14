@@ -43,7 +43,7 @@
             android:textSize="@dimen/_12sdp" />
     </LinearLayout>
 
-    <androidx.core.widget.NestedScrollView
+    <com.iptv.online.smart.liveplayer.tv.utils.SafeNestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/layoutAds"
@@ -319,7 +319,7 @@
             </LinearLayout>
 
         </LinearLayout>
-    </androidx.core.widget.NestedScrollView>
+    </com.iptv.online.smart.liveplayer.tv.utils.SafeNestedScrollView>
 
     <FrameLayout
         android:id="@+id/layoutAds"

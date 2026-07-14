@@ -209,16 +209,7 @@ public class Admob {
         return mInterstitialSplash;
     }
 
-    /**
-     * Load quảng cáo Full tại màn SplashActivity
-     * Sau khoảng thời gian timeout thì load ads và callback về cho View
-     *
-     * @param context
-     * @param id
-     * @param timeOut    : thời gian chờ ads, timeout <= 0 tương đương với việc bỏ timeout
-     * @param timeDelay  : thời gian chờ show ad từ lúc load ads
-     * @param adListener
-     */
+
     public void loadSplashInterstitialAds(final Context context, String id, long timeOut, long timeDelay, AdCallback adListener) {
         isTimeDelay = false;
         isTimeout = false;
@@ -432,6 +423,8 @@ public class Admob {
             @Override
             public void onAdDismissedFullScreenContent() {
                 AppOpenManager.getInstance().setInterstitialShowing(false);
+                // Splash interstitial pan 30 sec gap na counter ma ganvo
+                SharePreferenceUtils.setLastImpressionInterstitialTime(context);
                 mInterstitialSplash = null;
                 if (adListener != null) {
                     if (!openActivityAfterShowInterAds) {
@@ -568,6 +561,8 @@ public class Admob {
             @Override
             public void onAdDismissedFullScreenContent() {
                 AppOpenManager.getInstance().setInterstitialShowing(false);
+                // Splash interstitial pan 30 sec gap na counter ma ganvo
+                SharePreferenceUtils.setLastImpressionInterstitialTime(context);
                 mInterstitialSplash = null;
                 if (adListener != null) {
                     if (!openActivityAfterShowInterAds) {

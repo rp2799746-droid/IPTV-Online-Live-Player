@@ -79,7 +79,7 @@
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
-    <androidx.core.widget.NestedScrollView
+    <com.iptv.online.smart.liveplayer.tv.utils.SafeNestedScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:overScrollMode="never"
@@ -105,7 +105,7 @@
 
                     <include
                         android:id="@+id/adShimmer"
-                        layout="@layout/ad_shimmer_native_ad_large" />
+                        layout="@layout/ad_shimmer_native_ad_medium_channel" />
                 </FrameLayout>
             </FrameLayout>
 
@@ -156,7 +156,7 @@
             </FrameLayout>
         </LinearLayout>
 
-    </androidx.core.widget.NestedScrollView>
+    </com.iptv.online.smart.liveplayer.tv.utils.SafeNestedScrollView>
 
 
 </LinearLayout>

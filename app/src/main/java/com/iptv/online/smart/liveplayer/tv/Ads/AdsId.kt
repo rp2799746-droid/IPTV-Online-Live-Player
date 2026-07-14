@@ -12,7 +12,7 @@ object AdsId {
     private const val TEST_REWARD = "/21775744923/example/rewarded"
 
     val isDebug: Boolean
-        get() = false
+        get() = true
 
     // ---------------- REAL IDs (fill from sheet) ----------------
     // Splash
@@ -41,20 +41,14 @@ object AdsId {
     private const val INTER_ONBOARDING_REAL = "ca-app-pub-2864154863223892/5730555625"
 
     // Home
-    private const val NATIVE_HOME_REAL = "ca-app-pub-2864154863223892/9478228940"
     private const val INTER_HOME_REAL = "ca-app-pub-2864154863223892/3207703179"
     private const val INTER_BACK = "ca-app-pub-2864154863223892/9581539835"
 
     // Collapsible banner
     private const val BANNER_COLLAPSE_home_REAL = "ca-app-pub-2864154863223892/7785873321"
 
-    // Reward
-//    private const val REWARD_SERVER_REAL = "/21775744923/example/rewarded"
-
     //native_channel
-    private const val NATIVE_CHANNEL_REAL = "ca-app-pub-2864154863223892/1820997138"
-    private const val NATIVE_FAVORITE_REAL = "ca-app-pub-2864154863223892/5159709986"
-    private const val NATIVE_HOSTORY_REAL = "ca-app-pub-2864154863223892/3918149616"
+
     private const val NATIVE_PLAYLIST_REAL = "ca-app-pub-2864154863223892/3561318166"
     private const val INTER_MIRRORING_REAL = "ca-app-pub-2864154863223892/1264672324"
     private const val NATIVE_MIRRORING_REAL = "ca-app-pub-2864154863223892/7638508982"
@@ -64,6 +58,13 @@ object AdsId {
     private const val BANNER_SPLASH_UNINSTALL_REAL = "ca-app-pub-2864154863223892/5012345649"
     private const val NATIVE_UNINSTALL_REAL = "ca-app-pub-2864154863223892/2248236490"
     private const val NATIVE_SURVEY_UNINSTALL_REAL = "ca-app-pub-2864154863223892/9935154824"
+
+
+    private const val native_home_2005 = "ca-app-pub-2864154863223892/1230304300"
+    private const val native_channel_2005 = "ca-app-pub-2864154863223892/6291059299"
+    private const val native_favorite_2005 = "ca-app-pub-2864154863223892/2207132600"
+    private const val native_history_2005 = "ca-app-pub-2864154863223892/3124628450"
+    private const val inter_welcome_back = "ca-app-pub-2864154863223892/7166347602"
 
 
     // ---------------- PUBLIC IDs (auto-debug switch) ----------------
@@ -130,9 +131,7 @@ object AdsId {
         get() = if (isDebug) TEST_INTER else INTER_ONBOARDING_REAL
 
     // Home
-    @JvmStatic
-    val nativeHome: String
-        get() = if (isDebug) TEST_NATIVE else NATIVE_HOME_REAL
+
 
     @JvmStatic
     val interHome: String
@@ -155,17 +154,6 @@ object AdsId {
     val interback: String
         get() = if (isDebug) TEST_INTER else INTER_BACK
 
-    @JvmStatic
-    val NATIVE_CHANNEL: String
-        get() = if (isDebug) TEST_NATIVE else NATIVE_CHANNEL_REAL
-
-    @JvmStatic
-    val NATIVE_FAVORITE: String
-        get() = if (isDebug) TEST_NATIVE else NATIVE_FAVORITE_REAL
-
-    @JvmStatic
-    val NATIVE_HOSTORY: String
-        get() = if (isDebug) TEST_NATIVE else NATIVE_HOSTORY_REAL
 
     @JvmStatic
     val NATIVE_PLAYLIST: String
@@ -202,6 +190,26 @@ object AdsId {
     @JvmStatic
     val NATIVE_SURVEY_UNINSTALL: String
         get() = if (isDebug) TEST_NATIVE else NATIVE_SURVEY_UNINSTALL_REAL
+
+    @JvmStatic
+    val nativehome2005: String
+        get() = if (isDebug) TEST_NATIVE else native_home_2005
+
+    @JvmStatic
+    val nativechannel2005: String
+        get() = if (isDebug) TEST_NATIVE else native_channel_2005
+
+    @JvmStatic
+    val nativefavorite2005: String
+        get() = if (isDebug) TEST_NATIVE else native_favorite_2005
+
+    @JvmStatic
+    val nativehistory2005: String
+        get() = if (isDebug) TEST_NATIVE else native_history_2005
+
+    @JvmStatic
+    val interwelcomeback: String
+        get() = if (isDebug) TEST_INTER else inter_welcome_back
 
 
 }

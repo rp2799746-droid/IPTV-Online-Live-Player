@@ -166,4 +166,13 @@
     <string name="please_select_stars">Veuillez sélectionner des étoiles</string>
     <string name="please_describe_your_thought">Veuillez décrire votre pensée</string>
     <string name="thanks_for_rating">Merci pour l\'évaluation !</string>
+    <string name="i_understand">Je comprends</string>
+    <string name="important_notice">Avis Important</string>
+    <string name="iptv_smart_player_online_tv_does_not_provide_host_store_or_sell_any_content_or_media_this_application_is_only_a_media_player_designed_to_organize_and_play_your_own_digital_content">IPTV Smart Player – Online TV ne fournit, n\'héberge, ne stocke ni ne vend aucun contenu ou média. Cette application est uniquement un lecteur multimédia conçu pour organiser et lire votre propre contenu numérique.</string>
+    <string name="you_are_solely_responsible_for_providing_your_own_content_for_example_m3u_playlists">• Vous êtes seul responsable de fournir votre propre contenu (par exemple : listes de lecture M3U).</string>
+    <string name="iptv_smart_player_online_tv_is_not_affiliated_with_any_third_party_content_provider">• IPTV Smart Player – Online TV n\'est affilié à aucun fournisseur de contenu tiers.</string>
+    <string name="we_do_not_support_or_encourage_streaming_copyrighted_content_without_proper_authorization">• Nous ne soutenons ni n\'encourageons la diffusion de contenu protégé par le droit d\'auteur sans autorisation appropriée.</string>
+    <string name="welcome_back">Bon retour parmi nous 👋</string>
+    <string name="continue_watching_your_favorite_live_tv_channels_movies_amp_series_anytime"><![CDATA[Continuez à regarder vos chaînes de télévision en direct, vos films et vos séries préférés à tout moment]]></string>
+
 </resources>

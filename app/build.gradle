@@ -16,8 +16,8 @@ android {
         applicationId "com.iptv.online.smart.liveplayer.tv"
         minSdk 24
         targetSdk 36
-        versionCode 4
-        versionName "1.3"
+        versionCode 13
+        versionName "1.12"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -38,6 +38,10 @@ android {
         }
     }
     compileOptions {
+        // AppLovin SDK java.time.Duration vaapre chhe je API 26+ chhe. minSdk 24 hovathi
+        // juna device (API 24-25) par ClassNotFoundException crash aavto. Desugaring e class ne
+        // juna Android par pan available banave chhe.
+        coreLibraryDesugaringEnabled true
         sourceCompatibility JavaVersion.VERSION_11
         targetCompatibility JavaVersion.VERSION_11
     }
@@ -55,6 +59,8 @@ android {
 }
 
 dependencies {
+    // java.time desugaring (AppLovin java.time.Duration crash fix) -> jup 2️⃣ crash
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.4'
     implementation libs.androidx.core.ktx
     implementation libs.androidx.appcompat
     implementation libs.material
@@ -89,7 +95,7 @@ dependencies {
 
 
     // OneSignal SDK
-    implementation("com.onesignal:OneSignal:[4.0.0, 4.99.99]")
+    implementation 'com.onesignal:OneSignal:5.9.2'
 
     // Network + Ads
     implementation(libs.app.update.ktx)
@@ -114,8 +120,7 @@ dependencies {
     implementation("io.github.inflationx:calligraphy3:3.1.1")
     implementation("io.github.inflationx:viewpump:2.0.3")
 
-    // OneSignal SDK
-    implementation("com.onesignal:OneSignal:[4.0.0, 4.99.99]")
+
 
     // Navigation + Compose
     implementation("androidx.navigation:navigation-compose:2.5.3")

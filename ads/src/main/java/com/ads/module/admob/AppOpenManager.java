@@ -281,11 +281,7 @@ public class AppOpenManager implements Application.ActivityLifecycleCallbacks, L
                     }
 
 
-                    /**
-                     * Called when an app open ad has failed to load.
-                     *
-                     * @param loadAdError the error.
-                     */
+
                     @Override
                     public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
                         Log.d(TAG, "onAppOpenAdFailedToLoad: isSplash" + isSplash + " message " + loadAdError.getMessage());
@@ -324,9 +320,7 @@ public class AppOpenManager implements Application.ActivityLifecycleCallbacks, L
         notificationManager.notify(isSplash ? Admob.SPLASH_ADS : Admob.RESUME_ADS, notification);
     }
 
-    /**
-     * Creates and returns ad request.
-     */
+
     private AdRequest getAdRequest() {
         return new AdRequest.Builder().build();
     }
@@ -337,9 +331,7 @@ public class AppOpenManager implements Application.ActivityLifecycleCallbacks, L
         return (dateDifference < (numMilliSecondsPerHour * numHours));
     }
 
-    /**
-     * Utility method that checks if ad exists and can be shown.
-     */
+
     public boolean isAdAvailable(boolean isSplash) {
         long loadTime = isSplash ? splashLoadTime : appResumeLoadTime;
         boolean wasLoadTimeLessThanNHoursAgo = wasLoadTimeLessThanNHoursAgo(loadTime, 4);

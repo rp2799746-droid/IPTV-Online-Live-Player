@@ -47,13 +47,9 @@ class MainActivity : Base__Activity<ActivityMainBinding>() {
     private val NOTIFICATION_PERMISSION_CODE = 101
 
     companion object {
-        // આખા સેશનમાં ગમે તે ફીચર પરથી એક જ વાર ડાયલોગ બતાવવા માટે
         var isRatingShownInSession = false
-
-        // ટ્રિગર્સ એમનેમ રહેશે
         var triggerFromMirroring = false
         var triggerFromPlaylist = false
-        var triggerFromPlayer = false // જો પ્લેયર માટે પણ જોઈતું હોય
     }
 
     private val ratingHandler = Handler(Looper.getMainLooper())
@@ -151,10 +147,6 @@ class MainActivity : Base__Activity<ActivityMainBinding>() {
     }
 
     public override fun bindObjects() {
-
-        loadInteraddplaylit()
-        binding.viewPager.setAdapter(MyViewPagerAdapter(this))
-        binding.viewPager.setOffscreenPageLimit(3)
         configScript = RemoteConfigdata(this)
 
         if (configScript!!.isNeedToShowADs) {
@@ -166,6 +158,11 @@ class MainActivity : Base__Activity<ActivityMainBinding>() {
         } else {
             binding.bannerAdLayout.setVisibility(View.GONE)
         }
+
+        loadInteraddplaylit()
+        binding.viewPager.setAdapter(MyViewPagerAdapter(this))
+        binding.viewPager.setOffscreenPageLimit(3)
+
         checkIntent(getIntent())
 
         if (!checkNotificationPermission()) {
@@ -181,12 +178,12 @@ class MainActivity : Base__Activity<ActivityMainBinding>() {
 
 
         //preload
-        if (configScript!!.nativeChannel) {
+        if (configScript!!.nativechannel2005) {
             InfinityAdsManager.loadAd(
                 this@MainActivity,
-                AdsId.NATIVE_CHANNEL,
-                R.layout.layout_native_ad_large,
-                "native_channel"
+                AdsId.nativechannel2005,
+                R.layout.layout_native_ad_medium_channel,
+                "native_channel_2005"
             )
         }
         if (configScript!!.nativeMirroring) {
@@ -215,6 +212,24 @@ class MainActivity : Base__Activity<ActivityMainBinding>() {
             )
         }
 
+
+
+        if (configScript!!.nativefavorite2005) {
+            InfinityAdsManager.loadAd(
+                this@MainActivity,
+                AdsId.nativefavorite2005,
+                R.layout.layout_native_ad_small,
+                "native_favorite_2005"
+            )
+        }
+        if (configScript!!.nativehistory2005) {
+            InfinityAdsManager.loadAd(
+                this@MainActivity,
+                AdsId.nativehistory2005,
+                R.layout.layout_native_ad_small,
+                "native_history_2005"
+            )
+        }
     }
 
     public override fun bindListener() {
@@ -222,7 +237,6 @@ class MainActivity : Base__Activity<ActivityMainBinding>() {
         binding.navChannel.setOnClickListener({ v -> binding.viewPager.setCurrentItem(1) })
         binding.navFav.setOnClickListener({ v -> binding.viewPager.setCurrentItem(2) })
         binding.navHistory.setOnClickListener({ v -> binding.viewPager.setCurrentItem(3) })
-
         binding.fabAdd.setOnClickListener({ v ->
 
 
@@ -328,7 +342,7 @@ class MainActivity : Base__Activity<ActivityMainBinding>() {
         RATE = 0
         val mainDialog = Dialog(activity)
         mainDialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        mainDialog.setContentView(R.layout.fragment_rate) // આ તમારો સ્ટાર સિલેક્શન વાળો લેઆઉટ છે
+        mainDialog.setContentView(R.layout.fragment_rate)
 
         if (mainDialog.window != null) {
             mainDialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
@@ -338,7 +352,6 @@ class MainActivity : Base__Activity<ActivityMainBinding>() {
             )
         }
 
-        // સ્ટાર ઇમેજ વ્યુ આઈડી
         val imgStar1 = mainDialog.findViewById<ImageView>(R.id.img_start_1)
         val imgStar2 = mainDialog.findViewById<ImageView>(R.id.img_start_2)
         val imgStar3 = mainDialog.findViewById<ImageView>(R.id.img_start_3)
@@ -347,7 +360,6 @@ class MainActivity : Base__Activity<ActivityMainBinding>() {
         val btnSubmit = mainDialog.findViewById<TextView>(R.id.btn_rate_yes)
         val btnLater = mainDialog.findViewById<TextView?>(R.id.btn_rate_not)
 
-// ૧. સ્ટાર ક્લિક લોજિક: ફક્ત UI અપડેટ કરો અને RATE સેવ કરો
         imgStar1?.setOnClickListener { updateStars(1, mainDialog) }
         imgStar2?.setOnClickListener { updateStars(2, mainDialog) }
         imgStar3?.setOnClickListener { updateStars(3, mainDialog) }
@@ -511,11 +523,9 @@ class MainActivity : Base__Activity<ActivityMainBinding>() {
     }
 
     private fun handleRatingTrigger() {
-        // જો આ સેશનમાં ડાયલોગ એકવાર દેખાઈ ગયો હોય, તો આગળ વધવું જ નહીં
         if (isRatingShownInSession) {
             triggerFromMirroring = false
             triggerFromPlaylist = false
-            // triggerFromPlayer = false
             return
         }
 
@@ -523,7 +533,6 @@ class MainActivity : Base__Activity<ActivityMainBinding>() {
 
             Log.d("RatingCheck", "Trigger detected. Session status: $isRatingShownInSession")
 
-            // ટ્રિગર્સ રીસેટ કરી દેવા
             triggerFromMirroring = false
             triggerFromPlaylist = false
 
@@ -531,11 +540,11 @@ class MainActivity : Base__Activity<ActivityMainBinding>() {
                 val shared = getSharedPreferences("MyPrefFileExit", MODE_PRIVATE)
                 val isRatingDone = shared.getBoolean("rating_done", false)
 
-                // જો યુઝરે કાયમી રેટિંગ ન આપ્યું હોય અને આ સેશનમાં હજુ નથી બતાવ્યું
+
                 if (!isRatingDone && !isRatingShownInSession) {
                     openRateDialog()
 
-                    // ડાયલોગ બતાવતા જ આને true કરી દો, જેથી બીજી વાર ન આવે
+
                     isRatingShownInSession = true
                     Log.d("RatingCheck", "Rating Dialog Shown and Session Flag Set to True")
                 }

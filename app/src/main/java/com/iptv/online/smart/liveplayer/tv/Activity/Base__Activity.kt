@@ -7,6 +7,9 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.viewbinding.ViewBinding
 import com.ads.module.ads.ERainAd
@@ -22,7 +25,7 @@ import java.util.Locale
 
 abstract class Base__Activity<actBinding : ViewBinding> : AppCompatActivity() {
 
-    lateinit var binding: actBinding
+    open lateinit var binding: actBinding
     lateinit var mActivity: FragmentActivity
     lateinit var TAG: String
     private var _progressDialog: CustomLoader? = null
@@ -36,6 +39,15 @@ abstract class Base__Activity<actBinding : ViewBinding> : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val windowInsetsController =
+            WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView())
+
+
+        windowInsetsController.hide(WindowInsetsCompat.Type.navigationBars())
+        windowInsetsController.setSystemBarsBehavior(
+            WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        )
         binding = setViewBinding()
         setContentView(binding.root)
 

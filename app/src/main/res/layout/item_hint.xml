@@ -7,7 +7,7 @@
     android:paddingHorizontal="@dimen/_15sdp">
 
 
-    <androidx.core.widget.NestedScrollView
+    <com.iptv.online.smart.liveplayer.tv.utils.SafeNestedScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -51,7 +51,7 @@
                 android:textColor="@color/hinttext"
                 android:textSize="@dimen/_10ssp" />
         </LinearLayout>
-    </androidx.core.widget.NestedScrollView>
+    </com.iptv.online.smart.liveplayer.tv.utils.SafeNestedScrollView>
 
 
 </RelativeLayout>

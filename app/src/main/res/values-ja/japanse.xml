@@ -166,4 +166,12 @@
     <string name="please_select_stars">星を選択してください</string>
     <string name="please_describe_your_thought">あなたの考えを説明してください</string>
     <string name="thanks_for_rating">評価していただきありがとうございます！</string>
+    <string name="i_understand">理解しました</string>
+    <string name="important_notice">重要な通知</string>
+    <string name="iptv_smart_player_online_tv_does_not_provide_host_store_or_sell_any_content_or_media_this_application_is_only_a_media_player_designed_to_organize_and_play_your_own_digital_content">IPTV Smart Player – Online TVは、いかなるコンテンツやメディアの提供、ホスト、保存、販売も行いません。このアプリケーションは、お客様ご自身のデジタルコンテンツを整理・再生するために設計されたメディアプレーヤーです。</string>
+    <string name="you_are_solely_responsible_for_providing_your_own_content_for_example_m3u_playlists">• お客様ご自身のコンテンツ（例：M3Uプレイリスト）の提供については、お客様が単独で責任を負うものとします。</string>
+    <string name="iptv_smart_player_online_tv_is_not_affiliated_with_any_third_party_content_provider">• IPTV Smart Player – Online TVは、いかなるサードパーティのコンテンツプロバイダーとも提携していません。</string>
+    <string name="we_do_not_support_or_encourage_streaming_copyrighted_content_without_proper_authorization">• 当社は、適切な承認なしに著作権で保護されたコンテンツをストリーミングすることを推奨または支持するものではありません。</string>
+    <string name="welcome_back">おかえりなさい 👋</string>
+    <string name="continue_watching_your_favorite_live_tv_channels_movies_amp_series_anytime"><![CDATA[お気に入りのライブテレビチャンネル、映画、シリーズをいつでも視聴できます]]></string>
 </resources>

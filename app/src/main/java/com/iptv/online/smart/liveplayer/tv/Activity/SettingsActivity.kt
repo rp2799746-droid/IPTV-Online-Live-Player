@@ -64,7 +64,6 @@ class SettingsActivity : Base__Activity<ActivitySettingsBinding>() {
             val urlString = configScript?.privacyLink
 
             if (!urlString.isNullOrBlank() && urlString.startsWith("http")) {
-                // Pass the Uri directly, NO casting to String
                 openChromeCustomTabUrl(this, urlString)
             } else {
                 Toast.makeText(this, R.string.notfound, Toast.LENGTH_SHORT).show()
@@ -92,12 +91,9 @@ class SettingsActivity : Base__Activity<ActivitySettingsBinding>() {
         val isRatingDone = shared.getBoolean("rating_done", false)
 
         if (isRatingDone) {
-            // જો રેટિંગ કાયમી થઈ ગયું હોય તો ડાયલોગ ખોલવાની જરૂર નથી
             Toast.makeText(this, getString(R.string.thanks_for_rating), Toast.LENGTH_SHORT).show()
         } else {
-            // *** મુખ્ય ફેરફાર અહીં છે ***
-            // યુઝરે સેટિંગ્સમાં ક્લિક કર્યું એટલે આખા સેશન માટે ફ્લેગ TRUE કરી દો
-            // જેથી હવે Player કે MainActivity માં ઓટોમેટિક ડાયલોગ નહીં આવે
+
             MainActivity.isRatingShownInSession = true
 
             showRateDialogLogic(this)

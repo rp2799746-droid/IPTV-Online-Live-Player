@@ -166,4 +166,12 @@
     <string name="please_select_stars">Por favor selecciona las estrellas</string>
     <string name="please_describe_your_thought">Por favor describe tu pensamiento</string>
     <string name="thanks_for_rating">¡Gracias por calificar!</string>
+    <string name="i_understand">I Understand</string>
+    <string name="important_notice">Important Notice</string>
+    <string name="iptv_smart_player_online_tv_does_not_provide_host_store_or_sell_any_content_or_media_this_application_is_only_a_media_player_designed_to_organize_and_play_your_own_digital_content">IPTV Smart Player – Online TV does not provide, host, store, or sell any content or media. This application is only a media player designed to organize and play your own digital content.</string>
+    <string name="you_are_solely_responsible_for_providing_your_own_content_for_example_m3u_playlists">• You are solely responsible for providing your own content (for example: M3U playlists).</string>
+    <string name="iptv_smart_player_online_tv_is_not_affiliated_with_any_third_party_content_provider">• IPTV Smart Player – Online TV is not affiliated with any third-party content provider.</string>
+    <string name="we_do_not_support_or_encourage_streaming_copyrighted_content_without_proper_authorization">• We do not support or encourage streaming copyrighted content without proper authorization.</string>
+    <string name="welcome_back">Bienvenido de nuevo 👋</string>
+    <string name="continue_watching_your_favorite_live_tv_channels_movies_amp_series_anytime"><![CDATA[Continúa viendo tus canales de TV en vivo, películas y series favoritas en cualquier momento]]></string>
 </resources>

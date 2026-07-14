@@ -164,4 +164,12 @@
     <string name="please_select_stars">Vänligen välj stjärnor</string>
     <string name="please_describe_your_thought">Vänligen beskriv din tanke</string>
     <string name="thanks_for_rating">Tack för betyget!</string>
+    <string name="i_understand">Jag förstår</string>
+    <string name="important_notice">Viktigt meddelande</string>
+    <string name="iptv_smart_player_online_tv_does_not_provide_host_store_or_sell_any_content_or_media_this_application_is_only_a_media_player_designed_to_organize_and_play_your_own_digital_content">IPTV Smart Player – Online TV tillhandahåller, hostar, lagrar eller säljer inte något innehåll eller media. Denna applikation är endast en mediaspelare utformad för att organisera och spela upp ditt eget digitala innehåll.</string>
+    <string name="you_are_solely_responsible_for_providing_your_own_content_for_example_m3u_playlists">• Du är själv ansvarig för att tillhandahålla ditt eget innehåll (till exempel: M3U-spellistor).</string>
+    <string name="iptv_smart_player_online_tv_is_not_affiliated_with_any_third_party_content_provider">• IPTV Smart Player – Online TV är inte ansluten till någon tredjepartsleverantör av innehåll.</string>
+    <string name="we_do_not_support_or_encourage_streaming_copyrighted_content_without_proper_authorization">• Vi stöder eller uppmuntrar inte streaming av upphovsrättsskyddat innehåll utan korrekt tillstånd.</string>
+    <string name="welcome_back">Välkommen tillbaka 👋</string>
+    <string name="continue_watching_your_favorite_live_tv_channels_movies_amp_series_anytime"><![CDATA[Fortsätt titta på dina favoritkanaler för live-TV, filmer och serier när som helst]]></string>
 </resources>

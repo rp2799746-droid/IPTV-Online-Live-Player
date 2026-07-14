@@ -30,9 +30,8 @@ class FavoriteAdapter(private val context: Context, incomingList: MutableList<Ch
     private val favList: MutableList<Channel> = ArrayList(incomingList)
     private var listener: OnFavoriteChangeListener? = null
 
-    // ૧. Remote Config ડેટા મેળવો
     private val configScript = RemoteConfigdata(context as Activity)
-    private val isAdEnabled: Boolean = configScript.isNeedToShowADs && configScript.nativeFavorite
+    private val isAdEnabled: Boolean = configScript.isNeedToShowADs && configScript.nativefavorite2005
 
     interface OnFavoriteChangeListener {
         fun onFavoriteEmpty()
@@ -43,7 +42,6 @@ class FavoriteAdapter(private val context: Context, incomingList: MutableList<Ch
     }
 
     override fun getItemViewType(position: Int): Int {
-        // જો સ્વીચ ઓન હોય તો દર ૩ આઈટમ પછી એડ સ્લોટ આપો
         return if (isAdEnabled && (position + 1) % (AD_INTERVAL + 1) == 0) {
             TYPE_AD
         } else {
@@ -81,7 +79,7 @@ class FavoriteAdapter(private val context: Context, incomingList: MutableList<Ch
     }
 
     private fun handleNativeAd(adHolder: AdViewHolder) {
-        val tag = "native_favorite"
+        val tag = "native_favorite_2005"
         val state = InfinityAdsManager.adStateFlow.value[tag]
 
         if (isAdEnabled) {

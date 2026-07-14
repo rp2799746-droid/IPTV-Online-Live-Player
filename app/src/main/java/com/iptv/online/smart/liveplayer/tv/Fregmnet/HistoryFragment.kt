@@ -38,16 +38,10 @@ class HistoryFragment : Fragment() {
         rvHistory = view.findViewById<RecyclerView?>(R.id.rvHistory)
         layoutNoData = view.findViewById<LinearLayout?>(R.id.layoutNoData)
 
-        InfinityAdsManager.loadAd(
-            requireActivity(),
-            AdsId.NATIVE_HOSTORY,
-            R.layout.layout_native_ad_large,
-            "native_history"
-        )
 
         viewLifecycleOwner.lifecycleScope.launchWhenStarted {
             InfinityAdsManager.adStateFlow.collect { states ->
-                if (states["native_history"] is NativeAdUiState.Success) {
+                if (states["native_history_2005"] is NativeAdUiState.Success) {
                     adapter?.notifyDataSetChanged()
                 }
             }

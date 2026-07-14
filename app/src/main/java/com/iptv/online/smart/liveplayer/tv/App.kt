@@ -19,6 +19,7 @@ import com.iptv.online.smart.liveplayer.tv.BuildConfig
 import com.iptv.online.smart.liveplayer.tv.R
 import com.iptv.online.smart.liveplayer.tv.adsutils.AdsId
 import com.iptv.online.smart.liveplayer.tv.adsutils.RemoteConfigdata
+import com.iptv.online.smart.liveplayer.tv.Ads.AppResumeWelcomeManager
 
 import com.onesignal.OneSignal
 import dagger.hilt.android.HiltAndroidApp
@@ -75,29 +76,35 @@ class App : AdsMultiDexApplication() {
                 .build()
         )
 
-        OneSignal.initWithContext(this)
-        OneSignal.setAppId("9971a8a0-4bb3-48ae-bac0-30af3026640d")
+        OneSignal.initWithContext(this,"9971a8a0-4bb3-48ae-bac0-30af3026640d")
+
 
         val environment =
             if (BuildConfig.DEBUG) ERainAdConfig.ENVIRONMENT_DEVELOP else ERainAdConfig.ENVIRONMENT_PRODUCTION
-        val mERainAdConfig = ERainAdConfig(this, environment)
+        mERainAdConfig = ERainAdConfig(this, environment)
 
-        val adjustConfig = AdjustConfig(true, getString(R.string.adjust_token))
-        mERainAdConfig.adjustConfig = adjustConfig
-        mERainAdConfig.facebookClientToken = getString(R.string.facebook_client_token)
-        mERainAdConfig.setAdjustTokenTiktok(getString(R.string.tiktok_token))
-        mERainAdConfig.setIdAdResume(AdsId.openResume)
+        mERainAdConfig.adjustConfig = AdjustConfig(true, resources.getString(R.string.adjust_token))
+        mERainAdConfig.facebookClientToken = resources.getString(R.string.facebook_client_token)
+        mERainAdConfig.adjustTokenTiktok = resources.getString(R.string.tiktok_token)
+//        mERainAdConfig.idAdResume = (AdsId.openResume)
+        mERainAdConfig.idAdResume = (AdsId.interwelcomeback)
+
+        // Be interstitial ad ni vachche ochha ma ochho 30 second no gap raakhvo.
+        // ERainAd.forceShowInterstitial aa value (second) check kare chhe, etle
+        // welcome-back ane infinity badha inter ne aa gap lagu padshe.
+        mERainAdConfig.intervalInterstitialAd = 30
 
         ERainAd.getInstance().init(this, mERainAdConfig)
+
         Admob.getInstance().setDisableAdResumeWhenClickAds(true)
         Admob.getInstance().setOpenActivityAfterShowInterAds(true)
 
         AppOpenManager.getInstance().disableAppResumeWithActivity(SplashActivity::class.java)
 
-        if (RemoteConfigdata(this).appOpenOn && RemoteConfigdata(this).isNeedToShowADs)
-            AppOpenManager.getInstance().enableAppResume()
-        else
-            AppOpenManager.getInstance().disableAppResume()
+        // App resume par App-Open ad ni jagya e Welcome Screen batavvi che,
+        // etle resume open-ad disable rakhiye ane WelcomeManager init kariye.
+        AppOpenManager.getInstance().disableAppResume()
+        AppResumeWelcomeManager.init(this)
 
 
     }

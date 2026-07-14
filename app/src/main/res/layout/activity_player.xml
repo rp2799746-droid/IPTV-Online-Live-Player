@@ -37,21 +37,21 @@
             android:id="@+id/Share"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:padding="@dimen/_5sdp"
+            android:padding="@dimen/_6sdp"
             android:src="@drawable/share" />
 
         <ImageView
             android:id="@+id/Favorite"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:padding="@dimen/_4sdp"
+            android:padding="@dimen/_5sdp"
             android:src="@drawable/ic_fav_off" />
 
         <ImageView
             android:id="@+id/History"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:padding="@dimen/_5sdp"
+            android:padding="@dimen/_6sdp"
             android:src="@drawable/his" />
     </LinearLayout>
 

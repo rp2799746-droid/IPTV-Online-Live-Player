@@ -23,6 +23,7 @@ import com.iptv.online.smart.liveplayer.tv.Model.LanguageModel
 import com.iptv.online.smart.liveplayer.tv.R
 import com.iptv.online.smart.liveplayer.tv.ReadFile.BOOKER_Manager
 import com.iptv.online.smart.liveplayer.tv.ReadFile.PreferenceManager
+import com.iptv.online.smart.liveplayer.tv.adsutils.AdsId
 import com.iptv.online.smart.liveplayer.tv.adsutils.NativeAdUiState
 import com.iptv.online.smart.liveplayer.tv.adsutils.RemoteConfigdata
 import com.iptv.online.smart.liveplayer.tv.databinding.ActivityLanguageBinding
@@ -125,10 +126,12 @@ class Language_Activity2 : Base__Activity<ActivityLanguageBinding>(),
                 if (screenCount == 1) config.nativeLang1ClickOn else config.nativeLang2ClickOn
 
             if (config.isNeedToShowADs && isAdEnabled) {
+                val retriedTags = mutableSetOf<String>()
                 lifecycleScope.launchWhenStarted {
                     InfinityAdsManager.adStateFlow.collect { states ->
                         val state = states[tag]
                         if (state is NativeAdUiState.Success) {
+                            Log.d("AdManager123", "[$tag] Success, 🚀 showing ID: [${state.adsID}]")
                             binding.adShimmer.root.visibility = View.GONE
                             binding.frAds.visibility = View.VISIBLE
                             ERainAd.getInstance().populateNativeAdView(
@@ -167,9 +170,24 @@ class Language_Activity2 : Base__Activity<ActivityLanguageBinding>(),
                             if (binding.frAds.visibility != View.VISIBLE) {
                                 binding.adShimmer.root.visibility = View.VISIBLE
                             }
-                        } else if (state is NativeAdUiState.Failed) {
-                            binding.adShimmer.root.visibility = View.GONE
-                            binding.frAds.visibility = View.GONE
+                        } else if (state == null || state is NativeAdUiState.Failed || state is NativeAdUiState.Empty) {
+                            // Click ad ready nathi (preload j nathi thayu ke fail gayu) ->
+                            // 90%+ show rate mate ahiya ek j var jate FRESH load karo (fallback).
+                            if (binding.frAds.visibility != View.VISIBLE) {
+                                if (retriedTags.add(tag)) {
+                                    binding.adShimmer.root.visibility = View.VISIBLE
+                                    val adId = if (screenCount == 1)
+                                        AdsId.nativeLanguage1Click else AdsId.nativeLanguage2Click
+                                    InfinityAdsManager.loadAd(
+                                        this@Language_Activity2, adId,
+                                        R.layout.layout_native_ad_lang_click, tag
+                                    )
+                                    Log.d("AdManager123", "[$tag] fallback reload triggered")
+                                } else {
+                                    binding.adShimmer.root.visibility = View.GONE
+                                    binding.frAds.visibility = View.GONE
+                                }
+                            }
                         }
                     }
                 }

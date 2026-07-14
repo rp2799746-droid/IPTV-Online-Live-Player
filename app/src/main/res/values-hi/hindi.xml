@@ -166,4 +166,12 @@
     <string name="please_select_stars">कृपया स्टार चुनें</string>
     <string name="please_describe_your_thought">कृपया अपने विचार लिखें</string>
     <string name="thanks_for_rating">रेटिंग के लिए धन्यवाद!</string>
+    <string name="i_understand">मैं समझता हूँ</string>
+    <string name="important_notice">महत्वपूर्ण सूचना</string>
+    <string name="iptv_smart_player_online_tv_does_not_provide_host_store_or_sell_any_content_or_media_this_application_is_only_a_media_player_designed_to_organize_and_play_your_own_digital_content">IPTV Smart Player – Online TV किसी भी सामग्री (content) या मीडिया को प्रदान, होस्ट, स्टोर या बेचता नहीं है। यह एप्लिकेशन केवल एक मीडिया प्लेयर है जिसे आपकी अपनी डिजिटल सामग्री को व्यवस्थित करने और चलाने के लिए डिज़ाइन किया गया है।</string>
+    <string name="you_are_solely_responsible_for_providing_your_own_content_for_example_m3u_playlists">• आप अपनी सामग्री (उदाहरण के लिए: M3U प्लेलिस्ट) प्रदान करने के लिए पूरी तरह से जिम्मेदार हैं।</string>
+    <string name="iptv_smart_player_online_tv_is_not_affiliated_with_any_third_party_content_provider">• IPTV Smart Player – Online TV किसी भी तृतीय-पक्ष सामग्री प्रदाता (third-party content provider) से संबद्ध नहीं है।</string>
+    <string name="we_do_not_support_or_encourage_streaming_copyrighted_content_without_proper_authorization">• हम उचित प्राधिकरण के बिना कॉपीराइट सामग्री को स्ट्रीम करने का समर्थन या प्रोत्साहन नहीं करते हैं।</string>
+    <string name="welcome_back">वापस स्वागत है 👋</string>
+    <string name="continue_watching_your_favorite_live_tv_channels_movies_amp_series_anytime"><![CDATA[अपने पसंदीदा लाइव टीवी चैनल, फिल्में और सीरीज़ कभी भी देखना जारी रखें]]></string>
 </resources>

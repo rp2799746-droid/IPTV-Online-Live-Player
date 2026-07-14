@@ -166,4 +166,12 @@
     <string name="please_select_stars">Lütfen yıldız seçin</string>
     <string name="please_describe_your_thought">Lütfen düşüncelerinizi açıklayın</string>
     <string name="thanks_for_rating">Değerlendirmeniz için teşekkürler!</string>
+    <string name="i_understand">Anlıyorum</string>
+    <string name="important_notice">Önemli Bildirim</string>
+    <string name="iptv_smart_player_online_tv_does_not_provide_host_store_or_sell_any_content_or_media_this_application_is_only_a_media_player_designed_to_organize_and_play_your_own_digital_content">IPTV Smart Player – Online TV, herhangi bir içerik veya medya sağlamaz, barındırmaz, depolamaz veya satmaz. Bu uygulama, yalnızca kendi dijital içeriğinizi düzenlemek ve oynatmak için tasarlanmış bir medya oynatıcıdır.</string>
+    <string name="you_are_solely_responsible_for_providing_your_own_content_for_example_m3u_playlists">• Kendi içeriğinizi (örneğin: M3U oynatma listeleri) sağlamaktan yalnızca siz sorumlusunuz.</string>
+    <string name="iptv_smart_player_online_tv_is_not_affiliated_with_any_third_party_content_provider">• IPTV Smart Player – Online TV, herhangi bir üçüncü taraf içerik sağlayıcısı ile ilişkili değildir.</string>
+    <string name="we_do_not_support_or_encourage_streaming_copyrighted_content_without_proper_authorization">• Gerekli izinler olmaksızın telif hakkıyla korunan içeriğin yayınlanmasını desteklemiyor veya teşvik etmiyoruz.</string>
+    <string name="welcome_back">Tekrar hoş geldiniz 👋</string>
+    <string name="continue_watching_your_favorite_live_tv_channels_movies_amp_series_anytime"><![CDATA[Favori canlı TV kanallarınızı, filmlerinizi ve dizilerinizi istediğiniz zaman izlemeye devam edin]]></string>
 </resources>

@@ -44,16 +44,11 @@ class FavoriteFragment : Fragment() {
 
 
         configScript = RemoteConfigdata(requireActivity())
-        InfinityAdsManager.loadAd(
-            requireActivity(),
-            AdsId.NATIVE_FAVORITE, // દા.ત. AdsId.nativeChannel
-            R.layout.layout_native_ad_large, // તમારું Native Ad Layout
-            "native_favorite"
-        )
+
 
         viewLifecycleOwner.lifecycleScope.launchWhenStarted {
             InfinityAdsManager.adStateFlow.collect { states ->
-                val state = states["native_favorite"]
+                val state = states["native_favorite_2005"]
 
                 // જો સ્ટેટ Success હોય કે Loading હોય, બંને વખતે એડેપ્ટરને જાણ કરો
                 // જેથી તે શિમર અથવા એડ બતાવી શકે

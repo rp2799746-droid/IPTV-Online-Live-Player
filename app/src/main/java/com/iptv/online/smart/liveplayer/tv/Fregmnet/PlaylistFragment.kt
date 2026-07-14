@@ -29,6 +29,7 @@ import com.iptv.online.smart.liveplayer.tv.Ads.InfinityAdsManager
 import com.iptv.online.smart.liveplayer.tv.Ads.InfinityAdsManager.showInterAds
 import com.iptv.online.smart.liveplayer.tv.adsutils.NativeAdUiState
 import com.iptv.online.smart.liveplayer.tv.adsutils.RemoteConfigdata
+import com.iptv.online.smart.liveplayer.tv.adsutils.getShouldDisplayNativeHome
 import com.iptv.online.smart.liveplayer.tv.adsutils.isInternetAvailable
 import com.iptv.online.smart.liveplayer.tv.databinding.FragmentPlaylistBinding
 import com.iptv.online.smart.liveplayer.tv.utils.gone
@@ -131,32 +132,6 @@ class PlaylistFragment : Fragment() {
         loadInterAds()
         loadIntermirrring()
         configScript = RemoteConfigdata(requireActivity())
-        InfinityAdsManager.loadAd(
-            requireActivity(),
-            AdsId.nativeHome,
-            R.layout.layout_native_ad_large,
-            "native_home"
-        )
-
-        if (configScript!!.nativeFavorite) {
-            InfinityAdsManager.loadAd(
-                requireActivity(),
-                AdsId.NATIVE_FAVORITE,
-                R.layout.layout_native_ad_large,
-                "native_favorite"
-            )
-        }
-        if (configScript!!.nativeHistory) {
-            InfinityAdsManager.loadAd(
-                requireActivity(),
-                AdsId.NATIVE_HOSTORY,
-                R.layout.layout_native_ad_large,
-                "native_history"
-            )
-        }
-
-
-
 
         nativeAds()
 
@@ -271,15 +246,23 @@ class PlaylistFragment : Fragment() {
     }
 
     private fun nativeAds() {
+
+        Log.d("hh", "nativeAds: "+requireActivity().getShouldDisplayNativeHome())
+        if (!requireActivity().getShouldDisplayNativeHome()) {
+            binding?.adShimmer?.root?.gone
+            binding?.frAds?.gone
+            return
+        }
         configScript?.let {
             if (it.isNeedToShowADs) {
-                if (configScript!!.nativeHomeOn) {
+                if (configScript!!.nativehome2005) {
 
                     val handledAds = mutableSetOf<String>()
+                    val retriedTags = mutableSetOf<String>()
 
                     lifecycleScope.launchWhenStarted {
                         InfinityAdsManager.adStateFlow.collect { states ->
-                            val tag = "native_home"
+                            val tag = "native_home_2005"
                             val state = states[tag]
                             if (state is NativeAdUiState.Success && !handledAds.contains(tag)) {
                                 handledAds.add(tag) // mark as handled
@@ -319,9 +302,23 @@ class PlaylistFragment : Fragment() {
                                 binding?.adShimmer?.root?.visible
                                 binding?.frAds?.visible
 
-                            } else if (state is NativeAdUiState.Failed || state is NativeAdUiState.Empty) {
-                                binding?.adShimmer?.root?.gone
-                                binding?.frAds?.gone
+                            } else if (state == null || state is NativeAdUiState.Failed || state is NativeAdUiState.Empty) {
+                                // No-fill / preload fail (real id ma sambhave) ->
+                                // 90%+ show rate mate ahiya ek j var jate FRESH load karo (fallback).
+                                if (retriedTags.add(tag)) {
+                                    binding?.adShimmer?.root?.visible
+                                    binding?.frAds?.visible
+                                    InfinityAdsManager.loadAd(
+                                        requireActivity(),
+                                        AdsId.nativehome2005,
+                                        R.layout.layout_native_ad_medium,
+                                        tag
+                                    )
+                                    Log.d("AdManager123", "[$tag] fallback reload triggered")
+                                } else {
+                                    binding?.adShimmer?.root?.gone
+                                    binding?.frAds?.gone
+                                }
                             }
 
                         }

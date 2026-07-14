@@ -37,7 +37,7 @@
     </LinearLayout>
 
 
-    <androidx.core.widget.NestedScrollView
+    <com.iptv.online.smart.liveplayer.tv.utils.SafeNestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@id/btnAddPlaylist"
@@ -158,7 +158,7 @@
             </FrameLayout>
         </LinearLayout>
 
-    </androidx.core.widget.NestedScrollView>
+    </com.iptv.online.smart.liveplayer.tv.utils.SafeNestedScrollView>
 
     <TextView
         android:id="@+id/btnAddPlaylist"

@@ -165,4 +165,12 @@
     <string name="please_select_stars">Silakan pilih bintang</string>
     <string name="please_describe_your_thought">Harap jelaskan pemikiran Anda</string>
     <string name="thanks_for_rating">Terima kasih atas penilaiannya!</string>
+    <string name="i_understand">Saya Mengerti</string>
+    <string name="important_notice">Pemberitahuan Penting</string>
+    <string name="iptv_smart_player_online_tv_does_not_provide_host_store_or_sell_any_content_or_media_this_application_is_only_a_media_player_designed_to_organize_and_play_your_own_digital_content">IPTV Smart Player – Online TV tidak menyediakan, menampung, menyimpan, atau menjual konten atau media apa pun. Aplikasi ini hanyalah pemutar media yang dirancang untuk mengatur dan memutar konten digital Anda sendiri.</string>
+    <string name="you_are_solely_responsible_for_providing_your_own_content_for_example_m3u_playlists">• Anda bertanggung jawab penuh untuk menyediakan konten Anda sendiri (misalnya: daftar putar M3U).</string>
+    <string name="iptv_smart_player_online_tv_is_not_affiliated_with_any_third_party_content_provider">• IPTV Smart Player – Online TV tidak berafiliasi dengan penyedia konten pihak ketiga mana pun.</string>
+    <string name="we_do_not_support_or_encourage_streaming_copyrighted_content_without_proper_authorization">• Kami tidak mendukung atau menganjurkan streaming konten berhak cipta tanpa otorisasi yang tepat.</string>
+    <string name="welcome_back">Selamat datang kembali 👋</string>
+    <string name="continue_watching_your_favorite_live_tv_channels_movies_amp_series_anytime"><![CDATA[Lanjutkan menonton saluran TV langsung, film & serial favorit Anda kapan saja]]></string>
 </resources>

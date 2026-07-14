@@ -51,12 +51,7 @@ class FileSelectActivity : Base__Activity<ActivityFileSelectBinding>() {
     override fun bindObjects() {
         setupFilePicker()
         configScript = RemoteConfigdata(this@FileSelectActivity)
-        InfinityAdsManager.loadAd(
-            this@FileSelectActivity,
-            AdsId.NATIVE_PLAYLIST,
-            R.layout.layout_native_ad_large,
-            "native_playlist"
-        )
+
         nativeAds()
         loadInteraddplaylit()
     }

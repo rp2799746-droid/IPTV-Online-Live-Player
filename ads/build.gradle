@@ -91,7 +91,7 @@ afterEvaluate {
                 from(components["release"])
                 groupId = "com.github.trongluan99"
                 artifactId = "ERain-Studio"
-                version = "1.4"
+                version = "1.7"
             }
         }
     }

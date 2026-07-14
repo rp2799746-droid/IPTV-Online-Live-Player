@@ -25,6 +25,7 @@ import com.iptv.online.smart.liveplayer.tv.adsutils.isInternetAvailable
 import com.iptv.online.smart.liveplayer.tv.databinding.ActivityIntroBinding
 import com.iptv.online.smart.liveplayer.tv.Fregmnet.IntroFragmentFullAd
 import com.iptv.online.smart.liveplayer.tv.adsutils.getSHouldDisplayHighCTA
+//import com.iptv.online.smart.liveplayer.tv.adsutils.getShouldDisplayNativeOnboardingFull2
 import com.iptv.online.smart.liveplayer.tv.adsutils.getShouldDisplayWidgetUninstall
 import com.iptv.online.smart.liveplayer.tv.utils.Preference
 
@@ -53,35 +54,17 @@ class IntroActivity : Base__Activity<ActivityIntroBinding>() {
         val isFullAdEnabled =
             if (isDone) configScript.nativeOnbFull2On else configScript.nativeOnbFull1On
 
-        if (configScript.isNeedToShowADs) {
-            if (isFullAdEnabled) {
-                val adIdFull =
-                    if (isDone) AdsId.nativeOnboardingFull2 else AdsId.nativeOnboardingFull1
-                val tagFull = if (isDone) "native_onboarding_full_2" else "native_onboarding_full_1"
-                InfinityAdsManager.loadAd(this, adIdFull, R.layout.layout_native_ad_full, tagFull)
-            }
 
-            val adId1 = if (isDone) AdsId.nativeOnboarding2_1 else AdsId.nativeOnboarding1_1
-            val tag1 = if (isDone) "native_onboarding_2_1" else "native_onboarding_1_1"
-            InfinityAdsManager.loadAd(this, adId1, R.layout.layout_native_ad_large, tag1)
-
-            val adId4 = if (isDone) AdsId.nativeOnboarding2_4 else AdsId.nativeOnboarding1_4
-            val tag4 = if (isDone) "native_onboarding_2_4" else "native_onboarding_1_4"
-            InfinityAdsManager.loadAd(this, adId4, R.layout.layout_native_ad_large, tag4)
-        }
 
         fragments = arrayListOf<Fragment>().apply {
             add(IntroFragment1()) // Index 0
             add(IntroFragment2())
-            Log.d("aaaa", "ddd: +"+getShouldDisplayNativeOnboardingFull1())
-            Log.d("aaaa", "ddd: +"+getShouldDisplayInterOnboarding())
-            Log.d("aaaa", "ddd: +"+getShouldDisplayWidgetUninstall())
-            Log.d("aaaa", "ddd: +"+getSHouldDisplayHighCTA())
-            if (getShouldDisplayNativeOnboardingFull1() && isInternetAvailable() &&
-                configScript.isNeedToShowADs && isFullAdEnabled
-            ) {
+            Log.d("aaaa", "ddd: +" + getShouldDisplayNativeOnboardingFull1())
+            Log.d("aaaa", "ddd: +" + getShouldDisplayInterOnboarding())
+            Log.d("aaaa", "ddd: +" + getShouldDisplayWidgetUninstall())
+            Log.d("aaaa", "ddd: +" + getSHouldDisplayHighCTA())
+            if (getShouldDisplayNativeOnboardingFull1() && isInternetAvailable() && configScript.isNeedToShowADs && isFullAdEnabled) {
 
-                Log.d("AdManager123", "Full Ad 2 Added")
                 add(IntroFragmentFullAd())
             }
 
@@ -92,6 +75,58 @@ class IntroActivity : Base__Activity<ActivityIntroBinding>() {
         binding.pagerIntro.offscreenPageLimit = 5
     }
 
+    /*
+      override fun bindObjects() {
+          loadInterAds()
+          val isDone = isIntroFlowDone()
+
+          fragments = arrayListOf<Fragment>().apply {
+              add(IntroFragment1())               // Index 0 - Page 1
+              add(IntroFragment2())               // Index 1 - Page 2
+
+              // ---- FULL AD 1 : should FALSE hoy tyare ad ----
+              val full1Should = getShouldDisplayNativeOnboardingFull1()
+              val full1Net    = isInternetAvailable()
+              val full1NeedAd = configScript.isNeedToShowADs
+              val full1On     = configScript.nativeOnbFull1On
+
+              Log.d("INTRO_ADS", "FULL_1 -> should=$full1Should net=$full1Net needAds=$full1NeedAd full1On=$full1On")
+
+              if (!full1Should && full1Net && full1NeedAd && full1On) {   // <-- !full1Should
+                  Log.d("INTRO_ADS", "FULL_1 -> ADDED ✅")
+                  add(IntroFragmentFullAd())      // full ad 1
+              } else {
+                  Log.d("INTRO_ADS", "FULL_1 -> NOT added ❌")
+                  add(IntroFragmentFullAd())      // full ad 1
+
+              }
+
+              add(IntroFragment3())               // Page 3
+
+              // ---- FULL AD 2 : should FALSE hoy tyare ad ----
+              val full2Should = getShouldDisplayNativeOnboardingFull2()
+              val full2Net    = isInternetAvailable()
+              val full2NeedAd = configScript.isNeedToShowADs
+              val full2On     = configScript.nativeOnbFull2On
+
+              Log.d("INTRO_ADS", "FULL_2 -> should=$full2Should net=$full2Net needAds=$full2NeedAd full2On=$full2On")
+
+              if (!full2Should && full2Net && full2NeedAd && full2On) {   // <-- !full2Should
+                  Log.d("INTRO_ADS", "FULL_2 -> ADDED ✅")
+                  add(IntroFragmentFullAd())      // full ad 2
+              } else {
+                  Log.d("INTRO_ADS", "FULL_2 -> NOT added ❌");
+                          add(IntroFragmentFullAd())      // full ad 1
+
+              }
+
+              add(IntroFragment4())               // Page 4
+          }
+
+          Log.d("INTRO_ADS", "Total fragments = ${fragments.size}")
+          binding.pagerIntro.offscreenPageLimit = 5
+      }
+    */
     private fun loadInterAds() {
         Log.i(
             "AdManager123",
@@ -161,7 +196,11 @@ class IntroActivity : Base__Activity<ActivityIntroBinding>() {
                     flags = (Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
                 }
             else
-                Intent(this, MainActivity::class.java).apply {
+//                Intent(this, MainActivity::class.java).apply {
+//                    putExtra("isFromIntro", true)
+//                    flags = (Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+//                }
+                Intent(this, ActivityNotice::class.java).apply {
                     putExtra("isFromIntro", true)
                     flags = (Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
                 }
@@ -175,19 +214,12 @@ class IntroActivity : Base__Activity<ActivityIntroBinding>() {
     }
 
     private fun updateButtonStyles(index: Int) {
-        val isDone = isIntroFlowDone()
 
-        if (index == 1 && getShouldDisplayNativeOnboardingFull1() && configScript.isNeedToShowADs) {
-            val adIdFull = if (isDone) AdsId.nativeOnboardingFull2 else AdsId.nativeOnboardingFull1
-            val tagFull = if (isDone) "native_onboarding_full_2" else "native_onboarding_full_1"
-
-            InfinityAdsManager.loadAd(this, adIdFull, R.layout.layout_native_ad_full, tagFull)
-        }
 
         if (index > 0) {
             val adapter = binding.pagerIntro.adapter as FragmentStateAdapter
             fragments.getOrNull(index)?.let { fragment ->
-                if (fragment is LazyShowAds) {
+                if (fragment is LazyShowAds  && fragment.isAdded) {
                     Log.d("AdManager123", "Calling showAds for fragment at index: $index")
                     fragment.showAds()
                 }

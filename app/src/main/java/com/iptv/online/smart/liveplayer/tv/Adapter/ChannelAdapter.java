@@ -93,12 +93,11 @@ public class ChannelAdapter extends RecyclerView.Adapter<ChannelAdapter.ViewHold
             boolean newFavoriteStatus = !channel.isFavorite();
             channel.setFavorite(newFavoriteStatus);
 
-            // Room Database માં અપડેટ કરો
-            // ID પ્રોપર સેટ હોવી જોઈએ: URL + PlaylistName
+
             String uniqueId = channel.getChannelUrl() + "|" + channel.getPlaylistName();
             channel.setId(uniqueId);
 
-            // બેકગ્રાઉન્ડ થ્રેડમાં સેવ કરવું હિતાવહ છે, પણ જો allowMainThreadQueries હોય તો:
+
             AppDatabase.getInstance(context).historyDao().insertHistory(channel);
 
             notifyItemChanged(position);

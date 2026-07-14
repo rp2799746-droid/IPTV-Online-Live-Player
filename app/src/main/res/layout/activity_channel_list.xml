@@ -80,7 +80,7 @@
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
-    <androidx.core.widget.NestedScrollView
+    <com.iptv.online.smart.liveplayer.tv.utils.SafeNestedScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:overScrollMode="never"
@@ -116,7 +116,7 @@
                 android:layout_height="match_parent"
                 android:padding="8dp" />
         </LinearLayout>
-    </androidx.core.widget.NestedScrollView>
+    </com.iptv.online.smart.liveplayer.tv.utils.SafeNestedScrollView>
 
 
 </LinearLayout>

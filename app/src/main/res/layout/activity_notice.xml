@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.iptv.online.smart.liveplayer.tv.utils.SafeNestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:fillViewport="true"
+    android:scrollbars="none">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:paddingStart="24dp"
+        android:paddingEnd="24dp"
+        android:paddingBottom="40dp">
+
+        <ImageView
+            android:layout_width="@dimen/_200sdp"
+            android:layout_height="@dimen/_200sdp"
+            android:layout_marginTop="-10dp"
+            android:contentDescription="Notice icon"
+            android:src="@drawable/hand" />
+
+        <!-- Title -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="-80dp"
+            android:fontFamily="@font/sf_pro_text_bold"
+            android:text="@string/important_notice"
+            android:textColor="@color/black"
+            android:textSize="25sp" />
+
+        <!-- Blue underline -->
+        <View
+            android:layout_width="48dp"
+            android:layout_height="4dp"
+            android:layout_marginTop="14dp"
+            android:background="@drawable/round_borderfill_box_hover" />
+
+        <!-- Card with content -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/card_bg"
+            android:orientation="vertical"
+            android:padding="22dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/sf_pro_text_medium"
+                android:lineSpacingExtra="6dp"
+                android:text="@string/iptv_smart_player_online_tv_does_not_provide_host_store_or_sell_any_content_or_media_this_application_is_only_a_media_player_designed_to_organize_and_play_your_own_digital_content"
+                android:textColor="@color/black"
+                android:textSize="15sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:fontFamily="@font/sf_pro_text_medium"
+                android:lineSpacingExtra="5dp"
+                android:text="@string/you_are_solely_responsible_for_providing_your_own_content_for_example_m3u_playlists"
+                android:textColor="#70363636"
+                android:textSize="14sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:fontFamily="@font/sf_pro_text_medium"
+                android:lineSpacingExtra="5dp"
+                android:text="@string/iptv_smart_player_online_tv_is_not_affiliated_with_any_third_party_content_provider"
+                android:textColor="#70363636"
+                android:textSize="14sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:fontFamily="@font/sf_pro_text_medium"
+                android:lineSpacingExtra="5dp"
+                android:text="@string/we_do_not_support_or_encourage_streaming_copyrighted_content_without_proper_authorization"
+                android:textColor="#70363636"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <!-- Spacer pushes button to bottom -->
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:minHeight="30dp" />
+
+        <!-- "I Understand" button WITHOUT background (transparent, just text) -->
+        <TextView
+            android:id="@+id/btnUnderstand"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:layout_gravity="center"
+            android:layout_marginHorizontal="@dimen/_20sdp"
+            android:layout_marginVertical="@dimen/_10sdp"
+            android:background="@drawable/round_borderfill_box_hover"
+            android:fontFamily="@font/sf_pro_text_semibold"
+            android:gravity="center"
+            android:text="@string/i_understand"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="18sp" />
+
+    </LinearLayout>
+</com.iptv.online.smart.liveplayer.tv.utils.SafeNestedScrollView>

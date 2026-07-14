@@ -17,7 +17,7 @@
 
             <include
                 android:id="@+id/adShimmer"
-                layout="@layout/ad_shimmer_native_ad_large" />
+                layout="@layout/ad_shimmer_native_ad_small" />
         </FrameLayout>
     </FrameLayout>
 

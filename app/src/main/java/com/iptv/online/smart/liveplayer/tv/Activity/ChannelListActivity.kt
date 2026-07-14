@@ -38,12 +38,7 @@ class ChannelListActivity : Base__Activity<ActivityChannelListBinding>() {
         binding.rvChannels.layoutManager = LinearLayoutManager(this)
 
         configScript = RemoteConfigdata(this@ChannelListActivity)
-        InfinityAdsManager.loadAd(
-            this@ChannelListActivity,
-            AdsId.NATIVE_CHANNELLIST,
-            R.layout.layout_native_ad_large,
-            "native_channel_list"
-        )
+
         nativeAds()
     }
 

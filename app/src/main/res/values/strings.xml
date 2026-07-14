@@ -23,7 +23,6 @@
     <string name="rate_yes">Rate</string>
     <string name="exit_app">Exit App?</string>
     <string name="this_action_may_contain_ads">This action may contain Ads…</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="smart_live_tv">Smart Live TV</string>
     <string name="iptv_smart_player_lets_you_stream_live_tv_movies_amp_shows_from_your_iptv_provider_in_one_seamless_app"><![CDATA[IPTV Smart Player lets you stream live TV, movies, & shows from your IPTV provider in one seamless app.]]></string>
@@ -138,8 +137,8 @@
     <string name="removed_from_favorites">Removed from Favorites</string>
     <string name="check_your_internet_connection">Check Your Internet Connection</string>
     <string name="you_don_t_have_google_play_installed">You don\'t have Google Play installed</string>
-    <string name="playlist">Playlist \'</string>
-    <string name="imported">\' Imported!</string>
+    <string name="playlist">Playlist</string>
+    <string name="imported">Imported!</string>
     <string name="failed_to_save_data">Failed to save data!</string>
     <string name="no_valid_channels_found_in_file">No valid channels found in file!</string>
     <string name="error">"Error: "</string>
@@ -172,5 +171,13 @@
     <string name="please_select_stars">Please select stars</string>
     <string name="please_describe_your_thought">Please describe your thought</string>
     <string name="thanks_for_rating">Thanks for rating!</string>
+    <string name="i_understand">I Understand</string>
+    <string name="important_notice">Important Notice</string>
+    <string name="iptv_smart_player_online_tv_does_not_provide_host_store_or_sell_any_content_or_media_this_application_is_only_a_media_player_designed_to_organize_and_play_your_own_digital_content">IPTV Smart Player – Online TV does not provide, host, store, or sell any content or media. This application is only a media player designed to organize and play your own digital content.</string>
+    <string name="you_are_solely_responsible_for_providing_your_own_content_for_example_m3u_playlists">• You are solely responsible for providing your own content (for example: M3U playlists).</string>
+    <string name="iptv_smart_player_online_tv_is_not_affiliated_with_any_third_party_content_provider">• IPTV Smart Player – Online TV is not affiliated with any third-party content provider.</string>
+    <string name="we_do_not_support_or_encourage_streaming_copyrighted_content_without_proper_authorization">• We do not support or encourage streaming copyrighted content without proper authorization.</string>
+    <string name="welcome_back">Welcome Back 👋</string>
+    <string name="continue_watching_your_favorite_live_tv_channels_movies_amp_series_anytime"><![CDATA[Continue watching your favorite Live TV channels, movies & series anytime]]></string>
 
 </resources>

@@ -20,16 +20,6 @@ class RemoteConfigdata(
         get() = Preference.getString(context, "height_button_cta")
         set(value) = Preference.setString(context, "height_button_cta", value)
 
-
-
-//    var terms_of_uses: String
-//        get() = Preference.getString(context, "terms_of_uses")
-//        set(value) = Preference.setString(context, "terms_of_uses", value)
-//
-//    var aboutUsLink: String
-//        get() = Preference.getString(context, "about_us")
-//        set(value) = Preference.setString(context, "about_us", value)
-
     var isNeedToShowADs: Boolean
         get() = Preference.getBoolean(context, "is_need_to_show_ads", true)
         set(value) = Preference.setBoolean(context, "is_need_to_show_ads", value)
@@ -85,8 +75,8 @@ class RemoteConfigdata(
         set(value) = Preference.setBoolean(context, "ad_native_onb_full_2_on", value)
 
     var nativeOnb21On: Boolean
-        get() = Preference.getBoolean(context, "native_onboarding_2_1", true)
-        set(value) = Preference.setBoolean(context, "native_onboarding_2_1", value)
+        get() = Preference.getBoolean(context, "native_onboarding_2_1_on", true)
+        set(value) = Preference.setBoolean(context, "native_onboarding_2_1_on", value)
 
     var nativeOnb24On: Boolean
         get() = Preference.getBoolean(context, "ad_native_onb_2_4_on", true)
@@ -98,9 +88,6 @@ class RemoteConfigdata(
 
 
     // ---------------- HOME ----------------
-    var nativeHomeOn: Boolean
-        get() = Preference.getBoolean(context, "ad_native_home_on", true)
-        set(value) = Preference.setBoolean(context, "ad_native_home_on", value)
 
     var interHomeOn: Boolean
         get() = Preference.getBoolean(context, "ad_inter_home_on", true)
@@ -109,7 +96,7 @@ class RemoteConfigdata(
 
     // ---------------- COLLAPSIBLE BANNER ----------------
     var bannerCollapsehomeOn: Boolean
-        get() = Preference.getBoolean(context, "ad_banner_collapse_home_on", true)
+        get() = Preference.getBoolean(context, "ad_banner_collapse__home_on", true)
         set(value) = Preference.setBoolean(context, "ad_banner_collapse__home_on", value)
 
 
@@ -127,17 +114,7 @@ class RemoteConfigdata(
         get() = Preference.getBoolean(context, "inter_back", true)
         set(value) = Preference.setBoolean(context, "inter_back", value)
 
-    var nativeChannel: Boolean
-        get() = Preference.getBoolean(context, "native_channel", true)
-        set(value) = Preference.setBoolean(context, "native_channel", value)
 
-    var nativeFavorite: Boolean
-        get() = Preference.getBoolean(context, "native_favorite", true)
-        set(value) = Preference.setBoolean(context, "native_favorite", value)
-
-    var nativeHistory: Boolean
-        get() = Preference.getBoolean(context, "native_history", true)
-        set(value) = Preference.setBoolean(context, "native_history", value)
     var nativePlaylist: Boolean
         get() = Preference.getBoolean(context, "native_playlist", true)
         set(value) = Preference.setBoolean(context, "native_playlist", value)
@@ -168,10 +145,24 @@ class RemoteConfigdata(
         get() = Preference.getBoolean(context, "native_survey_uninstall", true)
         set(value) = Preference.setBoolean(context, "native_survey_uninstall", value)
 
+    var nativehome2005: Boolean
+        get() = Preference.getBoolean(context, "native_home_2005", true)
+        set(value) = Preference.setBoolean(context, "native_home_2005", value)
+    var nativechannel2005: Boolean
+        get() = Preference.getBoolean(context, "native_channel_2005", true)
+        set(value) = Preference.setBoolean(context, "native_channel_2005", value)
+    var nativefavorite2005: Boolean
+        get() = Preference.getBoolean(context, "native_favorite_2005", true)
+        set(value) = Preference.setBoolean(context, "native_favorite_2005", value)
+
+    var nativehistory2005: Boolean
+        get() = Preference.getBoolean(context, "native_history_2005", true)
+        set(value) = Preference.setBoolean(context, "native_history_2005", value)
 
 
-
-
+    var interwelcomeback: Boolean
+        get() = Preference.getBoolean(context, "interwelcomeback", true)
+        set(value) = Preference.setBoolean(context, "interwelcomeback", value)
 
 
 }

@@ -96,6 +96,10 @@ object InfinityAdsManager {
         }
     }
 
+    // Be interstitial ni vachche 30 second no gap App.kt ma
+    // mERainAdConfig.intervalInterstitialAd = 30 thi centralized rite enforce
+    // thay chhe (ERainAd.forceShowInterstitial ni andar). Etle ahiya alag
+    // gap-manager ni jarur nathi — welcome-back ne pan e j gap lagu padshe.
     fun Activity.showInterAds(
         mInterstitialAd: ApInterstitialAd?,
         onComplete: () -> Unit,
@@ -114,7 +118,6 @@ object InfinityAdsManager {
             onComplete.invoke()
         }
     }
-
     fun Activity.loadAndShowCollapsingBanner(adLayout: View) {
         val config = RemoteConfigdata(this)
         val adId = AdsId.banner_collap_home

@@ -70,9 +70,15 @@ public class ERainAd {
     public Boolean getShouldDisplayNativeOnboardingFull1() {
         return true;
     }
+    public Boolean getShouldDisplayNativeOnboardingNormal1() {
+        return true;
+    }
+    public Boolean getShouldDisplayNativeOnboardingNormal2() {
+        return true;
+    }
 
     public Boolean getShouldDisplayNativeOnboardingFull2() {
-        return !isOrganic;
+        return true;
     }
 
     public Boolean getShouldDisplayNativeOnboarding2() {
@@ -84,6 +90,9 @@ public class ERainAd {
     }
 
     public Boolean getShouldDisplayHighCTA() {
+        return true;
+    }
+   public Boolean getShouldDisplayNativeHome() {
         return true;
     }
 

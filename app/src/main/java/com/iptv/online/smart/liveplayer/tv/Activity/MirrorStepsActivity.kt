@@ -71,12 +71,7 @@ class MirrorStepsActivity : Base__Activity<ActivityMirrorStepsBinding>() {
 
         binding.switchSound.isChecked = true
         configScript = RemoteConfigdata(this@MirrorStepsActivity)
-        InfinityAdsManager.loadAd(
-            this@MirrorStepsActivity,
-            AdsId.NATIVE_MIRRORING,
-            R.layout.layout_native_ad_large,
-            "native_mirroring"
-        )
+
         nativeAds()
         loadInterAds()
     }

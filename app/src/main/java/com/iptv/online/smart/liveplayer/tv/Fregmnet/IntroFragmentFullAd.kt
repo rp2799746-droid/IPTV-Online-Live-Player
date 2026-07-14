@@ -1,12 +1,17 @@
 package com.iptv.online.smart.liveplayer.tv.Fregmnet
 
+import android.graphics.Color
+import android.graphics.PorterDuff
+import android.graphics.drawable.GradientDrawable
 import android.util.Log
 import android.view.View
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.ads.module.ads.ERainAd
 import com.iptv.online.smart.liveplayer.tv.Activity.IntroActivity
 import com.iptv.online.smart.liveplayer.tv.Ads.InfinityAdsManager
 import com.iptv.online.smart.liveplayer.tv.R
+import com.iptv.online.smart.liveplayer.tv.adsutils.AdsId
 import com.iptv.online.smart.liveplayer.tv.adsutils.LazyShowAds
 import com.iptv.online.smart.liveplayer.tv.adsutils.NativeAdUiState
 import com.iptv.online.smart.liveplayer.tv.adsutils.RemoteConfigdata
@@ -15,6 +20,7 @@ import com.iptv.online.smart.liveplayer.tv.utils.isIntroFlowDone
 import com.iptv.online.smart.liveplayer.tv.utils.triggerClick
 import com.iptv.online.smart.liveplayer.tv.utils.visible
 import com.iptv.online.smart.liveplayer.tv.databinding.FragmentIntroFullAdBinding
+import kotlinx.coroutines.delay
 
 class IntroFragmentFullAd : BaseFragment<FragmentIntroFullAdBinding>(), LazyShowAds {
 
@@ -53,6 +59,7 @@ class IntroFragmentFullAd : BaseFragment<FragmentIntroFullAdBinding>(), LazyShow
         if (currentConfig.isNeedToShowADs) {
             if (currentConfig.nativeOnbFull1On) {
                 val handledAds = mutableSetOf<String>()
+                val retriedTags = mutableSetOf<String>()
 
                 lifecycleScope.launchWhenStarted {
                     InfinityAdsManager.adStateFlow.collect { states ->
@@ -70,7 +77,7 @@ class IntroFragmentFullAd : BaseFragment<FragmentIntroFullAdBinding>(), LazyShow
 
                             binding.adShimmer.root.gone
                             binding.frAds.visible
-                            binding.ivCloseAd.visible
+                            binding.ivCloseAd.gone
 
                             ERainAd.getInstance().populateNativeAdView(
                                 activeActivity,
@@ -78,7 +85,16 @@ class IntroFragmentFullAd : BaseFragment<FragmentIntroFullAdBinding>(), LazyShow
                                 binding.frAds,
                                 binding.adShimmer.root
                             )
-
+                            if (tag == "native_onboarding_full_2") {   // 👈 નવી condition
+                                lifecycleScope.launchWhenStarted {
+                                    delay(3000)
+                                    binding.ivCloseAd.visible
+                                }
+                            }
+                           /* lifecycleScope.launchWhenStarted {
+                                delay(3000)
+                                binding.ivCloseAd.visible
+                            }*/
                             //// Height cta
                             val remoteHeightDp = state.ctaHeight
                             val adBtn = binding.frAds.findViewById<View>(R.id.ad_call_to_action)
@@ -94,6 +110,24 @@ class IntroFragmentFullAd : BaseFragment<FragmentIntroFullAdBinding>(), LazyShow
                                     adBtn.requestLayout()
                                     Log.d("AdManager123", "Height set to: $heightInPx px for tag: $tag")
                                 }
+
+                                if (tag == "native_onboarding_full_1") {
+                                    val bgColor = Color.parseColor("#EE6E17")
+                                    val bg = adBtn.background?.mutate()
+                                    if (bg is GradientDrawable) {
+                                        bg.setColor(bgColor)
+                                    } else if (bg != null) {
+                                        bg.mutate().setColorFilter(bgColor, PorterDuff.Mode.SRC_ATOP)
+                                    } else {
+                                        adBtn.setBackgroundColor(bgColor)
+                                    }
+
+                                    val adAttr = binding.frAds.findViewById<android.widget.TextView>(R.id.ad_attribution)
+                                    adAttr?.setTextColor(Color.parseColor("#FFFFFF"))
+                                    val adRoot = binding.frAds.findViewById<View>(R.id.ad_attribution)
+                                    adRoot?.setBackgroundColor(Color.parseColor("#EE6E17"))
+                                }
+
                             } else {
                                 Log.e("AdManager123", "CTA Button not found in layout for tag: $tag")
                             }
@@ -105,13 +139,24 @@ class IntroFragmentFullAd : BaseFragment<FragmentIntroFullAdBinding>(), LazyShow
                                 binding.adShimmer.root.visible
                                 binding.ivCloseAd.gone
                             }
-                        } else if (state is NativeAdUiState.Failed || state is NativeAdUiState.Empty) {
-                            binding.adShimmer.root.gone
-                            binding.frAds.gone
-                            binding.ivCloseAd.visible
-
-                            // ઓટોમેટિક નેક્સ્ટ કરવું હોય તો:
-                            // (activity as? IntroActivity)?.getNextFragment()
+                        } else if (state == null || state is NativeAdUiState.Failed || state is NativeAdUiState.Empty) {
+                            // Ad ready nathi -> 90%+ show rate mate ek j var jate FRESH load (fallback).
+                            if (retriedTags.add(tag)) {
+                                binding.adShimmer.root.visible
+                                binding.frAds.gone
+                                binding.ivCloseAd.gone
+                                val adId = if (activeActivity.isIntroFlowDone())
+                                    AdsId.nativeOnboardingFull2 else AdsId.nativeOnboardingFull1
+                                InfinityAdsManager.loadAd(
+                                    activeActivity, adId, R.layout.layout_native_ad_full, tag
+                                )
+                                Log.d("AdManager123", "[$tag] fallback reload triggered")
+                            } else {
+                                // Fallback pachi pan na aavyu -> hide + close batavo jethi user aagal jai sake.
+                                binding.adShimmer.root.gone
+                                binding.frAds.gone
+                                binding.ivCloseAd.visible
+                            }
                         }
                     }
                 }

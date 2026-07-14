@@ -65,7 +65,6 @@
             android:layout_marginHorizontal="16dp"
             android:layout_marginBottom="24dp"
             android:background="@drawable/round_borderfill_box_hover"
-            android:backgroundTint="@color/Hover71"
             android:textAllCaps="true"
             android:textColor="#FFFFFF"
             android:textSize="15sp"

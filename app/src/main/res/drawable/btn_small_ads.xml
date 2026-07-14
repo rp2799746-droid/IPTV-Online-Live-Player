@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <gradient
+        android:angle="180"
+        android:centerColor="@color/Hover71"
+        android:endColor="@color/secondhovercolor"
+        android:startColor="@color/HoverColor" />
+    <corners android:radius="@dimen/_10sdp" />
+</shape>
+-->
+
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+<gradient
+    android:angle="225"
+    android:startColor="#42A7FF"
+    android:endColor="#3484FF" />
+    <corners
+        android:topLeftRadius="@dimen/_8sdp"
+        android:topRightRadius="@dimen/_8sdp"
+        android:bottomLeftRadius="0dp"
+        android:bottomRightRadius="0dp" />
+</shape>

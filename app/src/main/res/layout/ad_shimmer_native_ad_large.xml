@@ -2,89 +2,104 @@
 <com.facebook.shimmer.ShimmerFrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/unified"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content">
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:shimmer_auto_start="true"
+    app:shimmer_duration="1000">
 
-    <RelativeLayout
-        android:layout_width="wrap_content"
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/ads_bg"
-        android:padding="@dimen/_10sdp">
+        android:layout_margin="8dp"
+        app:cardBackgroundColor="#EDEDED"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="5dp">
 
-        <ImageView
-            android:id="@+id/ad_app_icon"
-            android:layout_width="35dp"
-            android:layout_height="35dp"
-            android:adjustViewBounds="true"
-            android:src="@color/darker_gray" />
-
-        <TextView
-            android:id="@+id/ad_icon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/_10sdp"
-            android:layout_marginTop="@dimen/_5sdp"
-            android:layout_toEndOf="@id/ad_app_icon"
-            android:background="@drawable/bg_ad_icon"
-            android:backgroundTint="@color/darker_gray"
-            android:paddingHorizontal="5dp"
-            android:paddingVertical="2dp"
-            android:text="Ad"
-            android:textColor="#ffffff"
-            android:textSize="11dp" />
-
-        <TextView
-            android:id="@+id/ad_headline"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignTop="@id/ad_icon"
-            android:layout_marginStart="2dp"
-            android:layout_toEndOf="@id/ad_icon"
-            android:background="@color/darker_gray"
-            android:textSize="15dp"
-            android:textStyle="bold" />
+            android:paddingBottom="8dp">
 
-        <TextView
-            android:id="@+id/ad_advertiser"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/ad_headline"
-            android:layout_alignStart="@id/ad_icon"
-            android:layout_marginTop="5dp"
-            android:background="@color/darker_gray"
-            android:textSize="13dp"
-            android:textStyle="bold" />
+            <View
+                android:id="@+id/shimmer_ad_app_icon"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:layout_marginStart="@dimen/_10sdp"
+                android:background="@color/darker_gray"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/ad_body"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/ad_app_icon"
-            android:layout_marginTop="8dp"
-            android:background="@color/darker_gray"
-            android:textColor="@color/black"
-            android:textSize="13dp" />
+            <View
+                android:id="@+id/shimmer_ad_icon"
+                android:layout_width="25dp"
+                android:layout_height="16dp"
+                android:layout_marginStart="@dimen/_10sdp"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:background="@drawable/bg_ad_icon"
+                android:backgroundTint="@color/darker_gray"
+                app:layout_constraintStart_toEndOf="@id/shimmer_ad_app_icon"
+                app:layout_constraintTop_toTopOf="parent" />
 
-        <com.google.android.gms.ads.nativead.MediaView
-            android:id="@+id/ad_media"
-            android:layout_width="match_parent"
-            android:layout_height="120dp"
-            android:layout_below="@id/ad_body"
-            android:layout_marginTop="12dp"
-            android:background="@color/darker_gray" />
+            <View
+                android:id="@+id/shimmer_ad_headline"
+                android:layout_width="0dp"
+                android:layout_height="16dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="8dp"
+                android:background="@color/darker_gray"
+                app:layout_constraintBottom_toBottomOf="@id/shimmer_ad_icon"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/shimmer_ad_icon"
+                app:layout_constraintTop_toTopOf="@id/shimmer_ad_icon" />
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/ad_call_to_action"
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:layout_below="@id/ad_media"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="5dp"
-            android:background="@drawable/bg_btn_native_cta"
-            android:backgroundTint="@color/darker_gray"
-            android:textAllCaps="false"
-            android:textColor="#ffffff"
-            android:textSize="16dp" />
+            <View
+                android:id="@+id/shimmer_ad_advertiser"
+                android:layout_width="0dp"
+                android:layout_height="14dp"
+                android:layout_marginStart="2dp"
+                android:layout_marginTop="5dp"
+                android:background="@color/darker_gray"
+                app:layout_constraintEnd_toEndOf="@id/shimmer_ad_headline"
+                app:layout_constraintStart_toStartOf="@id/shimmer_ad_icon"
+                app:layout_constraintTop_toBottomOf="@id/shimmer_ad_headline" />
 
-    </RelativeLayout>
+            <View
+                android:id="@+id/shimmer_ad_body"
+                android:layout_width="0dp"
+                android:layout_height="14dp"
+                android:layout_marginHorizontal="@dimen/_5sdp"
+                android:layout_marginTop="6dp"
+                android:background="@color/darker_gray"
+                app:layout_constraintEnd_toEndOf="@id/shimmer_ad_advertiser"
+                app:layout_constraintStart_toStartOf="@id/shimmer_ad_app_icon"
+                app:layout_constraintTop_toBottomOf="@id/shimmer_ad_advertiser" />
+
+            <View
+                android:id="@+id/shimmer_ad_media"
+                android:layout_width="0dp"
+                android:layout_height="140dp"
+                android:layout_marginHorizontal="8dp"
+                android:layout_marginTop="12dp"
+                android:background="@color/darker_gray"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/shimmer_ad_body" />
+
+            <View
+                android:id="@+id/shimmer_ad_call_to_action"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="4dp"
+                android:layout_marginHorizontal="8dp"
+                android:background="@drawable/bg_btn_native_cta"
+                android:backgroundTint="@color/darker_gray"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/shimmer_ad_media" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
 </com.facebook.shimmer.ShimmerFrameLayout>

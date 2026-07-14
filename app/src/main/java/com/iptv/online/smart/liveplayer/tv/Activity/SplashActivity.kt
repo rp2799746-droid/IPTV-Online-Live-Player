@@ -342,7 +342,11 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
                 }
             })
 
-        noInternetDialog!!.show()
+        // BadTokenException fix: Activity finish/destroy thai gayu hoy (async no-internet
+        // callback pachi user niki gayo) to dialog show na karo -> "Unable to add window" crash na aave.
+        if (!isFinishing && !isDestroyed) {
+            noInternetDialog!!.show()
+        }
     }
 
 
@@ -513,7 +517,7 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
                     AppOpenManager.getInstance().loadOpenAppAdSplash(
                         this,
                         AdsId.openSplash,
-                        30000, 30000, true, object : AdCallback() {
+                        30000, 5000, true, object : AdCallback() {
                             override fun onNextAction() {
                                 super.onNextAction()
                                 Log.w(TAG, "loadInfinityFlow: onNextAction-else")

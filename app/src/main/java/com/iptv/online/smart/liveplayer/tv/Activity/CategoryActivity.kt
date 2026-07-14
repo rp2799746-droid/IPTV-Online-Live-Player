@@ -39,12 +39,6 @@ class CategoryActivity : Base__Activity<ActivityCategoryBinding>() {
         // Intent માંથી ડેટા મેળવો
 
         configScript = RemoteConfigdata(this@CategoryActivity)
-        InfinityAdsManager.loadAd(
-            this@CategoryActivity,
-            AdsId.NATIVE_CHANNEL, // દા.ત. AdsId.nativeChannel
-            R.layout.layout_native_ad_large, // તમારું Native Ad Layout
-            "native_channel"
-        )
 
 
 
@@ -68,13 +62,13 @@ class CategoryActivity : Base__Activity<ActivityCategoryBinding>() {
     private fun nativeAds() {
         configScript?.let {
             if (it.isNeedToShowADs) {
-                if (configScript!!.nativeChannel) {
+                if (configScript!!.nativechannel2005) {
 
                     val handledAds = mutableSetOf<String>()
 
                     lifecycleScope.launchWhenStarted {
                         InfinityAdsManager.adStateFlow.collect { states ->
-                            val tag = "native_channel"
+                            val tag = "native_channel_2005"
                             val state = states[tag]
                             if (state is NativeAdUiState.Success && !handledAds.contains(tag)) {
                                 handledAds.add(tag) // mark as handled
