@@ -40,6 +40,10 @@ class IntroActivity : Base__Activity<ActivityIntroBinding>() {
     override fun setViewBinding() = ActivityIntroBinding.inflate(layoutInflater)
 
     private var mInterstitialAd: ApInterstitialAd? = null
+    // Show-rate: inter_onboarding ne intro START ma load na karo. User onboarding ma agal
+    // vadhe (2ja page e) tyare load karo -> show point (onboarding end) ni najik -> ochi
+    // drop-off -> uncho show rate. Ek j var trigger thay eno guard.
+    private var interOnbLoadTriggered = false
     var fragments = emptyList<Fragment>()
 
     private val configScript: RemoteConfigdata by lazy {
@@ -48,7 +52,10 @@ class IntroActivity : Base__Activity<ActivityIntroBinding>() {
 
 
     override fun bindObjects() {
-        loadInterAds()
+        // inter_onboarding ne have ahiya (intro start) load nathi karta -> te bahu vehlu hatu
+        // (show onboarding-end e thay -> vachche ghana exit -> show rate 19%). Have onPageSelected
+        // ma user later page e pohonche tyare load thay che (show-rate optimization).
+        // loadInterAds()
         val isDone = isIntroFlowDone()
 
         val isFullAdEnabled =
@@ -182,6 +189,13 @@ class IntroActivity : Base__Activity<ActivityIntroBinding>() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
                 updateButtonStyles(position)
+                // Show-rate: user onboarding ma agal vadhe (page >= 1) tyare J inter_onboarding
+                // load karo. Je users 1st page e j chhodi de emna mate request nathi thato ->
+                // ane load show point (end) ni najik thay -> show rate uncho (target 19% -> 30%+).
+                if (position >= 1 && !interOnbLoadTriggered) {
+                    interOnbLoadTriggered = true
+                    loadInterAds()
+                }
             }
         })
 

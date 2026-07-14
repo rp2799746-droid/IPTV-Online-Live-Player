@@ -117,42 +117,36 @@ class Language_Activity : Base__Activity<ActivityLanguageBinding>(),
         binding.recyclerView.layoutManager = LinearLayoutManager(this)
         loadSavedLanguage()
         setAdapter()
-        preloadIntroAds()
+        // Show-rate optimization: native_onboarding_1_1 ne ahiya (Language screen) preload
+        // NA karo -> te bahu vehlu hatu (Intro sudhi user pohonche tya sudhi ghana exit thai
+        // jata -> show rate 23%). Have IntroFragment1 pote j (jyare Intro khule tyare) load
+        // kare che (eno fallback che), etle load show point ni najik thay -> show rate uncho.
+        // preloadIntroAds()
     }
 
 
     private fun loadLanguageAd() {
-//        val currentAdId = if (screenCount == 1) AdsId.nativeLanguage1 else AdsId.nativeLanguage2
-//        val tag = "native_lang_tag"
-//        configScript = RemoteConfigdata(this@Language_Activity)
-//        InfinityAdsManager.loadAd(
-//            this,
-//            currentAdId,
-//            R.layout.layout_native_ad_large,
-//            tag
-//        )
-//
-//        startAdFlow(tag)
-//
-//        val clickAdId =
-//            if (screenCount == 1) AdsId.nativeLanguage1Click else AdsId.nativeLanguage2Click
-//        val clickTag = "native_lang_click_tag"
-//
-//        val isClickAdEnabled = if (screenCount == 1)
-//            configScript!!.nativeLang1ClickOn
-//        else
-//            configScript!!.nativeLang2ClickOn
-//
-//        if (configScript!!.isNeedToShowADs && isClickAdEnabled) {
-//            InfinityAdsManager.loadAd(this, clickAdId, R.layout.layout_native_ad_large, clickTag)
-//            Log.d("AdManager123", "Click tag preloaded in onCreate: $clickTag")
-//        }
+
 
         val tag = "native_lang_tag"
         configScript = RemoteConfigdata(this@Language_Activity)
 
-        // Ad already Splash ma load thai gayu che, ahiya fakt state observe/bind karo
         startAdFlow(tag)
+
+        // CLICK ad ne Language screen 1 khule tyare J PRELOAD karo (demo jevu; splash ma nahi).
+        // Screen 1 nu single action = language tap -> screen 2. Etle je users screen 1 e aave
+        // e lagbhag badha screen 2 e jaay -> preload thi screen 2 par ad READY (instant, shimmer
+        // ochho) + fakt 1 screen aagal hovathi show rate pan saras.
+        val clickAdId =
+            if (screenCount == 1) AdsId.nativeLanguage1Click else AdsId.nativeLanguage2Click
+        val isClickAdEnabled =
+            if (screenCount == 1) configScript!!.nativeLang1ClickOn else configScript!!.nativeLang2ClickOn
+        if (configScript!!.isNeedToShowADs && isClickAdEnabled) {
+            InfinityAdsManager.loadAd(
+                this, clickAdId, R.layout.layout_native_ad_lang_click, "native_lang_click_tag"
+            )
+            Log.d("AdManager123", "Click ad PRELOADED on Language screen 1 open")
+        }
     }
 
     private fun preloadIntroAds() {
@@ -393,6 +387,8 @@ class Language_Activity : Base__Activity<ActivityLanguageBinding>(),
             binding.done.visibility = View.VISIBLE
         } else {
             // ===== NEW: GpsTracker jevu 2-screen flow =====
+            // Click ad screen 1 khulti vakhte j preload thai gayu chhe (loadLanguageAd ma),
+            // etle screen 2 par te ready hoy -> instant show.
             // Splash flow ma language tap thatra j biju language screen (screen 2) kholo.
             val i = Intent(this, Language_Activity2::class.java)
             i.putExtra("selectedLanguage", languageModel_?.s_lan_code)

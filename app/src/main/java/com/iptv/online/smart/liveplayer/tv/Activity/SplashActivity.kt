@@ -618,11 +618,9 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
     }
     private fun preloadLanguageAdInApp() {
 
-var configScript: RemoteConfigdata? = remoteData
 
         val currentAdId = if (screenCount == 1) AdsId.nativeLanguage1 else AdsId.nativeLanguage2
         val tag = "native_lang_tag"
-        configScript = RemoteConfigdata(this@SplashActivity)
         InfinityAdsManager.loadAd(
             this,
             currentAdId,
@@ -630,21 +628,9 @@ var configScript: RemoteConfigdata? = remoteData
             tag
         )
 
-//        startAdFlow(tag)
 
-        val clickAdId =
-            if (screenCount == 1) AdsId.nativeLanguage1Click else AdsId.nativeLanguage2Click
-        val clickTag = "native_lang_click_tag"
 
-        val isClickAdEnabled = if (screenCount == 1)
-            configScript!!.nativeLang1ClickOn
-        else
-            configScript!!.nativeLang2ClickOn
 
-        if (configScript!!.isNeedToShowADs && isClickAdEnabled) {
-            InfinityAdsManager.loadAd(this, clickAdId, R.layout.layout_native_ad_lang_click, clickTag)
-            Log.d("AdManager123", "Click tag preloaded in onCreate: $clickTag")
-        }
     }
     private fun setConfigData(config: FirebaseRemoteConfig) {
         Log.i(TAG, "setConfigData: $config")

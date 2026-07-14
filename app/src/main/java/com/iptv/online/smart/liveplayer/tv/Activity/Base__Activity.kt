@@ -31,6 +31,7 @@ abstract class Base__Activity<actBinding : ViewBinding> : AppCompatActivity() {
     private var _progressDialog: CustomLoader? = null
 
     private var mInterstitialAd: ApInterstitialAd? = null
+    open val needBackInterAd: Boolean = false
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
@@ -63,15 +64,13 @@ abstract class Base__Activity<actBinding : ViewBinding> : AppCompatActivity() {
         bindListener()
         bindMethod()
         bindObserver()
-        loadInterAds()
+        if (needBackInterAd) loadInterAds()
     }
 
     private fun loadInterAds() {
 
-        if (isInternetAvailable() && RemoteConfigdata(this@Base__Activity).isNeedToShowADs && RemoteConfigdata(
-                this@Base__Activity
-            ).interback
-        ) {
+        val config = RemoteConfigdata(this@Base__Activity)
+        if (isInternetAvailable() && config.isNeedToShowADs && config.interback) {
             ERainAd.getInstance()
                 .getInterstitialAds(this, AdsId.interback, object : AdCallback() {
                     override fun onApInterstitialLoad(apInterstitialAd: ApInterstitialAd?) {

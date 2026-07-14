@@ -27,6 +27,7 @@ import com.iptv.online.smart.liveplayer.tv.adsutils.AdsId
 import com.iptv.online.smart.liveplayer.tv.adsutils.NativeAdUiState
 import com.iptv.online.smart.liveplayer.tv.adsutils.RemoteConfigdata
 import com.iptv.online.smart.liveplayer.tv.databinding.ActivityLanguageBinding
+import com.iptv.online.smart.liveplayer.tv.utils.isIntroFlowDone
 import java.util.Locale
 
 
@@ -99,8 +100,20 @@ class Language_Activity2 : Base__Activity<ActivityLanguageBinding>(),
         setAdapter()
 
         // Screen 2 par "click" native ad batave (screen 1 na click ad jevu).
-        // Aa ad SplashActivity ma pehla thi preload thai gayu hoy chhe.
+        // Aa ad Language screen 1 khulti vakhte pehla thi preload thai gayu hoy chhe.
         loadLanguageClickAd()
+
+        // Onboarding native ad ne AHIYA (screen 2 = Intro ni AGAL-ni screen) PRELOAD karo.
+        // Pehla aa Language screen 1 ma thato hato (2 screen aagal -> vadhu drop-off -> low
+        // show rate). Have 1 j screen aagal -> Intro (IntroFragment1) khule tyare ad READY
+        // (instant, shimmer ochho) + show rate pan saras (demo jevu).
+        if (configScript?.isNeedToShowADs == true) {
+            val isDone = isIntroFlowDone()
+            val onbAdId = if (isDone) AdsId.nativeOnboarding2_1 else AdsId.nativeOnboarding1_1
+            val onbTag = if (isDone) "native_onboarding_2_1" else "native_onboarding_1_1"
+            InfinityAdsManager.loadAd(this, onbAdId, R.layout.layout_native_ad_large, onbTag)
+            Log.d("AdManager123", "Onboarding native PRELOADED on Language screen 2: $onbTag")
+        }
     }
 
     override fun bindListener() {
