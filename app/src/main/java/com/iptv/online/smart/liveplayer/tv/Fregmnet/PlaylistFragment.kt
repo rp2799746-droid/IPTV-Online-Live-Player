@@ -85,7 +85,7 @@ class PlaylistFragment : Fragment() {
     ): View? {
         binding = FragmentPlaylistBinding.inflate(inflater, container, false)
         setupBanner()
-        // Demo jevu CENTRALIZED: interHome ane interMirroring AdsManager thi load.
+        // Centralized: interHome ane interMirroring AdsManager thi load.
         AdsManager.loadInterHome(requireActivity())
         AdsManager.loadInterMirroring(requireActivity())
         configScript = RemoteConfigdata(requireActivity())

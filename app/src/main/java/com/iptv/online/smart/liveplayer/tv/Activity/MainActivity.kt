@@ -140,7 +140,7 @@ class MainActivity : Base__Activity<ActivityMainBinding>() {
             binding.bannerAdLayout.setVisibility(View.GONE)
         }
 
-        // Demo jevu CENTRALIZED: interAddPlaylist ne AdsManager thi load.
+        // Centralized: interAddPlaylist ne AdsManager thi load.
         AdsManager.loadInterAddPlaylist(this)
         binding.viewPager.setAdapter(MyViewPagerAdapter(this))
         binding.viewPager.setOffscreenPageLimit(3)

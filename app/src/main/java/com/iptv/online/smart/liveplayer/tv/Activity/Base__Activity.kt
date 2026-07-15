@@ -63,7 +63,7 @@ abstract class Base__Activity<actBinding : ViewBinding> : AppCompatActivity() {
         bindListener()
         bindMethod()
         bindObserver()
-        // Demo jevu CENTRALIZED: interback ne AdsManager thi load karo (opt-in screen).
+        // Centralized: interback ne AdsManager thi load karo (opt-in screen).
         if (needBackInterAd) AdsManager.loadInterBack(this)
     }
 
@@ -74,7 +74,7 @@ abstract class Base__Activity<actBinding : ViewBinding> : AppCompatActivity() {
     abstract fun bindMethod()
     open fun bindObserver() {}
     override fun onBackPressed() {
-        // Demo jevu: centralized showInterBack -> gating + forceShowInterstitial andar j.
+        // centralized showInterBack -> gating + forceShowInterstitial andar j.
         // Ad ready na hoy to sidhu finish() thay (showInterBack andar handle).
         AdsManager.showInterBack(this) {
             finish()

@@ -34,7 +34,7 @@ class MirrorStepsActivity : Base__Activity<ActivityMirrorStepsBinding>() {
     override fun onBackPressed() {
         if (isTaskRoot) {
             MainActivity.triggerFromMirroring = true
-            // Demo jevu: centralized showInterBack -> ad ready hoy to show, nahi to sidhu navigate.
+            // centralized showInterBack -> ad ready hoy to show, nahi to sidhu navigate.
             AdsManager.showInterBack(this) {
                 val intent = Intent(this, MainActivity::class.java)
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
@@ -55,7 +55,7 @@ class MirrorStepsActivity : Base__Activity<ActivityMirrorStepsBinding>() {
         configScript = RemoteConfigdata(this@MirrorStepsActivity)
 
         nativeAds()
-        // Demo jevu CENTRALIZED: interback ne AdsManager thi load karo.
+        // Centralized: interback ne AdsManager thi load karo.
         AdsManager.loadInterBack(this)
     }
 

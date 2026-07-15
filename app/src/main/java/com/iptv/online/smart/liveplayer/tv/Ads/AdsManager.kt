@@ -31,9 +31,9 @@ object AdsManager {
         adId: String,
         layoutId: Int,
         adTag: String,
-        shouldDisplay: Boolean = true,   // demo na loadNativeInternal jevu: shouldDisplay gating
+        shouldDisplay: Boolean = true,   // shouldDisplay gating
     ) {
-        // Demo na loadNativeInternal jevu gating: needAds + network + shouldDisplay
+        // Gating: needAds + network + shouldDisplay
         if (RemoteConfigdata(context).isNeedToShowADs && context.isInternetAvailable() && shouldDisplay) {
             Log.d("AdManager123", "🔄 Loading ad for tag=$adTag, id=$adId")
             ERainAd.getInstance().loadNativeAdResultCallback(
@@ -100,14 +100,14 @@ object AdsManager {
             }
         } catch (ex: Exception) {
             ex.printStackTrace()
-            40L // કોઈ પણ ભૂલના કિસ્સામાં ડિફોલ્ટ 40
+            40L
         }
     }
 
 
 
-    // ── Interstitial: Onboarding — demo na AdsManager jevu CENTRALIZED load + show ──
-    // Demo ma: AdsManager.loadInterOnboarding / showInterOnboarding. Ad reference ahiya
+    // ── Interstitial: Onboarding — CENTRALIZED load + show ──
+    // Ad reference ahiya
     // ek j centralized member (interOnboarding) ma rahe -> screen pote field na rakhe,
     // badhi jagya aa j method vaapre.
     private var interOnboarding: ApInterstitialAd? = null
@@ -129,7 +129,7 @@ object AdsManager {
     fun showInterOnboarding(activity: Activity, ignoreLimit: Boolean = false, onAction: () -> Unit) {
         val interstitial = interOnboarding
         if (interstitial != null
-            && interstitial.isReady   // demo jevu j: isReady check
+            && interstitial.isReady   // isReady check
             && RemoteConfigdata(activity).isNeedToShowADs
             && (ignoreLimit || activity.getShouldDisplayInterOnboarding())
         ) {
@@ -145,7 +145,7 @@ object AdsManager {
         }
     }
 
-    // ── Bija badha interstitials — CENTRALIZED (demo na AdsManager jevu) ──
+    // ── Bija badha interstitials — CENTRALIZED ──
     // Badha inter nu reference ahiya ek jagya (interAdMap) ma rahe. Screen pote field na rakhe.
     private val interAdMap = mutableMapOf<String, ApInterstitialAd?>()
 

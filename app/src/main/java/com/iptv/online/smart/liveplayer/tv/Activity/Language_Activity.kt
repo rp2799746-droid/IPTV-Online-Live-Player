@@ -41,7 +41,6 @@ class Language_Activity : Base__Activity<ActivityLanguageBinding>(),
     private var preferenceManager: PreferenceManager? = null
     private var sp: SharedPreferences? = null
     private var sp_editor: SharedPreferences.Editor? = null
-//    private var screenCount = 1
     private var configScript: RemoteConfigdata? = null
 
     override fun setViewBinding(): ActivityLanguageBinding {
@@ -49,9 +48,7 @@ class Language_Activity : Base__Activity<ActivityLanguageBinding>(),
     }
 
 
-    companion object {
-        var isAdRefreshedInSession = false
-    }
+
 
     override fun bindObjects() {
 
@@ -133,7 +130,7 @@ class Language_Activity : Base__Activity<ActivityLanguageBinding>(),
 
         startAdFlow(tag)
 
-        // CLICK ad ne Language screen 1 khule tyare J PRELOAD karo (demo jevu; splash ma nahi).
+        // CLICK ad ne Language screen 1 khule tyare J PRELOAD karo (splash ma nahi).
         // Screen 1 nu single action = language tap -> screen 2. Etle je users screen 1 e aave
         // e lagbhag badha screen 2 e jaay -> preload thi screen 2 par ad READY (instant, shimmer
         // ochho) + fakt 1 screen aagal hovathi show rate pan saras.
@@ -370,7 +367,7 @@ class Language_Activity : Base__Activity<ActivityLanguageBinding>(),
             // ===== Settings flow: pehla jevu j single screen (Done batavo) =====
             binding.done.visibility = View.VISIBLE
         } else {
-            // ===== NEW: GpsTracker jevu 2-screen flow =====
+            // ===== NEW: 2-screen flow =====
             // Click ad screen 1 khulti vakhte j preload thai gayu chhe (loadLanguageAd ma),
             // etle screen 2 par te ready hoy -> instant show.
             // Splash flow ma language tap thatra j biju language screen (screen 2) kholo.
@@ -378,7 +375,7 @@ class Language_Activity : Base__Activity<ActivityLanguageBinding>(),
             i.putExtra("selectedLanguage", languageModel_?.s_lan_code)
             i.putExtra("selectedLanguageName", languageModel_?.s_lan_name)
             i.putExtra("isFromSplash", true)
-            // GpsTracker jevu seamless transition (animation vagar) -> jethi activity
+            // seamless transition (animation vagar) -> jethi activity
             // badlati hoy evu na dekhay, same screen par ad refresh thayu hoy evu lage.
             val options = android.app.ActivityOptions.makeCustomAnimation(this, 0, 0)
             startActivity(i, options.toBundle())

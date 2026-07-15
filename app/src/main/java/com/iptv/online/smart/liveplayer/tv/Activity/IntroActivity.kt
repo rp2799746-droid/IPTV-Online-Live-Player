@@ -46,8 +46,8 @@ class IntroActivity : Base__Activity<ActivityIntroBinding>() {
 
 
     override fun bindObjects() {
-        // Demo jevu CENTRALIZED: inter_onboarding ne Intro (onboarding) START ma load karo.
-        // Load ane show banne centralized AdsManager ma chhe (demo na AdsManager jevu).
+        // Centralized: inter_onboarding ne Intro (onboarding) START ma load karo.
+        // Load ane show banne centralized AdsManager ma chhe.
         AdsManager.loadInterOnboarding(this)
         val isDone = isIntroFlowDone()
 
@@ -137,7 +137,7 @@ class IntroActivity : Base__Activity<ActivityIntroBinding>() {
 
     private fun callNext() {
         setIntroFlowDone()
-        // Demo jevu: centralized showInterOnboarding -> gating + forceShowInterstitial andar j.
+        // centralized showInterOnboarding -> gating + forceShowInterstitial andar j.
         AdsManager.showInterOnboarding(this) {
             redirectToNextActivity()
         }
