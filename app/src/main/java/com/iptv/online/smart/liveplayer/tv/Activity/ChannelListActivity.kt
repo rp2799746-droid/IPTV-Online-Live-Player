@@ -48,11 +48,9 @@ class ChannelListActivity : Base__Activity<ActivityChannelListBinding>() {
                 if (configScript!!.nativeChannelList) {
 
                     val handledAds = mutableSetOf<String>()
+                    val tag = "native_channel_list"
 
-                    lifecycleScope.launchWhenStarted {
-                        AdsManager.adStateFlow.collect { states ->
-                            val tag = "native_channel_list"
-                            val state = states[tag]
+                    AdsManager.getAdLive(tag).observe(this@ChannelListActivity) { state ->
                             if (state is NativeAdUiState.Success && !handledAds.contains(tag)) {
                                 handledAds.add(tag) // mark as handled
                                 Log.d(
@@ -96,7 +94,6 @@ class ChannelListActivity : Base__Activity<ActivityChannelListBinding>() {
                                 binding?.frAds?.gone
                             }
 
-                        }
                     }
 
                 } else {

@@ -73,11 +73,9 @@ class FileSelectActivity : Base__Activity<ActivityFileSelectBinding>() {
                 if (configScript!!.nativePlaylist) {
 
                     val handledAds = mutableSetOf<String>()
+                    val tag = "native_playlist"
 
-                    lifecycleScope.launchWhenStarted {
-                        AdsManager.adStateFlow.collect { states ->
-                            val tag = "native_playlist"
-                            val state = states[tag]
+                    AdsManager.getAdLive(tag).observe(this@FileSelectActivity) { state ->
                             if (state is NativeAdUiState.Success && !handledAds.contains(tag)) {
                                 handledAds.add(tag) // mark as handled
                                 Log.d(
@@ -128,7 +126,6 @@ class FileSelectActivity : Base__Activity<ActivityFileSelectBinding>() {
                                 binding?.frAds?.gone
                             }
 
-                        }
                     }
 
                 } else {

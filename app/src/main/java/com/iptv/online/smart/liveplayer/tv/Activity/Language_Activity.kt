@@ -47,9 +47,6 @@ class Language_Activity : Base__Activity<ActivityLanguageBinding>(),
         return ActivityLanguageBinding.inflate(getLayoutInflater())
     }
 
-
-
-
     override fun bindObjects() {
 
         sp = getSharedPreferences(getPackageName(), 0)
@@ -114,10 +111,7 @@ class Language_Activity : Base__Activity<ActivityLanguageBinding>(),
         binding.recyclerView.layoutManager = LinearLayoutManager(this)
         loadSavedLanguage()
         setAdapter()
-        // NA karo -> te bahu vehlu hatu (Intro sudhi user pohonche tya sudhi ghana exit thai
-        // jata -> show rate 23%). Have IntroFragment1 pote j (jyare Intro khule tyare) load
-        // kare che (eno fallback che), etle load show point ni najik thay -> show rate uncho.
-        // preloadIntroAds()
+
     }
 
 
@@ -129,16 +123,7 @@ class Language_Activity : Base__Activity<ActivityLanguageBinding>(),
 
         startAdFlow(tag)
 
-        val clickAdId =
-            if (screenCount == 1) AdsId.nativeLanguage1Click else AdsId.nativeLanguage2Click
-        val isClickAdEnabled =
-            if (screenCount == 1) configScript!!.nativeLang1ClickOn else configScript!!.nativeLang2ClickOn
-        if (configScript!!.isNeedToShowADs && isClickAdEnabled) {
-            AdsManager.loadAd(
-                this, clickAdId, R.layout.layout_native_ad_lang_click, "native_lang_click_tag"
-            )
-            Log.d("AdManager123", "Click ad PRELOADED on Language screen 1 open")
-        }
+        AdsManager.loadNativeLanguageClick(this, screenCount)
     }
 
 
@@ -154,9 +139,7 @@ class Language_Activity : Base__Activity<ActivityLanguageBinding>(),
             }
 
             if (config.isNeedToShowADs && isAdEnabled) {
-                lifecycleScope.launchWhenStarted {
-                    AdsManager.adStateFlow.collect { states ->
-                        val state = states[tag]
+                AdsManager.getAdLive(tag).observe(this@Language_Activity) { state ->
 
                         if (state is NativeAdUiState.Success) {
                             binding.adShimmer.root.visibility = View.GONE
@@ -217,7 +200,6 @@ class Language_Activity : Base__Activity<ActivityLanguageBinding>(),
                             binding.adShimmer.root.visibility = View.GONE
                             binding.frAds.visibility = View.GONE
                         }
-                    }
                 }
             } else {
                 binding.adShimmer.root.visibility = View.GONE
@@ -266,28 +248,12 @@ class Language_Activity : Base__Activity<ActivityLanguageBinding>(),
             val isFromSettings = intent.getBooleanExtra("settingss", false)
 
             if (isFromSettings) {
-                // ===== FIX 2: reliable + FAST (no flash) =====
-                // Problem: fakt finish() karta jivti juni SettingsActivity (juni/english
-                // language) pehla dekhati, pachi onResume ma recreate() thato -> flash +
-                // "time lage che" evu lagtu.
-                // Solution: CLEAR_TOP thi SettingsActivity ne finish+FRESH recreate karo.
-                // Standard launchMode hovathi CLEAR_TOP = e instance destroy thai ne navu
-                // bane -> navu attachBaseContext SIDHU navi language ma render kare (juni
-                // english no flash j na aave). MainActivity back-stack ma saval rahe che.
-                // SettingsActivity.onResume nu recreate() logic have safety-net tarike rahe.
+
                 val i = Intent(this, SettingsActivity::class.java)
                 i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                 startActivity(i)
                 finish()
 
-                // ===== OLD approaches (comment karya chhe, delete nathi karya) =====
-                // finish()   // FIX 1: reliable pan flash aavto
-                /*
-                val intent = Intent(this, SettingsActivity::class.java)
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                startActivity(intent)
-                finish()
-                */
             } else {
                 val intent = Intent(this, IntroActivity::class.java)
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
@@ -372,23 +338,6 @@ class Language_Activity : Base__Activity<ActivityLanguageBinding>(),
             startActivity(i, options.toBundle())
             overridePendingTransition(0, 0)
 
-            // ===== OLD single-screen behaviour (comment karyu chhe, delete nathi karyu) =====
-            /*
-            if (!isAdRefreshedInSession) {
-                startAdFlow("native_lang_click_tag")
-                isAdRefreshedInSession = true
-            }
-
-            if (configScript?.delayButtonDoneLanguage == true) {
-                binding.done.visibility = View.INVISIBLE
-                Handler(Looper.getMainLooper()).removeCallbacksAndMessages(null)
-                Handler(Looper.getMainLooper()).postDelayed({
-                    binding.done.visibility = View.VISIBLE
-                }, 3000)
-            } else {
-                binding.done.visibility = View.VISIBLE
-            }
-            */
         }
     }
 

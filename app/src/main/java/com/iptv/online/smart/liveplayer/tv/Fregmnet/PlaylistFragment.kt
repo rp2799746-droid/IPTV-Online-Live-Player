@@ -166,11 +166,9 @@ class PlaylistFragment : Fragment() {
 
                     val handledAds = mutableSetOf<String>()
                     val retriedTags = mutableSetOf<String>()
+                    val tag = "native_home_2005"
 
-                    lifecycleScope.launchWhenStarted {
-                        AdsManager.adStateFlow.collect { states ->
-                            val tag = "native_home_2005"
-                            val state = states[tag]
+                    AdsManager.getAdLive(tag).observe(viewLifecycleOwner) { state ->
                             if (state is NativeAdUiState.Success && !handledAds.contains(tag)) {
                                 handledAds.add(tag) // mark as handled
                                 Log.d(
@@ -228,7 +226,6 @@ class PlaylistFragment : Fragment() {
                                 }
                             }
 
-                        }
                     }
 
                 } else {

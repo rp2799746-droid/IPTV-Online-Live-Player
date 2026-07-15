@@ -46,15 +46,9 @@ class FavoriteFragment : Fragment() {
         configScript = RemoteConfigdata(requireActivity())
 
 
-        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
-            AdsManager.adStateFlow.collect { states ->
-                val state = states["native_favorite_2005"]
-
-                // જો સ્ટેટ Success હોય કે Loading હોય, બંને વખતે એડેપ્ટરને જાણ કરો
-                // જેથી તે શિમર અથવા એડ બતાવી શકે
-                if (state is NativeAdUiState.Success || state is NativeAdUiState.Loading) {
-                    adapter?.notifyDataSetChanged()
-                }
+        AdsManager.getAdLive("native_favorite_2005").observe(viewLifecycleOwner) { state ->
+            if (state is NativeAdUiState.Success || state is NativeAdUiState.Loading) {
+                adapter?.notifyDataSetChanged()
             }
         }
 

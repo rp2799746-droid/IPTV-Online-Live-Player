@@ -80,7 +80,7 @@ class FavoriteAdapter(private val context: Context, incomingList: MutableList<Ch
 
     private fun handleNativeAd(adHolder: AdViewHolder) {
         val tag = "native_favorite_2005"
-        val state = AdsManager.adStateFlow.value[tag]
+        val state = AdsManager.getAdLive(tag).value
 
         if (isAdEnabled) {
             adHolder.itemView.visibility = View.VISIBLE

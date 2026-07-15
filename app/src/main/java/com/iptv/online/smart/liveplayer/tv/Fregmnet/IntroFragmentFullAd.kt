@@ -60,16 +60,12 @@ class IntroFragmentFullAd : BaseFragment<FragmentIntroFullAdBinding>(), LazyShow
             if (currentConfig.nativeOnbFull1On) {
                 val handledAds = mutableSetOf<String>()
                 val retriedTags = mutableSetOf<String>()
+                val activeActivity = activity ?: return
+                val tag = if (activeActivity.isIntroFlowDone())
+                    "native_onboarding_full_2"
+                else "native_onboarding_full_1"
 
-                lifecycleScope.launchWhenStarted {
-                    AdsManager.adStateFlow.collect { states ->
-                        val activeActivity = activity ?: return@collect
-
-                        val tag = if (activeActivity.isIntroFlowDone())
-                            "native_onboarding_full_2"
-                        else "native_onboarding_full_1"
-
-                        val state = states[tag]
+                AdsManager.getAdLive(tag).observe(viewLifecycleOwner) { state ->
 
                         if (state is NativeAdUiState.Success && !handledAds.contains(tag)) {
                             handledAds.add(tag)
@@ -158,7 +154,6 @@ class IntroFragmentFullAd : BaseFragment<FragmentIntroFullAdBinding>(), LazyShow
                                 binding.ivCloseAd.visible
                             }
                         }
-                    }
                 }
             } else {
                 binding.adShimmer.root.gone

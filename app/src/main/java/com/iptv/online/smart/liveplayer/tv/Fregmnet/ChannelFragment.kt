@@ -81,11 +81,9 @@ class ChannelFragment : Fragment() {
                 if (configScript!!.nativechannel2005) {
 
                     val handledAds = mutableSetOf<String>()
+                    val tag = "native_channel_2005"
 
-                    lifecycleScope.launchWhenStarted {
-                        AdsManager.adStateFlow.collect { states ->
-                            val tag = "native_channel_2005"
-                            val state = states[tag]
+                    AdsManager.getAdLive(tag).observe(viewLifecycleOwner) { state ->
                             if (state is NativeAdUiState.Success && !handledAds.contains(tag)) {
                                 handledAds.add(tag) // mark as handled
                                 Log.d("AdManager121113", "[$tag] Success,🚀 showing ad is [${state.adsID}]")
@@ -126,7 +124,6 @@ class ChannelFragment : Fragment() {
                                 binding?.frAds?.gone
                             }
 
-                        }
                     }
 
                 } else {

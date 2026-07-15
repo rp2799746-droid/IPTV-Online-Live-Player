@@ -3,6 +3,8 @@ package com.iptv.online.smart.liveplayer.tv.Ads
 import android.app.Activity
 import android.util.Log
 import android.view.View
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.ads.module.ads.ERainAd
 import com.ads.module.ads.wrapper.ApInterstitialAd
 import com.ads.module.ads.wrapper.ApNativeAd
@@ -10,6 +12,7 @@ import com.ads.module.funtion.AdCallback
 import com.ads.module.util.AppConstant
 import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.LoadAdError
+import com.iptv.online.smart.liveplayer.tv.R
 import com.iptv.online.smart.liveplayer.tv.adsutils.AdsId
 import com.iptv.online.smart.liveplayer.tv.adsutils.NativeAdUiState
 import com.iptv.online.smart.liveplayer.tv.adsutils.RemoteConfigdata
@@ -25,13 +28,13 @@ object AdsManager {
 
     private val _adStateFlow = MutableStateFlow<Map<String, NativeAdUiState>>(emptyMap())
     val adStateFlow: StateFlow<Map<String, NativeAdUiState>> get() = _adStateFlow
+
+    private val adLiveMap = mutableMapOf<String, MutableLiveData<NativeAdUiState>>()
+    fun getAdLive(tag: String): LiveData<NativeAdUiState> =
+        adLiveMap.getOrPut(tag) { MutableLiveData() }
+
     private val currentAds = mutableMapOf<String, ApNativeAd?>()
-    fun loadAd(
-        context: Activity,
-        adId: String,
-        layoutId: Int,
-        adTag: String,
-        shouldDisplay: Boolean = true,
+    fun loadAd(context: Activity, adId: String, layoutId: Int, adTag: String, shouldDisplay: Boolean = true,
     ) {
         if (RemoteConfigdata(context).isNeedToShowADs && context.isInternetAvailable() && shouldDisplay) {
             Log.d("AdManager123", "🔄 Loading ad for tag=$adTag, id=$adId")
@@ -78,10 +81,29 @@ object AdsManager {
         }
     }
 
+    fun loadNativeLanguage(activity: Activity, screenCount: Int) {
+        val adId = if (screenCount == 1) AdsId.nativeLanguage1 else AdsId.nativeLanguage2
+        loadAd(activity, adId, R.layout.layout_native_ad_large, "native_lang_tag")
+    }
+
+    fun loadNativeLanguageClick(activity: Activity, screenCount: Int) {
+        val adId = if (screenCount == 1) AdsId.nativeLanguage1Click else AdsId.nativeLanguage2Click
+        val enabled = if (screenCount == 1) RemoteConfigdata(activity).nativeLang1ClickOn
+        else RemoteConfigdata(activity).nativeLang2ClickOn
+        loadAd(activity, adId, R.layout.layout_native_ad_lang_click, "native_lang_click_tag", enabled)
+    }
+
+    fun loadNativeOnboarding1(activity: Activity, isDone: Boolean) {
+        val adId = if (isDone) AdsId.nativeOnboarding2_1 else AdsId.nativeOnboarding1_1
+        val tag = if (isDone) "native_onboarding_2_1" else "native_onboarding_1_1"
+        loadAd(activity, adId, R.layout.layout_native_ad_large, tag)
+    }
+
     private fun updateAdState(tagName: String, state: NativeAdUiState) {
         _adStateFlow.value = _adStateFlow.value.toMutableMap().apply {
             this[tagName] = state
         }
+        adLiveMap.getOrPut(tagName) { MutableLiveData() }.postValue(state)
     }
 
     fun getCTAButtonHeight(context: android.content.Context): Long {
@@ -197,7 +219,7 @@ object AdsManager {
         Log.d("AdManager123", "Attempting to load Collapsible Banner: $adId")
 
         if (config.isNeedToShowADs) {
-            Log.d("AdManager123", "Ads Enabled: true. Showing layout and calling load.")
+            // Container turat batavo -> shimmer instant dekhay, pachi banner emma aave.
             adLayout.visible
 
             ERainAd.getInstance().loadCollapsibleBanner(
@@ -212,6 +234,7 @@ object AdsManager {
 
                     override fun onAdFailedToLoad(i: LoadAdError?) {
                         super.onAdFailedToLoad(i)
+                        adLayout.gone
                         Log.e("AdManager123", "Collapsible Banner Failed to Load. Error Code: $i")
                     }
 

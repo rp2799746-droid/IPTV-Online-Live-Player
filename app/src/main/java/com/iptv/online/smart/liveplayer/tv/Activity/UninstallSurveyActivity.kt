@@ -45,11 +45,9 @@ class UninstallSurveyActivity : Base__Activity<UninstallSurveyBinding>() {
                 if (configScript!!.nativesurveyUninstall) {
 
                     val handledAds = mutableSetOf<String>()
+                    val tag = "native_survey_uninstall"
 
-                    lifecycleScope.launchWhenStarted {
-                        AdsManager.adStateFlow.collect { states ->
-                            val tag = "native_survey_uninstall"
-                            val state = states[tag]
+                    AdsManager.getAdLive(tag).observe(this@UninstallSurveyActivity) { state ->
                             if (state is NativeAdUiState.Success && !handledAds.contains(tag)) {
                                 handledAds.add(tag) // mark as handled
                                 Log.d(
@@ -93,7 +91,6 @@ class UninstallSurveyActivity : Base__Activity<UninstallSurveyBinding>() {
                                 binding?.frAds?.gone
                             }
 
-                        }
                     }
 
                 } else {

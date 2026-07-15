@@ -131,7 +131,7 @@ class Historychannel(private val context: Context, private val channelList: Muta
 
     private fun loadNativeAdForAdapter(adHolder: AdViewHolder) {
         val tag = "native_history_2005"
-        val state = AdsManager.adStateFlow.value[tag]
+        val state = AdsManager.getAdLive(tag).value
 
         if (state is NativeAdUiState.Success) {
             adHolder.itemView.visibility = View.VISIBLE

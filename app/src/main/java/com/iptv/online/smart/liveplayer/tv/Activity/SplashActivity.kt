@@ -617,16 +617,7 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
         RemoteConfigdata(this)
     }
     private fun preloadLanguageAdInApp() {
-
-
-        val currentAdId = if (screenCount == 1) AdsId.nativeLanguage1 else AdsId.nativeLanguage2
-        val tag = "native_lang_tag"
-        AdsManager.loadAd(
-            this,
-            currentAdId,
-            R.layout.layout_native_ad_large,
-            tag
-        )
+        AdsManager.loadNativeLanguage(this, screenCount)
 
 
 

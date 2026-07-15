@@ -66,16 +66,12 @@ class IntroFragment1 : BaseFragment<FragmentIntro1Binding>() {
         if (configScript.isNeedToShowADs && configScript.nativeOnb11On) {
             val handledAds = mutableSetOf<String>()
             val retriedTags = mutableSetOf<String>()
+            val activeActivity = activity ?: return
+            val tag = if (activeActivity.isIntroFlowDone())
+                "native_onboarding_2_1"
+            else "native_onboarding_1_1"
 
-            lifecycleScope.launchWhenStarted {
-                AdsManager.adStateFlow.collect { states ->
-                    val activeActivity = activity ?: return@collect
-
-                    val tag = if (activeActivity.isIntroFlowDone())
-                        "native_onboarding_2_1"
-                    else "native_onboarding_1_1"
-
-                    val state = states[tag]
+            AdsManager.getAdLive(tag).observe(viewLifecycleOwner) { state ->
 
                     if (state is NativeAdUiState.Success && !handledAds.contains(tag)) {
                         handledAds.add(tag)
@@ -133,7 +129,6 @@ class IntroFragment1 : BaseFragment<FragmentIntro1Binding>() {
                             }
                         }
                     }
-                }
             }
         } else {
             binding.adShimmer.root.gone

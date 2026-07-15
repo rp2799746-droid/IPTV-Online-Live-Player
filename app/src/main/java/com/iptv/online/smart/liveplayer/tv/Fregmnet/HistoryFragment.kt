@@ -39,11 +39,9 @@ class HistoryFragment : Fragment() {
         layoutNoData = view.findViewById<LinearLayout?>(R.id.layoutNoData)
 
 
-        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
-            AdsManager.adStateFlow.collect { states ->
-                if (states["native_history_2005"] is NativeAdUiState.Success) {
-                    adapter?.notifyDataSetChanged()
-                }
+        AdsManager.getAdLive("native_history_2005").observe(viewLifecycleOwner) { state ->
+            if (state is NativeAdUiState.Success) {
+                adapter?.notifyDataSetChanged()
             }
         }
         return view

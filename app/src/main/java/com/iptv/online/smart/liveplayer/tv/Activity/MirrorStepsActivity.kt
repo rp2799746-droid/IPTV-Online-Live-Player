@@ -63,11 +63,9 @@ class MirrorStepsActivity : Base__Activity<ActivityMirrorStepsBinding>() {
                 if (configScript!!.nativeMirroring) {
 
                     val handledAds = mutableSetOf<String>()
+                    val tag = "native_mirroring"
 
-                    lifecycleScope.launchWhenStarted {
-                        AdsManager.adStateFlow.collect { states ->
-                            val tag = "native_mirroring"
-                            val state = states[tag]
+                    AdsManager.getAdLive(tag).observe(this@MirrorStepsActivity) { state ->
                             if (state is NativeAdUiState.Success && !handledAds.contains(tag)) {
                                 handledAds.add(tag) // mark as handled
                                 Log.d(
@@ -112,7 +110,6 @@ class MirrorStepsActivity : Base__Activity<ActivityMirrorStepsBinding>() {
                                 binding?.frAds?.gone
                             }
 
-                        }
                     }
 
                 } else {

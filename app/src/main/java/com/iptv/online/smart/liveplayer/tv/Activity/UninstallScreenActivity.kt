@@ -39,11 +39,9 @@ class UninstallScreenActivity : Base__Activity<UninstallScreeenBinding>() {
                 if (configScript!!.nativeUninstall) {
 
                     val handledAds = mutableSetOf<String>()
+                    val tag = "native_uninstall"
 
-                    lifecycleScope.launchWhenStarted {
-                        AdsManager.adStateFlow.collect { states ->
-                            val tag = "native_uninstall"
-                            val state = states[tag]
+                    AdsManager.getAdLive(tag).observe(this@UninstallScreenActivity) { state ->
                             if (state is NativeAdUiState.Success && !handledAds.contains(tag)) {
                                 handledAds.add(tag) // mark as handled
                                 Log.d(
@@ -87,7 +85,6 @@ class UninstallScreenActivity : Base__Activity<UninstallScreeenBinding>() {
                                 binding?.frAds?.gone
                             }
 
-                        }
                     }
 
                 } else {

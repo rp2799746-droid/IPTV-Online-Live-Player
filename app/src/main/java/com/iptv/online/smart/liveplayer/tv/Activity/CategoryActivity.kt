@@ -65,11 +65,9 @@ class CategoryActivity : Base__Activity<ActivityCategoryBinding>() {
                 if (configScript!!.nativechannel2005) {
 
                     val handledAds = mutableSetOf<String>()
+                    val tag = "native_channel_2005"
 
-                    lifecycleScope.launchWhenStarted {
-                        AdsManager.adStateFlow.collect { states ->
-                            val tag = "native_channel_2005"
-                            val state = states[tag]
+                    AdsManager.getAdLive(tag).observe(this@CategoryActivity) { state ->
                             if (state is NativeAdUiState.Success && !handledAds.contains(tag)) {
                                 handledAds.add(tag) // mark as handled
                                 Log.d(
@@ -117,7 +115,6 @@ class CategoryActivity : Base__Activity<ActivityCategoryBinding>() {
                                 binding?.frAds?.gone
                             }
 
-                        }
                     }
 
                 } else {

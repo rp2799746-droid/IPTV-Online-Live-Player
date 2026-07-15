@@ -99,18 +99,9 @@ class Language_Activity2 : Base__Activity<ActivityLanguageBinding>(),
         binding.recyclerView.layoutManager = LinearLayoutManager(this)
         setAdapter()
 
-        // Screen 2 par "click" native ad batave (screen 1 na click ad jevu).
-        // Aa ad Language screen 1 khulti vakhte pehla thi preload thai gayu hoy chhe.
         loadLanguageClickAd()
 
-        // Onboarding native ad ne AHIYA (screen 2 = Intro ni AGAL-ni screen) PRELOAD karo.
-        if (configScript?.isNeedToShowADs == true) {
-            val isDone = isIntroFlowDone()
-            val onbAdId = if (isDone) AdsId.nativeOnboarding2_1 else AdsId.nativeOnboarding1_1
-            val onbTag = if (isDone) "native_onboarding_2_1" else "native_onboarding_1_1"
-            AdsManager.loadAd(this, onbAdId, R.layout.layout_native_ad_large, onbTag)
-            Log.d("AdManager123", "Onboarding native PRELOADED on Language screen 2: $onbTag")
-        }
+        AdsManager.loadNativeOnboarding1(this, isIntroFlowDone())
     }
 
     override fun bindListener() {
@@ -137,9 +128,7 @@ class Language_Activity2 : Base__Activity<ActivityLanguageBinding>(),
 
             if (config.isNeedToShowADs && isAdEnabled) {
                 val retriedTags = mutableSetOf<String>()
-                lifecycleScope.launchWhenStarted {
-                    AdsManager.adStateFlow.collect { states ->
-                        val state = states[tag]
+                AdsManager.getAdLive(tag).observe(this@Language_Activity2) { state ->
                         if (state is NativeAdUiState.Success) {
                             Log.d("AdManager123", "[$tag] Success, 🚀 showing ID: [${state.adsID}]")
                             binding.adShimmer.root.visibility = View.GONE
@@ -199,7 +188,6 @@ class Language_Activity2 : Base__Activity<ActivityLanguageBinding>(),
                                 }
                             }
                         }
-                    }
                 }
             } else {
                 binding.adShimmer.root.visibility = View.GONE
