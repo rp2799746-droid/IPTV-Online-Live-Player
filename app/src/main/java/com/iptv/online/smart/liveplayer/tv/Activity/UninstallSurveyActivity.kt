@@ -9,7 +9,7 @@ import androidx.lifecycle.lifecycleScope
 import com.ads.module.ads.ERainAd
 import com.iptv.online.smart.liveplayer.tv.R
 import com.iptv.online.smart.liveplayer.tv.adsutils.AdsId
-import com.iptv.online.smart.liveplayer.tv.Ads.InfinityAdsManager
+import com.iptv.online.smart.liveplayer.tv.Ads.AdsManager
 import com.iptv.online.smart.liveplayer.tv.adsutils.NativeAdUiState
 import com.iptv.online.smart.liveplayer.tv.adsutils.RemoteConfigdata
 import com.iptv.online.smart.liveplayer.tv.databinding.UninstallSurveyBinding
@@ -29,7 +29,7 @@ class UninstallSurveyActivity : Base__Activity<UninstallSurveyBinding>() {
     override fun bindObjects() {
 
         configScript = RemoteConfigdata(this@UninstallSurveyActivity)
-        InfinityAdsManager.loadAd(
+        AdsManager.loadAd(
             this@UninstallSurveyActivity,
             AdsId.NATIVE_SURVEY_UNINSTALL,
             R.layout.layout_native_ad_large,
@@ -47,7 +47,7 @@ class UninstallSurveyActivity : Base__Activity<UninstallSurveyBinding>() {
                     val handledAds = mutableSetOf<String>()
 
                     lifecycleScope.launchWhenStarted {
-                        InfinityAdsManager.adStateFlow.collect { states ->
+                        AdsManager.adStateFlow.collect { states ->
                             val tag = "native_survey_uninstall"
                             val state = states[tag]
                             if (state is NativeAdUiState.Success && !handledAds.contains(tag)) {

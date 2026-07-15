@@ -43,7 +43,7 @@ import com.iptv.online.smart.liveplayer.tv.R
 import com.iptv.online.smart.liveplayer.tv.adsutils.AdsId
 import com.iptv.online.smart.liveplayer.tv.adsutils.EasyPreferences
 import com.iptv.online.smart.liveplayer.tv.adsutils.EasyPreferences.set
-import com.iptv.online.smart.liveplayer.tv.Ads.InfinityAdsManager
+import com.iptv.online.smart.liveplayer.tv.Ads.AdsManager
 import com.iptv.online.smart.liveplayer.tv.BuildConfig
 import com.iptv.online.smart.liveplayer.tv.adsutils.RemoteConfigdata
 import com.iptv.online.smart.liveplayer.tv.adsutils.getShouldDisplayWidgetUninstall
@@ -621,7 +621,7 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
 
         val currentAdId = if (screenCount == 1) AdsId.nativeLanguage1 else AdsId.nativeLanguage2
         val tag = "native_lang_tag"
-        InfinityAdsManager.loadAd(
+        AdsManager.loadAd(
             this,
             currentAdId,
             R.layout.layout_native_ad_large,

@@ -10,7 +10,7 @@ import com.iptv.online.smart.liveplayer.tv.Adapter.ChannelAdapter
 import com.iptv.online.smart.liveplayer.tv.Model.AppDatabase
 import com.iptv.online.smart.liveplayer.tv.R
 import com.iptv.online.smart.liveplayer.tv.adsutils.AdsId
-import com.iptv.online.smart.liveplayer.tv.Ads.InfinityAdsManager
+import com.iptv.online.smart.liveplayer.tv.Ads.AdsManager
 import com.iptv.online.smart.liveplayer.tv.adsutils.NativeAdUiState
 import com.iptv.online.smart.liveplayer.tv.adsutils.RemoteConfigdata
 import com.iptv.online.smart.liveplayer.tv.databinding.ActivityChannelListBinding
@@ -50,7 +50,7 @@ class ChannelListActivity : Base__Activity<ActivityChannelListBinding>() {
                     val handledAds = mutableSetOf<String>()
 
                     lifecycleScope.launchWhenStarted {
-                        InfinityAdsManager.adStateFlow.collect { states ->
+                        AdsManager.adStateFlow.collect { states ->
                             val tag = "native_channel_list"
                             val state = states[tag]
                             if (state is NativeAdUiState.Success && !handledAds.contains(tag)) {

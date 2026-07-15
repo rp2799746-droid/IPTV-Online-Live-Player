@@ -21,13 +21,20 @@ import com.iptv.online.smart.liveplayer.tv.utils.visible
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
-object InfinityAdsManager {
+object AdsManager {
 
     private val _adStateFlow = MutableStateFlow<Map<String, NativeAdUiState>>(emptyMap())
     val adStateFlow: StateFlow<Map<String, NativeAdUiState>> get() = _adStateFlow
     private val currentAds = mutableMapOf<String, ApNativeAd?>()
-    fun loadAd(context: Activity, adId: String, layoutId: Int, adTag: String) {
-        if (RemoteConfigdata(context).isNeedToShowADs) {
+    fun loadAd(
+        context: Activity,
+        adId: String,
+        layoutId: Int,
+        adTag: String,
+        shouldDisplay: Boolean = true,   // demo na loadNativeInternal jevu: shouldDisplay gating
+    ) {
+        // Demo na loadNativeInternal jevu gating: needAds + network + shouldDisplay
+        if (RemoteConfigdata(context).isNeedToShowADs && context.isInternetAvailable() && shouldDisplay) {
             Log.d("AdManager123", "🔄 Loading ad for tag=$adTag, id=$adId")
             ERainAd.getInstance().loadNativeAdResultCallback(
                 context, adId, layoutId, object : AdCallback() {
@@ -78,7 +85,7 @@ object InfinityAdsManager {
         }
     }
 
-    // InfinityAdsManager object ની અંદર
+    // AdsManager object ની અંદર
     fun getCTAButtonHeight(context: android.content.Context): Long {
         return try {
             val remoteData = RemoteConfigdata(context)
@@ -109,7 +116,6 @@ object InfinityAdsManager {
         val config = RemoteConfigdata(activity)
         if (!config.isNeedToShowADs
             || !config.interOnboardingOn
-            || !activity.isInternetAvailable()
             || (!ignoreLimit && !activity.getShouldDisplayInterOnboarding())
         ) {
             interOnboarding = null
@@ -123,6 +129,7 @@ object InfinityAdsManager {
     fun showInterOnboarding(activity: Activity, ignoreLimit: Boolean = false, onAction: () -> Unit) {
         val interstitial = interOnboarding
         if (interstitial != null
+            && interstitial.isReady   // demo jevu j: isReady check
             && RemoteConfigdata(activity).isNeedToShowADs
             && (ignoreLimit || activity.getShouldDisplayInterOnboarding())
         ) {
@@ -144,7 +151,7 @@ object InfinityAdsManager {
 
     private fun loadInterCentralized(activity: Activity, key: String, adId: String, enabled: Boolean) {
         val config = RemoteConfigdata(activity)
-        if (!config.isNeedToShowADs || !enabled || !activity.isInternetAvailable()) {
+        if (!config.isNeedToShowADs || !enabled) {
             interAdMap[key] = null
             return
         }
@@ -157,7 +164,7 @@ object InfinityAdsManager {
         activity: Activity, key: String, enabled: Boolean, onAction: () -> Unit
     ) {
         val ad = interAdMap[key]
-        if (ad != null && RemoteConfigdata(activity).isNeedToShowADs && enabled) {
+        if (ad != null && ad.isReady && RemoteConfigdata(activity).isNeedToShowADs && enabled) {
             ERainAd.getInstance().forceShowInterstitial(activity, ad, object : AdCallback() {
                 override fun onNextAction() {
                     super.onNextAction()

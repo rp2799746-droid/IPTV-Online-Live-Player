@@ -30,8 +30,8 @@ import com.ads.module.funtion.AdCallback
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import com.iptv.online.smart.liveplayer.tv.Adapter.MyViewPagerAdapter
-import com.iptv.online.smart.liveplayer.tv.Ads.InfinityAdsManager
-import com.iptv.online.smart.liveplayer.tv.Ads.InfinityAdsManager.loadAndShowCollapsingBanner
+import com.iptv.online.smart.liveplayer.tv.Ads.AdsManager
+import com.iptv.online.smart.liveplayer.tv.Ads.AdsManager.loadAndShowCollapsingBanner
 import com.iptv.online.smart.liveplayer.tv.R
 import com.iptv.online.smart.liveplayer.tv.adsutils.AdsId
 
@@ -140,8 +140,8 @@ class MainActivity : Base__Activity<ActivityMainBinding>() {
             binding.bannerAdLayout.setVisibility(View.GONE)
         }
 
-        // Demo jevu CENTRALIZED: interAddPlaylist ne InfinityAdsManager thi load.
-        InfinityAdsManager.loadInterAddPlaylist(this)
+        // Demo jevu CENTRALIZED: interAddPlaylist ne AdsManager thi load.
+        AdsManager.loadInterAddPlaylist(this)
         binding.viewPager.setAdapter(MyViewPagerAdapter(this))
         binding.viewPager.setOffscreenPageLimit(3)
 
@@ -161,7 +161,7 @@ class MainActivity : Base__Activity<ActivityMainBinding>() {
 
         //preload
         if (configScript!!.nativechannel2005) {
-            InfinityAdsManager.loadAd(
+            AdsManager.loadAd(
                 this@MainActivity,
                 AdsId.nativechannel2005,
                 R.layout.layout_native_ad_medium_channel,
@@ -169,7 +169,7 @@ class MainActivity : Base__Activity<ActivityMainBinding>() {
             )
         }
         if (configScript!!.nativeMirroring) {
-            InfinityAdsManager.loadAd(
+            AdsManager.loadAd(
                 this@MainActivity,
                 AdsId.NATIVE_MIRRORING,
                 R.layout.layout_native_ad_large,
@@ -178,7 +178,7 @@ class MainActivity : Base__Activity<ActivityMainBinding>() {
         }
 
         if (configScript!!.nativeChannelList) {
-            InfinityAdsManager.loadAd(
+            AdsManager.loadAd(
                 this@MainActivity,
                 AdsId.NATIVE_CHANNELLIST,
                 R.layout.layout_native_ad_large,
@@ -186,7 +186,7 @@ class MainActivity : Base__Activity<ActivityMainBinding>() {
             )
         }
         if (configScript!!.nativePlaylist) {
-            InfinityAdsManager.loadAd(
+            AdsManager.loadAd(
                 this@MainActivity,
                 AdsId.NATIVE_PLAYLIST,
                 R.layout.layout_native_ad_large,
@@ -197,7 +197,7 @@ class MainActivity : Base__Activity<ActivityMainBinding>() {
 
 
         if (configScript!!.nativefavorite2005) {
-            InfinityAdsManager.loadAd(
+            AdsManager.loadAd(
                 this@MainActivity,
                 AdsId.nativefavorite2005,
                 R.layout.layout_native_ad_small,
@@ -205,7 +205,7 @@ class MainActivity : Base__Activity<ActivityMainBinding>() {
             )
         }
         if (configScript!!.nativehistory2005) {
-            InfinityAdsManager.loadAd(
+            AdsManager.loadAd(
                 this@MainActivity,
                 AdsId.nativehistory2005,
                 R.layout.layout_native_ad_small,
@@ -222,7 +222,7 @@ class MainActivity : Base__Activity<ActivityMainBinding>() {
         binding.fabAdd.setOnClickListener({ v ->
 
 
-            InfinityAdsManager.showInterAddPlaylist(this) {
+            AdsManager.showInterAddPlaylist(this) {
                 val intent = Intent(this@MainActivity, FileSelectActivity::class.java)
                 startActivity(intent)
             }

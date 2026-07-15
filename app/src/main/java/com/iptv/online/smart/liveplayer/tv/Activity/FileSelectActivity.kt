@@ -24,7 +24,7 @@ import com.iptv.online.smart.liveplayer.tv.Model.AppDatabase
 import com.iptv.online.smart.liveplayer.tv.R
 import com.iptv.online.smart.liveplayer.tv.ReadFile.FileReader
 import com.iptv.online.smart.liveplayer.tv.adsutils.AdsId
-import com.iptv.online.smart.liveplayer.tv.Ads.InfinityAdsManager
+import com.iptv.online.smart.liveplayer.tv.Ads.AdsManager
 import com.iptv.online.smart.liveplayer.tv.adsutils.NativeAdUiState
 import com.iptv.online.smart.liveplayer.tv.adsutils.RemoteConfigdata
 import com.iptv.online.smart.liveplayer.tv.adsutils.isInternetAvailable
@@ -51,8 +51,8 @@ class FileSelectActivity : Base__Activity<ActivityFileSelectBinding>() {
         configScript = RemoteConfigdata(this@FileSelectActivity)
 
         nativeAds()
-        // Demo jevu CENTRALIZED: interAddPlaylist ne InfinityAdsManager thi load.
-        InfinityAdsManager.loadInterAddPlaylist(this)
+        // Demo jevu CENTRALIZED: interAddPlaylist ne AdsManager thi load.
+        AdsManager.loadInterAddPlaylist(this)
     }
 
     override fun bindListener() {
@@ -76,7 +76,7 @@ class FileSelectActivity : Base__Activity<ActivityFileSelectBinding>() {
                     val handledAds = mutableSetOf<String>()
 
                     lifecycleScope.launchWhenStarted {
-                        InfinityAdsManager.adStateFlow.collect { states ->
+                        AdsManager.adStateFlow.collect { states ->
                             val tag = "native_playlist"
                             val state = states[tag]
                             if (state is NativeAdUiState.Success && !handledAds.contains(tag)) {
@@ -200,7 +200,7 @@ class FileSelectActivity : Base__Activity<ActivityFileSelectBinding>() {
         reader.setOnFileReadListener(object : FileReader.OnFileReadListener {
             override fun onFinish(playlistName: String?, playlistUrl: String?) {
                 MainActivity.triggerFromPlaylist = true
-                InfinityAdsManager.showInterAddPlaylist(this@FileSelectActivity) {
+                AdsManager.showInterAddPlaylist(this@FileSelectActivity) {
                     Toast.makeText(
                         this@FileSelectActivity,
                         getString(R.string.playlist_added_successfully),

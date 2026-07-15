@@ -19,7 +19,7 @@ import com.facebook.shimmer.ShimmerFrameLayout
 import com.iptv.online.smart.liveplayer.tv.Activity.PlayerActivity
 import com.iptv.online.smart.liveplayer.tv.Model.Channel
 import com.iptv.online.smart.liveplayer.tv.R
-import com.iptv.online.smart.liveplayer.tv.Ads.InfinityAdsManager
+import com.iptv.online.smart.liveplayer.tv.Ads.AdsManager
 import com.iptv.online.smart.liveplayer.tv.adsutils.NativeAdUiState
 import com.iptv.online.smart.liveplayer.tv.adsutils.RemoteConfigdata
 import com.iptv.online.smart.liveplayer.tv.Model.AppDatabase
@@ -131,7 +131,7 @@ class Historychannel(private val context: Context, private val channelList: Muta
 
     private fun loadNativeAdForAdapter(adHolder: AdViewHolder) {
         val tag = "native_history_2005"
-        val state = InfinityAdsManager.adStateFlow.value[tag]
+        val state = AdsManager.adStateFlow.value[tag]
 
         if (state is NativeAdUiState.Success) {
             adHolder.itemView.visibility = View.VISIBLE

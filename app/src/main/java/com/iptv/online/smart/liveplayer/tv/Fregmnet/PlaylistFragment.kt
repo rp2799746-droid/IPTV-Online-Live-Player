@@ -25,7 +25,7 @@ import com.iptv.online.smart.liveplayer.tv.Model.BannerItem
 import com.iptv.online.smart.liveplayer.tv.Model.PlaylistGroup
 import com.iptv.online.smart.liveplayer.tv.R
 import com.iptv.online.smart.liveplayer.tv.adsutils.AdsId
-import com.iptv.online.smart.liveplayer.tv.Ads.InfinityAdsManager
+import com.iptv.online.smart.liveplayer.tv.Ads.AdsManager
 import com.iptv.online.smart.liveplayer.tv.adsutils.NativeAdUiState
 import com.iptv.online.smart.liveplayer.tv.adsutils.RemoteConfigdata
 import com.iptv.online.smart.liveplayer.tv.adsutils.getShouldDisplayNativeHome
@@ -85,9 +85,9 @@ class PlaylistFragment : Fragment() {
     ): View? {
         binding = FragmentPlaylistBinding.inflate(inflater, container, false)
         setupBanner()
-        // Demo jevu CENTRALIZED: interHome ane interMirroring InfinityAdsManager thi load.
-        InfinityAdsManager.loadInterHome(requireActivity())
-        InfinityAdsManager.loadInterMirroring(requireActivity())
+        // Demo jevu CENTRALIZED: interHome ane interMirroring AdsManager thi load.
+        AdsManager.loadInterHome(requireActivity())
+        AdsManager.loadInterMirroring(requireActivity())
         configScript = RemoteConfigdata(requireActivity())
 
         nativeAds()
@@ -101,7 +101,7 @@ class PlaylistFragment : Fragment() {
             PlaylistAdapter.OnPlaylistClickListener { playlistName: String? ->
 
 
-                InfinityAdsManager.showInterHome(requireActivity()) {
+                AdsManager.showInterHome(requireActivity()) {
                     val intent = Intent(getActivity(), CategoryActivity::class.java)
                     intent.putExtra("PLAYLIST_NAME", playlistName)
                     startActivity(intent)
@@ -114,7 +114,7 @@ class PlaylistFragment : Fragment() {
             override fun onClick(v: View?) {
 
 
-                InfinityAdsManager.showInterMirroring(requireActivity()) {
+                AdsManager.showInterMirroring(requireActivity()) {
                     val intent = Intent(getActivity(), MirrorStepsActivity::class.java)
                     startActivity(intent)
                 }
@@ -136,7 +136,7 @@ class PlaylistFragment : Fragment() {
             override fun onClick(v: View?) {
 
 
-                InfinityAdsManager.showInterHome(requireActivity()) {
+                AdsManager.showInterHome(requireActivity()) {
                     if (getActivity() is MainActivity) {
                         val mainActivity = getActivity() as MainActivity?
                         if (mainActivity!!.viewPager != null) {
@@ -169,7 +169,7 @@ class PlaylistFragment : Fragment() {
                     val retriedTags = mutableSetOf<String>()
 
                     lifecycleScope.launchWhenStarted {
-                        InfinityAdsManager.adStateFlow.collect { states ->
+                        AdsManager.adStateFlow.collect { states ->
                             val tag = "native_home_2005"
                             val state = states[tag]
                             if (state is NativeAdUiState.Success && !handledAds.contains(tag)) {
@@ -216,7 +216,7 @@ class PlaylistFragment : Fragment() {
                                 if (retriedTags.add(tag)) {
                                     binding?.adShimmer?.root?.visible
                                     binding?.frAds?.visible
-                                    InfinityAdsManager.loadAd(
+                                    AdsManager.loadAd(
                                         requireActivity(),
                                         AdsId.nativehome2005,
                                         R.layout.layout_native_ad_medium,

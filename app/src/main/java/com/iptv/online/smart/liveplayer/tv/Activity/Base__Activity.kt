@@ -15,7 +15,7 @@ import androidx.viewbinding.ViewBinding
 import com.ads.module.ads.ERainAd
 import com.ads.module.ads.wrapper.ApInterstitialAd
 import com.ads.module.funtion.AdCallback
-import com.iptv.online.smart.liveplayer.tv.Ads.InfinityAdsManager
+import com.iptv.online.smart.liveplayer.tv.Ads.AdsManager
 import com.iptv.online.smart.liveplayer.tv.adsutils.AdsId
 import com.iptv.online.smart.liveplayer.tv.adsutils.RemoteConfigdata
 import com.iptv.online.smart.liveplayer.tv.adsutils.isInternetAvailable
@@ -63,8 +63,8 @@ abstract class Base__Activity<actBinding : ViewBinding> : AppCompatActivity() {
         bindListener()
         bindMethod()
         bindObserver()
-        // Demo jevu CENTRALIZED: interback ne InfinityAdsManager thi load karo (opt-in screen).
-        if (needBackInterAd) InfinityAdsManager.loadInterBack(this)
+        // Demo jevu CENTRALIZED: interback ne AdsManager thi load karo (opt-in screen).
+        if (needBackInterAd) AdsManager.loadInterBack(this)
     }
 
 
@@ -76,7 +76,7 @@ abstract class Base__Activity<actBinding : ViewBinding> : AppCompatActivity() {
     override fun onBackPressed() {
         // Demo jevu: centralized showInterBack -> gating + forceShowInterstitial andar j.
         // Ad ready na hoy to sidhu finish() thay (showInterBack andar handle).
-        InfinityAdsManager.showInterBack(this) {
+        AdsManager.showInterBack(this) {
             finish()
         }
     }

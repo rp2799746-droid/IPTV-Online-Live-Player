@@ -7,7 +7,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.ads.module.ads.ERainAd
 import com.iptv.online.smart.liveplayer.tv.Fregmnet.BaseFragment
-import com.iptv.online.smart.liveplayer.tv.Ads.InfinityAdsManager
+import com.iptv.online.smart.liveplayer.tv.Ads.AdsManager
 import com.iptv.online.smart.liveplayer.tv.adsutils.LazyShowAds
 import com.iptv.online.smart.liveplayer.tv.adsutils.NativeAdUiState
 import com.iptv.online.smart.liveplayer.tv.adsutils.RemoteConfigdata
@@ -34,7 +34,7 @@ class IntroFragment4 : BaseFragment<FragmentIntro4Binding>(), LazyShowAds {
     override fun bindObjects() {
 
         if (configScript!!.nativehome2005) {
-            InfinityAdsManager.loadAd(
+            AdsManager.loadAd(
                 requireActivity(),
                 AdsId.nativehome2005,
                 R.layout.layout_native_ad_medium,
@@ -76,7 +76,7 @@ class IntroFragment4 : BaseFragment<FragmentIntro4Binding>(), LazyShowAds {
                 val retriedTags = mutableSetOf<String>()
 
                 lifecycleScope.launchWhenStarted {
-                    InfinityAdsManager.adStateFlow.collect { states ->
+                    AdsManager.adStateFlow.collect { states ->
                         val activeActivity = activity ?: return@collect
 
                         val tag = if (activeActivity.isIntroFlowDone())
@@ -134,7 +134,7 @@ class IntroFragment4 : BaseFragment<FragmentIntro4Binding>(), LazyShowAds {
                                     binding.adShimmer.root.visible
                                     val adId = if (activeActivity.isIntroFlowDone())
                                         AdsId.nativeOnboarding2_4 else AdsId.nativeOnboarding1_4
-                                    InfinityAdsManager.loadAd(
+                                    AdsManager.loadAd(
                                         activeActivity, adId, R.layout.layout_native_ad_large, tag
                                     )
                                     Log.d("AdManager123", "[$tag] fallback reload triggered")

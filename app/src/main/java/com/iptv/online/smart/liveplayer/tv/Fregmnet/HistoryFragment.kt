@@ -14,7 +14,7 @@ import com.iptv.online.smart.liveplayer.tv.Adapter.Historychannel
 import com.iptv.online.smart.liveplayer.tv.Model.AppDatabase
 import com.iptv.online.smart.liveplayer.tv.R
 import com.iptv.online.smart.liveplayer.tv.adsutils.AdsId
-import com.iptv.online.smart.liveplayer.tv.Ads.InfinityAdsManager
+import com.iptv.online.smart.liveplayer.tv.Ads.AdsManager
 import com.iptv.online.smart.liveplayer.tv.adsutils.NativeAdUiState
 
 
@@ -40,7 +40,7 @@ class HistoryFragment : Fragment() {
 
 
         viewLifecycleOwner.lifecycleScope.launchWhenStarted {
-            InfinityAdsManager.adStateFlow.collect { states ->
+            AdsManager.adStateFlow.collect { states ->
                 if (states["native_history_2005"] is NativeAdUiState.Success) {
                     adapter?.notifyDataSetChanged()
                 }

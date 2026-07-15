@@ -13,7 +13,7 @@ import com.ads.module.ads.wrapper.ApInterstitialAd
 import com.ads.module.funtion.AdCallback
 import com.iptv.online.smart.liveplayer.tv.R
 import com.iptv.online.smart.liveplayer.tv.adsutils.AdsId
-import com.iptv.online.smart.liveplayer.tv.Ads.InfinityAdsManager
+import com.iptv.online.smart.liveplayer.tv.Ads.AdsManager
 import com.iptv.online.smart.liveplayer.tv.adsutils.NativeAdUiState
 import com.iptv.online.smart.liveplayer.tv.adsutils.RemoteConfigdata
 import com.iptv.online.smart.liveplayer.tv.adsutils.isInternetAvailable
@@ -35,7 +35,7 @@ class MirrorStepsActivity : Base__Activity<ActivityMirrorStepsBinding>() {
         if (isTaskRoot) {
             MainActivity.triggerFromMirroring = true
             // Demo jevu: centralized showInterBack -> ad ready hoy to show, nahi to sidhu navigate.
-            InfinityAdsManager.showInterBack(this) {
+            AdsManager.showInterBack(this) {
                 val intent = Intent(this, MainActivity::class.java)
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
                 startActivity(intent)
@@ -55,8 +55,8 @@ class MirrorStepsActivity : Base__Activity<ActivityMirrorStepsBinding>() {
         configScript = RemoteConfigdata(this@MirrorStepsActivity)
 
         nativeAds()
-        // Demo jevu CENTRALIZED: interback ne InfinityAdsManager thi load karo.
-        InfinityAdsManager.loadInterBack(this)
+        // Demo jevu CENTRALIZED: interback ne AdsManager thi load karo.
+        AdsManager.loadInterBack(this)
     }
 
     private fun nativeAds() {
@@ -67,7 +67,7 @@ class MirrorStepsActivity : Base__Activity<ActivityMirrorStepsBinding>() {
                     val handledAds = mutableSetOf<String>()
 
                     lifecycleScope.launchWhenStarted {
-                        InfinityAdsManager.adStateFlow.collect { states ->
+                        AdsManager.adStateFlow.collect { states ->
                             val tag = "native_mirroring"
                             val state = states[tag]
                             if (state is NativeAdUiState.Success && !handledAds.contains(tag)) {

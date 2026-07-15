@@ -14,7 +14,7 @@ import com.iptv.online.smart.liveplayer.tv.Adapter.FavoriteAdapter
 import com.iptv.online.smart.liveplayer.tv.Model.AppDatabase
 import com.iptv.online.smart.liveplayer.tv.R
 import com.iptv.online.smart.liveplayer.tv.adsutils.AdsId
-import com.iptv.online.smart.liveplayer.tv.Ads.InfinityAdsManager
+import com.iptv.online.smart.liveplayer.tv.Ads.AdsManager
 import com.iptv.online.smart.liveplayer.tv.adsutils.NativeAdUiState
 import com.iptv.online.smart.liveplayer.tv.adsutils.RemoteConfigdata
 
@@ -47,7 +47,7 @@ class FavoriteFragment : Fragment() {
 
 
         viewLifecycleOwner.lifecycleScope.launchWhenStarted {
-            InfinityAdsManager.adStateFlow.collect { states ->
+            AdsManager.adStateFlow.collect { states ->
                 val state = states["native_favorite_2005"]
 
                 // જો સ્ટેટ Success હોય કે Loading હોય, બંને વખતે એડેપ્ટરને જાણ કરો

@@ -20,7 +20,7 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.iptv.online.smart.liveplayer.tv.Activity.SplashActivity.Companion.screenCount
 import com.iptv.online.smart.liveplayer.tv.Adapter.LanguageAdapter
-import com.iptv.online.smart.liveplayer.tv.Ads.InfinityAdsManager
+import com.iptv.online.smart.liveplayer.tv.Ads.AdsManager
 import com.iptv.online.smart.liveplayer.tv.Model.LanguageModel
 import com.iptv.online.smart.liveplayer.tv.R
 import com.iptv.online.smart.liveplayer.tv.ReadFile.BOOKER_Manager
@@ -142,7 +142,7 @@ class Language_Activity : Base__Activity<ActivityLanguageBinding>(),
         val isClickAdEnabled =
             if (screenCount == 1) configScript!!.nativeLang1ClickOn else configScript!!.nativeLang2ClickOn
         if (configScript!!.isNeedToShowADs && isClickAdEnabled) {
-            InfinityAdsManager.loadAd(
+            AdsManager.loadAd(
                 this, clickAdId, R.layout.layout_native_ad_lang_click, "native_lang_click_tag"
             )
             Log.d("AdManager123", "Click ad PRELOADED on Language screen 1 open")
@@ -163,7 +163,7 @@ class Language_Activity : Base__Activity<ActivityLanguageBinding>(),
 
             if (config.isNeedToShowADs && isAdEnabled) {
                 lifecycleScope.launchWhenStarted {
-                    InfinityAdsManager.adStateFlow.collect { states ->
+                    AdsManager.adStateFlow.collect { states ->
                         val state = states[tag]
 
                         if (state is NativeAdUiState.Success) {

@@ -15,7 +15,7 @@ import com.iptv.online.smart.liveplayer.tv.activities.forIntro.IntroFragment2
 import com.iptv.online.smart.liveplayer.tv.activities.forIntro.IntroFragment3
 import com.iptv.online.smart.liveplayer.tv.activities.forIntro.IntroFragment4
 import com.iptv.online.smart.liveplayer.tv.adsutils.AdsId
-import com.iptv.online.smart.liveplayer.tv.Ads.InfinityAdsManager
+import com.iptv.online.smart.liveplayer.tv.Ads.AdsManager
 import com.iptv.online.smart.liveplayer.tv.adsutils.LazyShowAds
 import com.iptv.online.smart.liveplayer.tv.adsutils.RemoteConfigdata
 import com.iptv.online.smart.liveplayer.tv.adsutils.getShouldDisplayInterOnboarding
@@ -47,8 +47,8 @@ class IntroActivity : Base__Activity<ActivityIntroBinding>() {
 
     override fun bindObjects() {
         // Demo jevu CENTRALIZED: inter_onboarding ne Intro (onboarding) START ma load karo.
-        // Load ane show banne centralized InfinityAdsManager ma chhe (demo na AdsManager jevu).
-        InfinityAdsManager.loadInterOnboarding(this)
+        // Load ane show banne centralized AdsManager ma chhe (demo na AdsManager jevu).
+        AdsManager.loadInterOnboarding(this)
         val isDone = isIntroFlowDone()
 
         val isFullAdEnabled =
@@ -138,7 +138,7 @@ class IntroActivity : Base__Activity<ActivityIntroBinding>() {
     private fun callNext() {
         setIntroFlowDone()
         // Demo jevu: centralized showInterOnboarding -> gating + forceShowInterstitial andar j.
-        InfinityAdsManager.showInterOnboarding(this) {
+        AdsManager.showInterOnboarding(this) {
             redirectToNextActivity()
         }
     }

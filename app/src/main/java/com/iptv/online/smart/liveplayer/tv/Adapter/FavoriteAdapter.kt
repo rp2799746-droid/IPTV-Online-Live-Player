@@ -20,7 +20,7 @@ import com.iptv.online.smart.liveplayer.tv.Activity.PlayerActivity
 import com.iptv.online.smart.liveplayer.tv.Model.AppDatabase
 import com.iptv.online.smart.liveplayer.tv.Model.Channel
 import com.iptv.online.smart.liveplayer.tv.R
-import com.iptv.online.smart.liveplayer.tv.Ads.InfinityAdsManager
+import com.iptv.online.smart.liveplayer.tv.Ads.AdsManager
 import com.iptv.online.smart.liveplayer.tv.adsutils.NativeAdUiState
 import com.iptv.online.smart.liveplayer.tv.adsutils.RemoteConfigdata
 
@@ -80,7 +80,7 @@ class FavoriteAdapter(private val context: Context, incomingList: MutableList<Ch
 
     private fun handleNativeAd(adHolder: AdViewHolder) {
         val tag = "native_favorite_2005"
-        val state = InfinityAdsManager.adStateFlow.value[tag]
+        val state = AdsManager.adStateFlow.value[tag]
 
         if (isAdEnabled) {
             adHolder.itemView.visibility = View.VISIBLE

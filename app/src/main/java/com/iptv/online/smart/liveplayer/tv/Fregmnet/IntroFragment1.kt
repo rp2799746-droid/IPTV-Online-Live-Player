@@ -8,7 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.ads.module.ads.ERainAd
 import com.iptv.online.smart.liveplayer.tv.Fregmnet.BaseFragment
-import com.iptv.online.smart.liveplayer.tv.Ads.InfinityAdsManager
+import com.iptv.online.smart.liveplayer.tv.Ads.AdsManager
 import com.iptv.online.smart.liveplayer.tv.adsutils.NativeAdUiState
 import com.iptv.online.smart.liveplayer.tv.adsutils.RemoteConfigdata
 import com.iptv.online.smart.liveplayer.tv.databinding.FragmentIntro1Binding
@@ -45,7 +45,7 @@ class IntroFragment1 : BaseFragment<FragmentIntro1Binding>() {
                val adIdFull =
                    if (isDone) AdsId.nativeOnboardingFull2 else AdsId.nativeOnboardingFull1
                val tagFull = if (isDone) "native_onboarding_full_2" else "native_onboarding_full_1"
-               InfinityAdsManager.loadAd(requireActivity(), adIdFull, R.layout.layout_native_ad_full, tagFull)
+               AdsManager.loadAd(requireActivity(), adIdFull, R.layout.layout_native_ad_full, tagFull)
            }
 
 
@@ -68,7 +68,7 @@ class IntroFragment1 : BaseFragment<FragmentIntro1Binding>() {
             val retriedTags = mutableSetOf<String>()
 
             lifecycleScope.launchWhenStarted {
-                InfinityAdsManager.adStateFlow.collect { states ->
+                AdsManager.adStateFlow.collect { states ->
                     val activeActivity = activity ?: return@collect
 
                     val tag = if (activeActivity.isIntroFlowDone())
@@ -122,7 +122,7 @@ class IntroFragment1 : BaseFragment<FragmentIntro1Binding>() {
                                 binding.adShimmer.root.visible
                                 val adId = if (activeActivity.isIntroFlowDone())
                                     AdsId.nativeOnboarding2_1 else AdsId.nativeOnboarding1_1
-                                InfinityAdsManager.loadAd(
+                                AdsManager.loadAd(
                                     activeActivity, adId, R.layout.layout_native_ad_large, tag
                                 )
                                 Log.d("AdManager123", "[$tag] fallback reload triggered")

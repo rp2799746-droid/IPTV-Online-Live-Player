@@ -18,7 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.ads.module.ads.ERainAd
 import com.iptv.online.smart.liveplayer.tv.Activity.SplashActivity.Companion.screenCount
 import com.iptv.online.smart.liveplayer.tv.Adapter.LanguageAdapter2
-import com.iptv.online.smart.liveplayer.tv.Ads.InfinityAdsManager
+import com.iptv.online.smart.liveplayer.tv.Ads.AdsManager
 import com.iptv.online.smart.liveplayer.tv.Model.LanguageModel
 import com.iptv.online.smart.liveplayer.tv.R
 import com.iptv.online.smart.liveplayer.tv.ReadFile.BOOKER_Manager
@@ -111,7 +111,7 @@ class Language_Activity2 : Base__Activity<ActivityLanguageBinding>(),
             val isDone = isIntroFlowDone()
             val onbAdId = if (isDone) AdsId.nativeOnboarding2_1 else AdsId.nativeOnboarding1_1
             val onbTag = if (isDone) "native_onboarding_2_1" else "native_onboarding_1_1"
-            InfinityAdsManager.loadAd(this, onbAdId, R.layout.layout_native_ad_large, onbTag)
+            AdsManager.loadAd(this, onbAdId, R.layout.layout_native_ad_large, onbTag)
             Log.d("AdManager123", "Onboarding native PRELOADED on Language screen 2: $onbTag")
         }
     }
@@ -141,7 +141,7 @@ class Language_Activity2 : Base__Activity<ActivityLanguageBinding>(),
             if (config.isNeedToShowADs && isAdEnabled) {
                 val retriedTags = mutableSetOf<String>()
                 lifecycleScope.launchWhenStarted {
-                    InfinityAdsManager.adStateFlow.collect { states ->
+                    AdsManager.adStateFlow.collect { states ->
                         val state = states[tag]
                         if (state is NativeAdUiState.Success) {
                             Log.d("AdManager123", "[$tag] Success, 🚀 showing ID: [${state.adsID}]")
@@ -191,7 +191,7 @@ class Language_Activity2 : Base__Activity<ActivityLanguageBinding>(),
                                     binding.adShimmer.root.visibility = View.VISIBLE
                                     val adId = if (screenCount == 1)
                                         AdsId.nativeLanguage1Click else AdsId.nativeLanguage2Click
-                                    InfinityAdsManager.loadAd(
+                                    AdsManager.loadAd(
                                         this@Language_Activity2, adId,
                                         R.layout.layout_native_ad_lang_click, tag
                                     )

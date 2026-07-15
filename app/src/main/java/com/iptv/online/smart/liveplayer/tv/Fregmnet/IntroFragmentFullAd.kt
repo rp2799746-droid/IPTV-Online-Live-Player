@@ -9,7 +9,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.ads.module.ads.ERainAd
 import com.iptv.online.smart.liveplayer.tv.Activity.IntroActivity
-import com.iptv.online.smart.liveplayer.tv.Ads.InfinityAdsManager
+import com.iptv.online.smart.liveplayer.tv.Ads.AdsManager
 import com.iptv.online.smart.liveplayer.tv.R
 import com.iptv.online.smart.liveplayer.tv.adsutils.AdsId
 import com.iptv.online.smart.liveplayer.tv.adsutils.LazyShowAds
@@ -62,7 +62,7 @@ class IntroFragmentFullAd : BaseFragment<FragmentIntroFullAdBinding>(), LazyShow
                 val retriedTags = mutableSetOf<String>()
 
                 lifecycleScope.launchWhenStarted {
-                    InfinityAdsManager.adStateFlow.collect { states ->
+                    AdsManager.adStateFlow.collect { states ->
                         val activeActivity = activity ?: return@collect
 
                         val tag = if (activeActivity.isIntroFlowDone())
@@ -147,7 +147,7 @@ class IntroFragmentFullAd : BaseFragment<FragmentIntroFullAdBinding>(), LazyShow
                                 binding.ivCloseAd.gone
                                 val adId = if (activeActivity.isIntroFlowDone())
                                     AdsId.nativeOnboardingFull2 else AdsId.nativeOnboardingFull1
-                                InfinityAdsManager.loadAd(
+                                AdsManager.loadAd(
                                     activeActivity, adId, R.layout.layout_native_ad_full, tag
                                 )
                                 Log.d("AdManager123", "[$tag] fallback reload triggered")

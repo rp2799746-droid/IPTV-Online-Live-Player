@@ -7,7 +7,7 @@ import androidx.lifecycle.lifecycleScope
 import com.ads.module.ads.ERainAd
 import com.iptv.online.smart.liveplayer.tv.R
 import com.iptv.online.smart.liveplayer.tv.adsutils.AdsId
-import com.iptv.online.smart.liveplayer.tv.Ads.InfinityAdsManager
+import com.iptv.online.smart.liveplayer.tv.Ads.AdsManager
 import com.iptv.online.smart.liveplayer.tv.adsutils.NativeAdUiState
 import com.iptv.online.smart.liveplayer.tv.adsutils.RemoteConfigdata
 import com.iptv.online.smart.liveplayer.tv.databinding.UninstallScreeenBinding
@@ -23,7 +23,7 @@ class UninstallScreenActivity : Base__Activity<UninstallScreeenBinding>() {
 
     override fun bindObjects() {
         configScript = RemoteConfigdata(this@UninstallScreenActivity)
-        InfinityAdsManager.loadAd(
+        AdsManager.loadAd(
             this@UninstallScreenActivity,
             AdsId.NATIVE_UNINSTALL,
             R.layout.layout_native_ad_large,
@@ -41,7 +41,7 @@ class UninstallScreenActivity : Base__Activity<UninstallScreeenBinding>() {
                     val handledAds = mutableSetOf<String>()
 
                     lifecycleScope.launchWhenStarted {
-                        InfinityAdsManager.adStateFlow.collect { states ->
+                        AdsManager.adStateFlow.collect { states ->
                             val tag = "native_uninstall"
                             val state = states[tag]
                             if (state is NativeAdUiState.Success && !handledAds.contains(tag)) {
