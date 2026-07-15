@@ -104,9 +104,6 @@ class Language_Activity2 : Base__Activity<ActivityLanguageBinding>(),
         loadLanguageClickAd()
 
         // Onboarding native ad ne AHIYA (screen 2 = Intro ni AGAL-ni screen) PRELOAD karo.
-        // Pehla aa Language screen 1 ma thato hato (2 screen aagal -> vadhu drop-off -> low
-        // show rate). Have 1 j screen aagal -> Intro (IntroFragment1) khule tyare ad READY
-        // (instant, shimmer ochho) + show rate pan saras.
         if (configScript?.isNeedToShowADs == true) {
             val isDone = isIntroFlowDone()
             val onbAdId = if (isDone) AdsId.nativeOnboarding2_1 else AdsId.nativeOnboarding1_1

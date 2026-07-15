@@ -114,7 +114,6 @@ class Language_Activity : Base__Activity<ActivityLanguageBinding>(),
         binding.recyclerView.layoutManager = LinearLayoutManager(this)
         loadSavedLanguage()
         setAdapter()
-        // Show-rate optimization: native_onboarding_1_1 ne ahiya (Language screen) preload
         // NA karo -> te bahu vehlu hatu (Intro sudhi user pohonche tya sudhi ghana exit thai
         // jata -> show rate 23%). Have IntroFragment1 pote j (jyare Intro khule tyare) load
         // kare che (eno fallback che), etle load show point ni najik thay -> show rate uncho.
@@ -130,10 +129,6 @@ class Language_Activity : Base__Activity<ActivityLanguageBinding>(),
 
         startAdFlow(tag)
 
-        // CLICK ad ne Language screen 1 khule tyare J PRELOAD karo (splash ma nahi).
-        // Screen 1 nu single action = language tap -> screen 2. Etle je users screen 1 e aave
-        // e lagbhag badha screen 2 e jaay -> preload thi screen 2 par ad READY (instant, shimmer
-        // ochho) + fakt 1 screen aagal hovathi show rate pan saras.
         val clickAdId =
             if (screenCount == 1) AdsId.nativeLanguage1Click else AdsId.nativeLanguage2Click
         val isClickAdEnabled =
@@ -367,15 +362,11 @@ class Language_Activity : Base__Activity<ActivityLanguageBinding>(),
             // ===== Settings flow: pehla jevu j single screen (Done batavo) =====
             binding.done.visibility = View.VISIBLE
         } else {
-            // ===== NEW: 2-screen flow =====
-            // Click ad screen 1 khulti vakhte j preload thai gayu chhe (loadLanguageAd ma),
             // etle screen 2 par te ready hoy -> instant show.
-            // Splash flow ma language tap thatra j biju language screen (screen 2) kholo.
             val i = Intent(this, Language_Activity2::class.java)
             i.putExtra("selectedLanguage", languageModel_?.s_lan_code)
             i.putExtra("selectedLanguageName", languageModel_?.s_lan_name)
             i.putExtra("isFromSplash", true)
-            // seamless transition (animation vagar) -> jethi activity
             // badlati hoy evu na dekhay, same screen par ad refresh thayu hoy evu lage.
             val options = android.app.ActivityOptions.makeCustomAnimation(this, 0, 0)
             startActivity(i, options.toBundle())

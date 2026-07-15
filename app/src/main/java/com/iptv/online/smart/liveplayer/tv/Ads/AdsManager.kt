@@ -31,9 +31,8 @@ object AdsManager {
         adId: String,
         layoutId: Int,
         adTag: String,
-        shouldDisplay: Boolean = true,   // shouldDisplay gating
+        shouldDisplay: Boolean = true,
     ) {
-        // Gating: needAds + network + shouldDisplay
         if (RemoteConfigdata(context).isNeedToShowADs && context.isInternetAvailable() && shouldDisplay) {
             Log.d("AdManager123", "🔄 Loading ad for tag=$adTag, id=$adId")
             ERainAd.getInstance().loadNativeAdResultCallback(
@@ -85,7 +84,6 @@ object AdsManager {
         }
     }
 
-    // AdsManager object ની અંદર
     fun getCTAButtonHeight(context: android.content.Context): Long {
         return try {
             val remoteData = RemoteConfigdata(context)
@@ -106,10 +104,6 @@ object AdsManager {
 
 
 
-    // ── Interstitial: Onboarding — CENTRALIZED load + show ──
-    // Ad reference ahiya
-    // ek j centralized member (interOnboarding) ma rahe -> screen pote field na rakhe,
-    // badhi jagya aa j method vaapre.
     private var interOnboarding: ApInterstitialAd? = null
 
     fun loadInterOnboarding(activity: Activity, ignoreLimit: Boolean = false) {
@@ -123,13 +117,12 @@ object AdsManager {
         }
         interOnboarding = ERainAd.getInstance()
             .getInterstitialAds(activity, AdsId.interOnboarding, object : AdCallback() {})
-        Log.d("AdManager123", "Inter Onboarding Loaded (centralized)")
     }
 
     fun showInterOnboarding(activity: Activity, ignoreLimit: Boolean = false, onAction: () -> Unit) {
         val interstitial = interOnboarding
         if (interstitial != null
-            && interstitial.isReady   // isReady check
+            && interstitial.isReady
             && RemoteConfigdata(activity).isNeedToShowADs
             && (ignoreLimit || activity.getShouldDisplayInterOnboarding())
         ) {
@@ -145,8 +138,6 @@ object AdsManager {
         }
     }
 
-    // ── Bija badha interstitials — CENTRALIZED ──
-    // Badha inter nu reference ahiya ek jagya (interAdMap) ma rahe. Screen pote field na rakhe.
     private val interAdMap = mutableMapOf<String, ApInterstitialAd?>()
 
     private fun loadInterCentralized(activity: Activity, key: String, adId: String, enabled: Boolean) {
@@ -157,7 +148,6 @@ object AdsManager {
         }
         interAdMap[key] = ERainAd.getInstance()
             .getInterstitialAds(activity, adId, object : AdCallback() {})
-        Log.i("AdManager123", "Inter Loaded (centralized): $key")
     }
 
     private fun showInterCentralized(
@@ -176,28 +166,24 @@ object AdsManager {
         }
     }
 
-    // interback — Base (back-press) ane MirrorSteps vaapre
     fun loadInterBack(activity: Activity) =
         loadInterCentralized(activity, "interback", AdsId.interback, RemoteConfigdata(activity).interback)
 
     fun showInterBack(activity: Activity, onAction: () -> Unit) =
         showInterCentralized(activity, "interback", RemoteConfigdata(activity).interback, onAction)
 
-    // interHome — PlaylistFragment na home clicks
     fun loadInterHome(activity: Activity) =
         loadInterCentralized(activity, "interHome", AdsId.interHome, RemoteConfigdata(activity).interHomeOn)
 
     fun showInterHome(activity: Activity, onAction: () -> Unit) =
         showInterCentralized(activity, "interHome", RemoteConfigdata(activity).interHomeOn, onAction)
 
-    // interMirroring — PlaylistFragment cast click
     fun loadInterMirroring(activity: Activity) =
         loadInterCentralized(activity, "interMirroring", AdsId.INTER_MIRRORING, RemoteConfigdata(activity).interMirroring)
 
     fun showInterMirroring(activity: Activity, onAction: () -> Unit) =
         showInterCentralized(activity, "interMirroring", RemoteConfigdata(activity).interMirroring, onAction)
 
-    // interAddPlaylist — MainActivity / FileSelectActivity
     fun loadInterAddPlaylist(activity: Activity) =
         loadInterCentralized(activity, "interAddPlaylist", AdsId.INTER_ADD_PLAYLIST, RemoteConfigdata(activity).interAddPlaylist)
 

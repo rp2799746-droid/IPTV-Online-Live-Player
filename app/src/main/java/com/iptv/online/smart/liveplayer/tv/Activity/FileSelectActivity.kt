@@ -51,7 +51,6 @@ class FileSelectActivity : Base__Activity<ActivityFileSelectBinding>() {
         configScript = RemoteConfigdata(this@FileSelectActivity)
 
         nativeAds()
-        // Centralized: interAddPlaylist ne AdsManager thi load.
         AdsManager.loadInterAddPlaylist(this)
     }
 
