@@ -1,4 +1,5 @@
 package com.iptv.online.smart.liveplayer.tv.Fregmnet
+import com.iptv.online.smart.liveplayer.tv.adsutils.populateNativeAdView
 
 import android.graphics.Color
 import android.graphics.PorterDuff
@@ -11,7 +12,8 @@ import com.ads.module.ads.ERainAd
 import com.iptv.online.smart.liveplayer.tv.Activity.IntroActivity
 import com.iptv.online.smart.liveplayer.tv.Ads.AdsManager
 import com.iptv.online.smart.liveplayer.tv.R
-import com.iptv.online.smart.liveplayer.tv.adsutils.AdsId
+import com.iptv.online.smart.liveplayer.tv.adsutils.AdRemoteConfig
+import com.iptv.online.smart.liveplayer.tv.adsutils.canShowFullScreenAd
 import com.iptv.online.smart.liveplayer.tv.adsutils.LazyShowAds
 import com.iptv.online.smart.liveplayer.tv.adsutils.NativeAdUiState
 import com.iptv.online.smart.liveplayer.tv.adsutils.RemoteConfigdata
@@ -57,7 +59,12 @@ class IntroFragmentFullAd : BaseFragment<FragmentIntroFullAdBinding>(), LazyShow
         val currentConfig = configScript ?: return
 
         if (currentConfig.isNeedToShowADs) {
-            if (currentConfig.nativeOnbFull1On) {
+            // iptv2 jevu: fullscreen native mate JSON enable_ua_check + organic (XOR) gate.
+            val fullCfg = if (currentActivity.isIntroFlowDone())
+                AdRemoteConfig.getInstance().native_onboarding_fullscreen_2_2
+            else AdRemoteConfig.getInstance().native_onboarding_fullscreen_1_2
+            // Pure JSON: canShowFullScreenAd() pote isEnable + enable_ua_check + organic check kare chhe.
+            if (fullCfg.canShowFullScreenAd()) {
                 val handledAds = mutableSetOf<String>()
                 val retriedTags = mutableSetOf<String>()
                 val activeActivity = activity ?: return
@@ -81,9 +88,12 @@ class IntroFragmentFullAd : BaseFragment<FragmentIntroFullAdBinding>(), LazyShow
                                 binding.frAds,
                                 binding.adShimmer.root
                             )
-                            if (tag == "native_onboarding_full_2") {   // 👈 નવી condition
+                            // iptv2 jevu: show_full_native_close_btn true hoy to j close (X) button
+                            // 3 sec pachi batavo -> banne full_1 ane full_2 mate (pehla fakt full_2
+                            // ne j batavtu, full_1 trap thato e pan fix). false hoy to close na batavo.
+                            if (currentConfig.isFullNativeCloseBtn) {
                                 lifecycleScope.launchWhenStarted {
-                                    delay(3000)
+                                    delay(1000)   // iptv2 jevu: 1 sec pachi close button
                                     binding.ivCloseAd.visible
                                 }
                             }
@@ -142,7 +152,7 @@ class IntroFragmentFullAd : BaseFragment<FragmentIntroFullAdBinding>(), LazyShow
                                 binding.frAds.gone
                                 binding.ivCloseAd.gone
                                 val adId = if (activeActivity.isIntroFlowDone())
-                                    AdsId.nativeOnboardingFull2 else AdsId.nativeOnboardingFull1
+                                    AdRemoteConfig.getInstance().native_onboarding_fullscreen_2_2.id else AdRemoteConfig.getInstance().native_onboarding_fullscreen_1_2.id
                                 AdsManager.loadAd(
                                     activeActivity, adId, R.layout.layout_native_ad_full, tag
                                 )

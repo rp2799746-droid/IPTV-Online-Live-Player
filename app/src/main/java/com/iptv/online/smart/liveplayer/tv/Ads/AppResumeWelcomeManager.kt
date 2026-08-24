@@ -11,6 +11,7 @@ import androidx.lifecycle.OnLifecycleEvent
 import androidx.lifecycle.ProcessLifecycleOwner
 import com.iptv.online.smart.liveplayer.tv.Activity.SplashActivity
 import com.iptv.online.smart.liveplayer.tv.Activity.WelcomeScreenActivity
+import com.iptv.online.smart.liveplayer.tv.adsutils.AdRemoteConfig
 import com.iptv.online.smart.liveplayer.tv.adsutils.RemoteConfigdata
 
 /**
@@ -58,7 +59,7 @@ object AppResumeWelcomeManager : LifecycleObserver, Application.ActivityLifecycl
 
         val config = RemoteConfigdata(activity)
         Log.d(TAG, "flags -> isNeedToShowADs=${config.isNeedToShowADs}, interwelcomeback=${config.interwelcomeback}")
-        if (!config.isNeedToShowADs || !config.interwelcomeback) {
+        if (!config.isNeedToShowADs || !AdRemoteConfig.getInstance().inter_welcome_back.isEnable) {
             Log.d(TAG, "welcome back disabled by remote config -> skip")
             return
         }

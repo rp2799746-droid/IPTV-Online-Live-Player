@@ -49,7 +49,9 @@ class SettingsActivity : Base__Activity<ActivitySettingsBinding>() {
 
 
         binding.cardLanguage.setOnClickListener({ v ->
-            val intent = Intent(this, Language_Activity::class.java)
+            // Language ni badhi screen ek j activity ma -> settingss = true flag thi
+            // LanguageActivity settings-mode ma khule chhe (ad nahi, Done + back).
+            val intent = Intent(this, LanguageActivity::class.java)
             intent.putExtra("settingss", true)
             startActivity(intent)
         })

@@ -1,4 +1,5 @@
 package com.iptv.online.smart.liveplayer.tv.Activity
+import com.iptv.online.smart.liveplayer.tv.adsutils.populateNativeAdView
 
 import android.content.Intent
 import android.net.Uri
@@ -8,7 +9,7 @@ import android.view.View
 import androidx.lifecycle.lifecycleScope
 import com.ads.module.ads.ERainAd
 import com.iptv.online.smart.liveplayer.tv.R
-import com.iptv.online.smart.liveplayer.tv.adsutils.AdsId
+import com.iptv.online.smart.liveplayer.tv.adsutils.AdRemoteConfig
 import com.iptv.online.smart.liveplayer.tv.Ads.AdsManager
 import com.iptv.online.smart.liveplayer.tv.adsutils.NativeAdUiState
 import com.iptv.online.smart.liveplayer.tv.adsutils.RemoteConfigdata
@@ -31,7 +32,7 @@ class UninstallSurveyActivity : Base__Activity<UninstallSurveyBinding>() {
         configScript = RemoteConfigdata(this@UninstallSurveyActivity)
         AdsManager.loadAd(
             this@UninstallSurveyActivity,
-            AdsId.NATIVE_SURVEY_UNINSTALL,
+            AdRemoteConfig.getInstance().native_survey_uninstall.id,
             R.layout.layout_native_ad_large,
             "native_survey_uninstall"
         )
@@ -42,7 +43,7 @@ class UninstallSurveyActivity : Base__Activity<UninstallSurveyBinding>() {
     private fun nativeAds() {
         configScript?.let {
             if (it.isNeedToShowADs) {
-                if (configScript!!.nativesurveyUninstall) {
+                if (AdRemoteConfig.getInstance().native_survey_uninstall.isEnable) {
 
                     val handledAds = mutableSetOf<String>()
                     val tag = "native_survey_uninstall"

@@ -1,4 +1,5 @@
 package com.iptv.online.smart.liveplayer.tv.Fregmnet
+import com.iptv.online.smart.liveplayer.tv.adsutils.populateNativeAdView
 
 import android.app.Dialog
 import android.content.Context
@@ -26,9 +27,9 @@ import com.iptv.online.smart.liveplayer.tv.Activity.ChannelListActivity
 import com.iptv.online.smart.liveplayer.tv.Adapter.GroupAdapter
 import com.iptv.online.smart.liveplayer.tv.Model.AppDatabase
 import com.iptv.online.smart.liveplayer.tv.Model.Channel
+import com.iptv.online.smart.liveplayer.tv.Model.DbCache
 import com.iptv.online.smart.liveplayer.tv.Model.ChannelGroup
 import com.iptv.online.smart.liveplayer.tv.R
-import com.iptv.online.smart.liveplayer.tv.adsutils.AdsId
 import com.iptv.online.smart.liveplayer.tv.Ads.AdsManager
 import com.iptv.online.smart.liveplayer.tv.adsutils.NativeAdUiState
 import com.iptv.online.smart.liveplayer.tv.adsutils.RemoteConfigdata
@@ -151,8 +152,10 @@ class ChannelFragment : Fragment() {
 
     private fun registerNetworkCallback() {
         try {
+            // Fragment detach hoy to crash na thay — safe nullable context.
+            val ctx = context ?: return
             val connectivityManager =
-                requireContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+                ctx.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 networkCallback = object : ConnectivityManager.NetworkCallback() {
                     override fun onAvailable(network: Network) {
@@ -198,6 +201,8 @@ class ChannelFragment : Fragment() {
     }
 
     private fun initRemoteConfig() {
+        // Fragment detach hoy to kaઈ na karo — niche requireActivity()/dialog crash na thay.
+        if (!isAdded) return
         if (!this.isNetworkAvailable) {
             showNoInternetDialog()
             return
@@ -232,8 +237,11 @@ class ChannelFragment : Fragment() {
 
     val isNetworkAvailable: Boolean
         get() {
+            // Fragment detach thai gayu hoy (dialog button no async click pachi user niki
+            // gayo) to requireContext() crash kare che. Etle safe nullable context vaprie.
+            val ctx = context ?: return false
             val connectivityManager =
-                requireContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
+                ctx.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
             if (connectivityManager != null) {
                 val activeNetworkInfo = connectivityManager.getActiveNetworkInfo()
                 return activeNetworkInfo != null && activeNetworkInfo.isConnected()
@@ -251,6 +259,8 @@ class ChannelFragment : Fragment() {
 
         view.findViewById<View?>(R.id.btn_settings)
             .setOnClickListener(View.OnClickListener { v: View? ->
+                // Fragment detach thai gayu hoy to kaઈ na karo — crash na thay.
+                if (!isAdded) return@OnClickListener
                 if (this.isNetworkAvailable) {
                     noInternetDialog!!.dismiss()
                     initRemoteConfig()
@@ -323,6 +333,7 @@ class ChannelFragment : Fragment() {
                 for (item in channels) {
                     db.historyDao().insertHistory(item)
                 }
+                DbCache.invalidate()
             }
 
             withContext(Dispatchers.Main) {
@@ -334,24 +345,11 @@ class ChannelFragment : Fragment() {
 
     private fun updateGroups() {
         lifecycleScope.launch(Dispatchers.IO) {
-            val all = db.historyDao().getChannelsByPlaylist(CLOUD_PLAYLIST_NAME)
+            // SQLite pote GROUP BY + COUNT + sort kari aape chhe (jo pehla aakhi
+            // channel list memory ma laavi ne Kotlin ma ganta hata - e bov dhimu hatu).
+            val tempList: List<ChannelGroup> = db.historyDao().getGroupCounts(CLOUD_PLAYLIST_NAME) ?: emptyList()
 
-            if (!all.isNullOrEmpty()) {
-                val map = HashMap<String, Int>()
-                for (c in all) {
-                    val gName = if (c.channelGroup.isNullOrEmpty()) "Other" else c.channelGroup!!
-                    map[gName] = map.getOrDefault(gName, 0) + 1
-                }
-
-                val tempList: MutableList<ChannelGroup> = ArrayList()
-                for (entry in map.entries) {
-                    tempList.add(ChannelGroup(entry.key, entry.value))
-                }
-
-                Collections.sort(tempList) { g1, g2 ->
-                    g1.name.compareTo(g2.name, ignoreCase = true)
-                }
-
+            if (tempList.isNotEmpty()) {
                 withContext(Dispatchers.Main) {
                     groupList.clear()
                     groupList.addAll(tempList)
@@ -375,12 +373,21 @@ class ChannelFragment : Fragment() {
 
     override fun onDestroy() {
         super.onDestroy()
+        // Open dialog band karo — window leak / BadToken atkave.
+        noInternetDialog?.dismiss()
+        noInternetDialog = null
         if (networkCallback != null) {
+            // onDestroy vakhtе context null hoy shake — requireContext() na vaprie.
             val connectivityManager =
-                requireContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
-            if (connectivityManager != null) {
-                connectivityManager.unregisterNetworkCallback(networkCallback!!)
+                context?.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
+            try {
+                // Callback register j na thyu hoy (register fail) ke pehla unregister thai
+                // gayu hoy to "NetworkCallback was not registered" crash aave — safe try-catch.
+                connectivityManager?.unregisterNetworkCallback(networkCallback!!)
+            } catch (e: IllegalArgumentException) {
+                e.printStackTrace()
             }
+            networkCallback = null
         }
     }
 }

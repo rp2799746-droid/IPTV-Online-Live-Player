@@ -1,4 +1,5 @@
 package com.iptv.online.smart.liveplayer.tv.Activity
+import com.iptv.online.smart.liveplayer.tv.adsutils.populateNativeAdView
 
 import android.content.Intent
 import android.media.AudioManager
@@ -12,7 +13,6 @@ import com.ads.module.ads.ERainAd
 import com.ads.module.ads.wrapper.ApInterstitialAd
 import com.ads.module.funtion.AdCallback
 import com.iptv.online.smart.liveplayer.tv.R
-import com.iptv.online.smart.liveplayer.tv.adsutils.AdsId
 import com.iptv.online.smart.liveplayer.tv.Ads.AdsManager
 import com.iptv.online.smart.liveplayer.tv.adsutils.NativeAdUiState
 import com.iptv.online.smart.liveplayer.tv.adsutils.RemoteConfigdata

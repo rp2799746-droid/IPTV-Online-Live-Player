@@ -91,11 +91,7 @@
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".Activity.Language_Activity"
-            android:exported="false"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".Activity.Language_Activity2"
+            android:name=".Activity.LanguageActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
 
@@ -121,6 +117,13 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
+
+        <!-- iptv2 jevu: DevConfig library ni checklist activity no theme override
+             (Android 15+ edge-to-edge fix - nahi to activity broken/crash thay ne dialog na khule) -->
+        <activity
+            android:name="com.itg.devconfig.ui.DeveloperChecklistActivity"
+            android:theme="@style/ThemeDevConfigInsetFix"
+            tools:replace="android:theme" />
     </application>
 
 </manifest>

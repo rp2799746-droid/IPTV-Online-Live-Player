@@ -31,11 +31,13 @@ abstract class BaseFragment<actBinding : ViewBinding> : Fragment() {
         if (activity != null)
             mActivity = activity as FragmentActivity
 
-        bindObjects()
-        bindListener()
-        bindMethod()
-        bindObserver()
-        bindAds()
+        // Har bind step ne alag try-catch ma -> ek (dr. bindObjects nu ad logic) fail thay
+        // to pan baki chale. Khas bindListener (Next button wiring) hammesha chale -> Next dead na thay.
+        try { bindObjects() } catch (e: Exception) { android.util.Log.e(TAG, "bindObjects failed", e) }
+        try { bindListener() } catch (e: Exception) { android.util.Log.e(TAG, "bindListener failed", e) }
+        try { bindMethod() } catch (e: Exception) { android.util.Log.e(TAG, "bindMethod failed", e) }
+        try { bindObserver() } catch (e: Exception) { android.util.Log.e(TAG, "bindObserver failed", e) }
+        try { bindAds() } catch (e: Exception) { android.util.Log.e(TAG, "bindAds failed", e) }
 
         return binding.root
     }

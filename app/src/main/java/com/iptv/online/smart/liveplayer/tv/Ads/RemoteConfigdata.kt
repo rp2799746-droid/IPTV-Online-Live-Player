@@ -109,6 +109,32 @@ class RemoteConfigdata(
         get() = Preference.getBoolean(context, "is_inter_on_splash", true)
         set(value) = Preference.setBoolean(context, "is_inter_on_splash", value)
 
+    // iptv2 jevu: 'is_intro_page' -> false hoy to onboarding skip thay. Default true.
+    var isIntroPage: Boolean
+        get() = Preference.getBoolean(context, "is_intro_page", true)
+        set(value) = Preference.setBoolean(context, "is_intro_page", value)
+
+    // iptv2 jevu: 'show_full_native_close_btn' -> fullscreen ad par close (X) button batavvo
+    // ke nahi. Default true (aa project ma btnNext nathi etle false = user trap, dhyan rakho).
+    var isFullNativeCloseBtn: Boolean
+        get() = Preference.getBoolean(context, "show_full_native_close_btn", true)
+        set(value) = Preference.setBoolean(context, "show_full_native_close_btn", value)
+
+    // iptv2 jevu: 'is_in_app_update' -> fakt fetch (IPTV2 ma pan use nathi thatu). Default false.
+    var isInAppUpdate: Boolean
+        get() = Preference.getBoolean(context, "is_in_app_update", false)
+        set(value) = Preference.setBoolean(context, "is_in_app_update", value)
+
+    // iptv2 jevu: 'is_all_ads_show' -> fakt fetch (IPTV2 ma pan use nathi thatu). Default true.
+    var isAllAdsShow: Boolean
+        get() = Preference.getBoolean(context, "is_all_ads_show", true)
+        set(value) = Preference.setBoolean(context, "is_all_ads_show", value)
+
+    // iptv2 jevu: language screen Done button no delay (ms). Default 1200 (1.2 sec, IPTV2 jem).
+    var timeDelayLanguageDone: Long
+        get() = Preference.getLong(context, "time_delay_show_language_done_button", 1200L)
+        set(value) = Preference.setLong(context, "time_delay_show_language_done_button", value)
+
 
     var interback: Boolean
         get() = Preference.getBoolean(context, "inter_back", true)

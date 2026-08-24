@@ -311,6 +311,8 @@
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
                         android:checked="true"
+                        android:thumb="@drawable/switch_thumb"
+                        app:track="@drawable/switch_track"
                         app:thumbTint="@color/thumb_selector"
                         app:trackTint="@color/track_selector" />
                 </RelativeLayout>

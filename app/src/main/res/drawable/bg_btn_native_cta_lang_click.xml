@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Language CLICK ad na CTA button mate. bg_btn_native_cta jevu j gradient,
+    pan corner radius 0 - etle button square dekhay.
+    Alag file rakhi chhe kem ke bg_btn_native_cta ne 12 layouts vapre chhe.
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <gradient
+        android:angle="225"
+        android:startColor="#42A7FF"
+        android:endColor="#3484FF" />
+    <corners android:radius="0dp" />
+</shape>

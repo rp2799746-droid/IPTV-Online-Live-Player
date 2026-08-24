@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    Language screen 2 (CLICK) nu native ad design.
-    GpsTracker na layout_native_ad_medium_lang jevu - alag file rakhi
-    jethi click ad nu design normal ad thi independent-ly change kari sakay.
+  native_language_1 (screen 1) - layout_native_ad_lang_click JEVU J structure (SAME height),
+  FARAK fakt: aa EDGE-TO-EDGE chhe (CardView margin 0, corner 0, elevation 0 + media/CTA
+  marginHorizontal 0). lang_click ma card border/margin rahe chhe. Content height same.
 -->
 <com.google.android.gms.ads.nativead.NativeAdView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -11,13 +11,15 @@
     android:layout_height="wrap_content"
     tools:ignore="HardcodedText,SpUsage">
 
+    <!-- edge-to-edge: side space (margin) 0, PAN corner rounded (20dp) rehy chhe -->
     <androidx.cardview.widget.CardView
+        android:id="@+id/ad_card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="2dp"
+        android:layout_margin="0dp"
         app:cardBackgroundColor="#EDEDED"
         app:cardCornerRadius="20dp"
-        app:cardElevation="5dp">
+        app:cardElevation="0dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -94,12 +96,12 @@
                 app:layout_constraintTop_toBottomOf="@id/ad_advertiser"
                 tools:text="ad body" />
 
-            <!-- ad-review: height ochhi -> media 90dp -> 80dp -->
+            <!-- media height lang_click jevi j 80dp, PAN marginHorizontal 0 (edge-to-edge) -->
             <com.google.android.gms.ads.nativead.MediaView
                 android:id="@+id/ad_media"
                 android:layout_width="0dp"
                 android:layout_height="80dp"
-                android:layout_marginHorizontal="8dp"
+                android:layout_marginHorizontal="0dp"
                 android:layout_marginTop="6dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

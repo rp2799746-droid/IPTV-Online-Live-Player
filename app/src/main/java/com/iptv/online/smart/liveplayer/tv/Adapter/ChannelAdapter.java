@@ -19,6 +19,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.iptv.online.smart.liveplayer.tv.Activity.PlayerActivity;
 import com.iptv.online.smart.liveplayer.tv.Model.AppDatabase;
 import com.iptv.online.smart.liveplayer.tv.Model.Channel;
+import com.iptv.online.smart.liveplayer.tv.Model.DbCache;
 import com.iptv.online.smart.liveplayer.tv.R;
 
 import java.util.ArrayList;
@@ -99,6 +100,9 @@ public class ChannelAdapter extends RecyclerView.Adapter<ChannelAdapter.ViewHold
 
 
             AppDatabase.getInstance(context).historyDao().insertHistory(channel);
+
+
+            DbCache.invalidate();
 
             notifyItemChanged(position);
 

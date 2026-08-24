@@ -1,4 +1,5 @@
 package com.iptv.online.smart.liveplayer.tv.Activity
+import com.iptv.online.smart.liveplayer.tv.adsutils.populateNativeAdView
 
 import android.Manifest
 import android.content.Intent
@@ -23,7 +24,6 @@ import com.ads.module.funtion.AdCallback
 import com.iptv.online.smart.liveplayer.tv.Model.AppDatabase
 import com.iptv.online.smart.liveplayer.tv.R
 import com.iptv.online.smart.liveplayer.tv.ReadFile.FileReader
-import com.iptv.online.smart.liveplayer.tv.adsutils.AdsId
 import com.iptv.online.smart.liveplayer.tv.Ads.AdsManager
 import com.iptv.online.smart.liveplayer.tv.adsutils.NativeAdUiState
 import com.iptv.online.smart.liveplayer.tv.adsutils.RemoteConfigdata
@@ -221,23 +221,11 @@ class FileSelectActivity : Base__Activity<ActivityFileSelectBinding>() {
 
     }
 
+    // Pehla aakhi channel list (hajaro rows) memory ma laavi ne loop marto hato -
+    // e main thread par bov var lagadto. Have SQLite ne j puchhi laie chhie, je
+    // pehli match male tya j atki jaay chhe.
     private fun isPlaylistAlreadyExist(name: String, url: String): Boolean {
-        val allChannels = AppDatabase.getInstance(this).historyDao().allHistory1
-
-        if (allChannels.isNullOrEmpty()) return false
-
-        for (channel in allChannels) {
-            val isNameSame = channel.playlistName?.equals(name, ignoreCase = true) == true
-
-
-            val isUrlSame = channel.playlistUrl?.equals(url, ignoreCase = true) == true ||
-                    channel.channelUrl?.equals(url, ignoreCase = true) == true
-
-            if (isNameSame || isUrlSame) {
-                return true
-            }
-        }
-        return false
+        return AppDatabase.getInstance(this).historyDao().playlistExists(name, url)
     }
 
 
@@ -284,11 +272,18 @@ class FileSelectActivity : Base__Activity<ActivityFileSelectBinding>() {
     private fun getFileNameFromUri(uri: Uri): String? {
         var result: String? = null
         if (uri.scheme == "content") {
-            contentResolver.query(uri, null, null, null, null)?.use { cursor ->
-                if (cursor.moveToFirst()) {
-                    val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
-                    if (nameIndex != -1) result = cursor.getString(nameIndex)
+            try {
+                // Aમુક file-picker media URI (content://media/...) query karva
+                // READ_EXTERNAL_STORAGE permission mange che; na hoy to SecurityException
+                // aave. Etle safe try-catch — fail thay to niche URI path thi naam lai le.
+                contentResolver.query(uri, null, null, null, null)?.use { cursor ->
+                    if (cursor.moveToFirst()) {
+                        val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                        if (nameIndex != -1) result = cursor.getString(nameIndex)
+                    }
                 }
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
         }
         if (result == null) {

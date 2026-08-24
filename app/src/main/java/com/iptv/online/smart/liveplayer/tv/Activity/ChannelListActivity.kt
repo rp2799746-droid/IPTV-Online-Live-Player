@@ -1,4 +1,5 @@
 package com.iptv.online.smart.liveplayer.tv.Activity
+import com.iptv.online.smart.liveplayer.tv.adsutils.populateNativeAdView
 
 import android.util.Log
 import android.view.View
@@ -8,14 +9,18 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.ads.module.ads.ERainAd
 import com.iptv.online.smart.liveplayer.tv.Adapter.ChannelAdapter
 import com.iptv.online.smart.liveplayer.tv.Model.AppDatabase
+import com.iptv.online.smart.liveplayer.tv.Model.Channel
+import com.iptv.online.smart.liveplayer.tv.Model.DbCache
 import com.iptv.online.smart.liveplayer.tv.R
-import com.iptv.online.smart.liveplayer.tv.adsutils.AdsId
 import com.iptv.online.smart.liveplayer.tv.Ads.AdsManager
 import com.iptv.online.smart.liveplayer.tv.adsutils.NativeAdUiState
 import com.iptv.online.smart.liveplayer.tv.adsutils.RemoteConfigdata
 import com.iptv.online.smart.liveplayer.tv.databinding.ActivityChannelListBinding
 import com.iptv.online.smart.liveplayer.tv.utils.gone
 import com.iptv.online.smart.liveplayer.tv.utils.visible
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class ChannelListActivity : Base__Activity<ActivityChannelListBinding>() {
 
@@ -127,18 +132,30 @@ class ChannelListActivity : Base__Activity<ActivityChannelListBinding>() {
         loadChannels()
     }
 
+    // Group ni channel list moti hoy shake, etle DB read IO thread par.
+    // Cache hoy to list TARAT dekhay ane fresh data aave etle update thai jaay.
     private fun loadChannels() {
+        val dao = AppDatabase.getInstance(this).historyDao()
+        val playlist = pName ?: ""
+        val group = gName ?: ""
+        val cacheKey = "grp:$playlist|$group"
 
-        val channelData = AppDatabase.getInstance(this).historyDao()
-            .getChannelsByGroup(pName ?: "", gName ?: "")
+        DbCache.getChannels(cacheKey)?.let { showChannels(it) }
 
-        if (channelData != null) {
-            if (adapter == null) {
-                adapter = ChannelAdapter(this, ArrayList(channelData))
-                binding.rvChannels.adapter = adapter
-            } else {
-                adapter?.updateList(ArrayList(channelData))
-            }
+        lifecycleScope.launch(Dispatchers.IO) {
+            val channelData = dao.getChannelsByGroup(playlist, group) ?: emptyList()
+            DbCache.putChannels(cacheKey, channelData)
+
+            withContext(Dispatchers.Main) { showChannels(channelData) }
+        }
+    }
+
+    private fun showChannels(channelData: List<Channel>) {
+        if (adapter == null) {
+            adapter = ChannelAdapter(this@ChannelListActivity, ArrayList(channelData))
+            binding.rvChannels.adapter = adapter
+        } else {
+            adapter?.updateList(ArrayList(channelData))
         }
     }
 

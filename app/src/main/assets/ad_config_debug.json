@@ -1,0 +1,329 @@
+{
+  "inter_splash": {
+    "id": "/21775744923/example/interstitial",
+    "isEnable": true,
+    "enable_ua_check": false
+  },
+  "banner_splash": {
+    "id": "/21775744923/example/fixed-size-banner",
+    "isEnable": true,
+    "reloadIntervalSeconds": 30,
+    "enable_ua_check": false
+  },
+  "open_resume": {
+    "id": "/21775744923/example/app-open",
+    "isEnable": true,
+    "enable_ua_check": false
+  },
+  "native_language_1": {
+    "id": "/21775744923/example/native",
+    "isEnable": true,
+    "colorCTA": "default",
+    "heightCTA": 40,
+    "positionCTA": "BOTTOM",
+    "components": [
+      "icon_headline",
+      "body",
+      "media",
+      "cta"
+    ],
+    "enable_ua_check": false
+  },
+  "native_language_1_click": {
+    "id": "/21775744923/example/native",
+    "isEnable": true,
+    "colorCTA": "default",
+    "heightCTA": 40,
+    "positionCTA": "BOTTOM",
+    "components": [
+      "icon_headline",
+      "body",
+      "media",
+      "cta"
+    ],
+    "enable_ua_check": false
+  },
+  "native_language_2": {
+    "id": "/21775744923/example/native",
+    "isEnable": true,
+    "colorCTA": "default",
+    "heightCTA": 40,
+    "positionCTA": "BOTTOM",
+    "components": [
+      "icon_headline",
+      "body",
+      "media",
+      "cta"
+    ],
+    "enable_ua_check": false
+  },
+  "native_language_2_click": {
+    "id": "/21775744923/example/native",
+    "isEnable": true,
+    "colorCTA": "default",
+    "heightCTA": 40,
+    "positionCTA": "BOTTOM",
+    "components": [
+      "icon_headline",
+      "body",
+      "media",
+      "cta"
+    ],
+    "enable_ua_check": false
+  },
+  "native_onboarding_1_1": {
+    "id": "/21775744923/example/native",
+    "isEnable": true,
+    "colorCTA": "default",
+    "heightCTA": 40,
+    "positionCTA": "BOTTOM",
+    "components": [
+      "icon_headline",
+      "body",
+      "media",
+      "cta"
+    ],
+    "enable_ua_check": false
+  },
+  "native_onboarding_2_1": {
+    "id": "/21775744923/example/native",
+    "isEnable": true,
+    "colorCTA": "default",
+    "heightCTA": 40,
+    "positionCTA": "BOTTOM",
+    "components": [
+      "icon_headline",
+      "body",
+      "media",
+      "cta"
+    ],
+    "enable_ua_check": false
+  },
+  "native_onboarding_1_4": {
+    "id": "/21775744923/example/native",
+    "isEnable": true,
+    "colorCTA": "default",
+    "heightCTA": 40,
+    "positionCTA": "BOTTOM",
+    "components": [
+      "icon_headline",
+      "body",
+      "media",
+      "cta"
+    ],
+    "enable_ua_check": false
+  },
+  "native_onboarding_2_4": {
+    "id": "/21775744923/example/native",
+    "isEnable": true,
+    "colorCTA": "default",
+    "heightCTA": 40,
+    "positionCTA": "BOTTOM",
+    "components": [
+      "icon_headline",
+      "body",
+      "media",
+      "cta"
+    ],
+    "enable_ua_check": false
+  },
+  "native_onboarding_fullscreen_1_2": {
+    "id": "/21775744923/example/native",
+    "isEnable": true,
+    "colorCTA": "default",
+    "heightCTA": 40,
+    "positionCTA": "BOTTOM",
+    "components": [
+      "icon_headline",
+      "body",
+      "media",
+      "cta"
+    ],
+    "enable_ua_check": false
+  },
+  "native_onboarding_fullscreen_2_2": {
+    "id": "/21775744923/example/native",
+    "isEnable": true,
+    "colorCTA": "default",
+    "heightCTA": 40,
+    "positionCTA": "BOTTOM",
+    "components": [
+      "icon_headline",
+      "body",
+      "media",
+      "cta"
+    ],
+    "enable_ua_check": false
+  },
+  "inter_onboarding": {
+    "id": "/21775744923/example/interstitial",
+    "isEnable": true,
+    "enable_ua_check": false
+  },
+  "inter_home": {
+    "id": "/21775744923/example/interstitial",
+    "isEnable": true,
+    "enable_ua_check": false
+  },
+  "inter_back": {
+    "id": "/21775744923/example/interstitial",
+    "isEnable": true,
+    "enable_ua_check": false
+  },
+  "banner_collapsible_home": {
+    "id": "ca-app-pub-3940256099942544/9214589741",
+    "isEnable": true,
+    "enable_ua_check": false
+  },
+  "native_home": {
+    "id": "/21775744923/example/native",
+    "isEnable": true,
+    "colorCTA": "default",
+    "heightCTA": 40,
+    "positionCTA": "BOTTOM",
+    "components": [
+      "icon_headline",
+      "body",
+      "media",
+      "cta"
+    ],
+    "enable_ua_check": false
+  },
+  "native_channel": {
+    "id": "/21775744923/example/native",
+    "isEnable": true,
+    "colorCTA": "default",
+    "heightCTA": 40,
+    "positionCTA": "BOTTOM",
+    "components": [
+      "icon_headline",
+      "body",
+      "media",
+      "cta"
+    ],
+    "enable_ua_check": false
+  },
+  "native_favorite": {
+    "id": "/21775744923/example/native",
+    "isEnable": true,
+    "colorCTA": "default",
+    "heightCTA": 40,
+    "positionCTA": "BOTTOM",
+    "components": [
+      "icon_headline",
+      "body",
+      "media",
+      "cta"
+    ],
+    "enable_ua_check": false
+  },
+  "native_history": {
+    "id": "/21775744923/example/native",
+    "isEnable": true,
+    "colorCTA": "default",
+    "heightCTA": 40,
+    "positionCTA": "BOTTOM",
+    "components": [
+      "icon_headline",
+      "body",
+      "media",
+      "cta"
+    ],
+    "enable_ua_check": false
+  },
+  "native_playlist": {
+    "id": "/21775744923/example/native",
+    "isEnable": true,
+    "colorCTA": "default",
+    "heightCTA": 40,
+    "positionCTA": "BOTTOM",
+    "components": [
+      "icon_headline",
+      "body",
+      "media",
+      "cta"
+    ],
+    "enable_ua_check": false
+  },
+  "native_channellist": {
+    "id": "/21775744923/example/native",
+    "isEnable": true,
+    "colorCTA": "default",
+    "heightCTA": 40,
+    "positionCTA": "BOTTOM",
+    "components": [
+      "icon_headline",
+      "body",
+      "media",
+      "cta"
+    ],
+    "enable_ua_check": false
+  },
+  "inter_add_playlist": {
+    "id": "/21775744923/example/interstitial",
+    "isEnable": true,
+    "enable_ua_check": false
+  },
+  "inter_mirroring": {
+    "id": "/21775744923/example/interstitial",
+    "isEnable": true,
+    "enable_ua_check": false
+  },
+  "native_mirroring": {
+    "id": "/21775744923/example/native",
+    "isEnable": true,
+    "colorCTA": "default",
+    "heightCTA": 40,
+    "positionCTA": "BOTTOM",
+    "components": [
+      "icon_headline",
+      "body",
+      "media",
+      "cta"
+    ],
+    "enable_ua_check": false
+  },
+  "inter_welcome_back": {
+    "id": "/21775744923/example/interstitial",
+    "isEnable": true,
+    "enable_ua_check": false
+  },
+  "inter_splash_uninstall": {
+    "id": "/21775744923/example/interstitial",
+    "isEnable": true,
+    "enable_ua_check": false
+  },
+  "banner_splash_uninstall": {
+    "id": "/21775744923/example/fixed-size-banner",
+    "isEnable": true,
+    "enable_ua_check": false
+  },
+  "native_uninstall": {
+    "id": "/21775744923/example/native",
+    "isEnable": true,
+    "colorCTA": "default",
+    "heightCTA": 40,
+    "positionCTA": "BOTTOM",
+    "components": [
+      "icon_headline",
+      "body",
+      "media",
+      "cta"
+    ],
+    "enable_ua_check": false
+  },
+  "native_survey_uninstall": {
+    "id": "/21775744923/example/native",
+    "isEnable": true,
+    "colorCTA": "default",
+    "heightCTA": 40,
+    "positionCTA": "BOTTOM",
+    "components": [
+      "icon_headline",
+      "body",
+      "media",
+      "cta"
+    ],
+    "enable_ua_check": false
+  }
+}

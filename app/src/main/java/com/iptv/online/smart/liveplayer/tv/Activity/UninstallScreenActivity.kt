@@ -1,4 +1,5 @@
 package com.iptv.online.smart.liveplayer.tv.Activity
+import com.iptv.online.smart.liveplayer.tv.adsutils.populateNativeAdView
 
 import android.content.Intent
 import android.util.Log
@@ -6,7 +7,7 @@ import android.view.View
 import androidx.lifecycle.lifecycleScope
 import com.ads.module.ads.ERainAd
 import com.iptv.online.smart.liveplayer.tv.R
-import com.iptv.online.smart.liveplayer.tv.adsutils.AdsId
+import com.iptv.online.smart.liveplayer.tv.adsutils.AdRemoteConfig
 import com.iptv.online.smart.liveplayer.tv.Ads.AdsManager
 import com.iptv.online.smart.liveplayer.tv.adsutils.NativeAdUiState
 import com.iptv.online.smart.liveplayer.tv.adsutils.RemoteConfigdata
@@ -25,7 +26,7 @@ class UninstallScreenActivity : Base__Activity<UninstallScreeenBinding>() {
         configScript = RemoteConfigdata(this@UninstallScreenActivity)
         AdsManager.loadAd(
             this@UninstallScreenActivity,
-            AdsId.NATIVE_UNINSTALL,
+            AdRemoteConfig.getInstance().native_uninstall.id,
             R.layout.layout_native_ad_large,
             "native_uninstall"
         )
@@ -36,7 +37,7 @@ class UninstallScreenActivity : Base__Activity<UninstallScreeenBinding>() {
     private fun nativeAds() {
         configScript?.let {
             if (it.isNeedToShowADs) {
-                if (configScript!!.nativeUninstall) {
+                if (AdRemoteConfig.getInstance().native_uninstall.isEnable) {
 
                     val handledAds = mutableSetOf<String>()
                     val tag = "native_uninstall"

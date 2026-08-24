@@ -1,4 +1,5 @@
 package com.iptv.online.smart.liveplayer.tv.Adapter
+import com.iptv.online.smart.liveplayer.tv.adsutils.populateNativeAdView
 
 import android.app.Activity
 import android.content.Context
@@ -19,6 +20,7 @@ import com.facebook.shimmer.ShimmerFrameLayout
 import com.iptv.online.smart.liveplayer.tv.Activity.PlayerActivity
 import com.iptv.online.smart.liveplayer.tv.Model.AppDatabase
 import com.iptv.online.smart.liveplayer.tv.Model.Channel
+import com.iptv.online.smart.liveplayer.tv.Model.DbCache
 import com.iptv.online.smart.liveplayer.tv.R
 import com.iptv.online.smart.liveplayer.tv.Ads.AdsManager
 import com.iptv.online.smart.liveplayer.tv.adsutils.NativeAdUiState
@@ -156,6 +158,7 @@ class FavoriteAdapter(private val context: Context, incomingList: MutableList<Ch
                 val ch = favList[idx]
                 ch.isFavorite = false
                 AppDatabase.getInstance(context).historyDao().insertHistory(ch)
+                DbCache.invalidate()
                 favList.removeAt(idx)
                 notifyDataSetChanged()
                 if (favList.isEmpty()) listener?.onFavoriteEmpty()

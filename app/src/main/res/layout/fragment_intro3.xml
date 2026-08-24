@@ -107,7 +107,10 @@
                     android:fontFamily="@font/sf_pro_text_bold"
                     android:gravity="center"
                     android:text="@string/next"
-                    android:textSize="@dimen/_14ssp" />
+                    android:textSize="@dimen/_14ssp"
+                    android:singleLine="true"
+                    android:ellipsize="marquee"
+                    android:marqueeRepeatLimit="marquee_forever" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
         </LinearLayout>

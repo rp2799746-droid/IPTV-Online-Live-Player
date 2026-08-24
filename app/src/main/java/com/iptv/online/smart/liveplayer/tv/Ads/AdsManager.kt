@@ -1,6 +1,8 @@
 package com.iptv.online.smart.liveplayer.tv.Ads
 
 import android.app.Activity
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.View
 import androidx.lifecycle.LiveData
@@ -13,11 +15,9 @@ import com.ads.module.util.AppConstant
 import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.LoadAdError
 import com.iptv.online.smart.liveplayer.tv.R
-import com.iptv.online.smart.liveplayer.tv.adsutils.AdsId
+import com.iptv.online.smart.liveplayer.tv.adsutils.AdRemoteConfig
 import com.iptv.online.smart.liveplayer.tv.adsutils.NativeAdUiState
 import com.iptv.online.smart.liveplayer.tv.adsutils.RemoteConfigdata
-import com.iptv.online.smart.liveplayer.tv.adsutils.getSHouldDisplayHighCTA
-import com.iptv.online.smart.liveplayer.tv.adsutils.getShouldDisplayInterOnboarding
 import com.iptv.online.smart.liveplayer.tv.adsutils.isInternetAvailable
 import com.iptv.online.smart.liveplayer.tv.utils.gone
 import com.iptv.online.smart.liveplayer.tv.utils.visible
@@ -32,6 +32,35 @@ object AdsManager {
     private val adLiveMap = mutableMapOf<String, MutableLiveData<NativeAdUiState>>()
     fun getAdLive(tag: String): LiveData<NativeAdUiState> =
         adLiveMap.getOrPut(tag) { MutableLiveData() }
+
+    // ---- Native ad preload ne thoda-thoda karine mokalvano (stagger) ----
+    //
+    // Screen khulte j 7 native ad EK SAATHE load thata hata. AdMob dareek native ad
+    // mate WebView ubhu kare chhe, ane ek saathe ghana WebView banave to Chromium ni
+    // andar native lock contention thay -> main thread atke -> ANR.
+    // (Play Console ma "Native method - J.N.OOZ / J.N.JJ / J.N.VZ" + "Native lock
+    //  contention" vala rows aa j chhe.)
+    //
+    // Badhi ad load to thay j chhe - bas ek saathe nahi, vaari-fari ne.
+
+    private val preloadHandler = Handler(Looper.getMainLooper())
+
+    /** Ek preload request: kaya id ni ad, kaya layout ma, kaya tag thi. */
+    data class AdSpec(val adId: String, val layoutId: Int, val tag: String)
+
+    /**
+     * [specs] ne [gapMs] na antare ek pachi ek load kare chhe.
+     * Activity vachche band thai gai hoy to baaki ni skip thai jaay chhe.
+     */
+    fun preloadStaggered(activity: Activity, specs: List<AdSpec>, gapMs: Long = 250L) {
+        specs.forEachIndexed { index, spec ->
+            preloadHandler.postDelayed({
+                if (!activity.isFinishing && !activity.isDestroyed) {
+                    loadAd(activity, spec.adId, spec.layoutId, spec.tag)
+                }
+            }, index * gapMs)
+        }
+    }
 
     private val currentAds = mutableMapOf<String, ApNativeAd?>()
     fun loadAd(context: Activity, adId: String, layoutId: Int, adTag: String, shouldDisplay: Boolean = true,
@@ -82,21 +111,34 @@ object AdsManager {
     }
 
     fun loadNativeLanguage(activity: Activity, screenCount: Int) {
-        val adId = if (screenCount == 1) AdsId.nativeLanguage1 else AdsId.nativeLanguage2
-        loadAd(activity, adId, R.layout.layout_native_ad_large, "native_lang_tag")
+        // id + isEnable have JSON (AdRemoteConfig) mathi aave chhe.
+        val cfg = if (screenCount == 1) AdRemoteConfig.getInstance().native_language_1
+        else AdRemoteConfig.getInstance().native_language_2
+        // native_language_1 (screen 1) -> ALAG layout (ad-review: height ochhi + edge-to-edge).
+        // Baki (screen 2, onboarding, home...) ne layout_native_ad_large j rahe.
+        val layoutRes = if (screenCount == 1) R.layout.layout_native_ad_lang_1
+        else R.layout.layout_native_ad_large
+        loadAd(activity, cfg.id, layoutRes, "native_lang_tag", cfg.isEnable)
     }
 
     fun loadNativeLanguageClick(activity: Activity, screenCount: Int) {
-        val adId = if (screenCount == 1) AdsId.nativeLanguage1Click else AdsId.nativeLanguage2Click
-        val enabled = if (screenCount == 1) RemoteConfigdata(activity).nativeLang1ClickOn
-        else RemoteConfigdata(activity).nativeLang2ClickOn
-        loadAd(activity, adId, R.layout.layout_native_ad_lang_click, "native_lang_click_tag", enabled)
+        // id + isEnable have JSON (AdRemoteConfig) mathi aave chhe.
+        val cfg = if (screenCount == 1) AdRemoteConfig.getInstance().native_language_1_click
+        else AdRemoteConfig.getInstance().native_language_2_click
+
+        // Screen 1 = flush design (border/space nahi), Screen 2 = juno card design.
+        val layoutRes = if (screenCount == 1) R.layout.layout_native_ad_lang_click
+        else R.layout.layout_native_ad_lang_click_2
+
+        loadAd(activity, cfg.id, layoutRes, "native_lang_click_tag", cfg.isEnable)
     }
 
     fun loadNativeOnboarding1(activity: Activity, isDone: Boolean) {
-        val adId = if (isDone) AdsId.nativeOnboarding2_1 else AdsId.nativeOnboarding1_1
+        // id + isEnable JSON (AdRemoteConfig) mathi.
+        val cfg = if (isDone) AdRemoteConfig.getInstance().native_onboarding_2_1
+        else AdRemoteConfig.getInstance().native_onboarding_1_1
         val tag = if (isDone) "native_onboarding_2_1" else "native_onboarding_1_1"
-        loadAd(activity, adId, R.layout.layout_native_ad_large, tag)
+        loadAd(activity, cfg.id, R.layout.layout_native_ad_large, tag, cfg.isEnable)
     }
 
     private fun updateAdState(tagName: String, state: NativeAdUiState) {
@@ -111,7 +153,7 @@ object AdsManager {
             val remoteData = RemoteConfigdata(context)
             val value = remoteData.height_button_cta.toLongOrNull() ?: 40L
 
-            val isHighCTAEnabled = context.getSHouldDisplayHighCTA()
+            val isHighCTAEnabled = ERainAd.getInstance().getShouldDisplayHighCTA(true) == true
 
             return if (isHighCTAEnabled) {
                 value.coerceIn(36L, 52L)
@@ -130,15 +172,16 @@ object AdsManager {
 
     fun loadInterOnboarding(activity: Activity, ignoreLimit: Boolean = false) {
         val config = RemoteConfigdata(activity)
+        val cfg = AdRemoteConfig.getInstance().inter_onboarding
         if (!config.isNeedToShowADs
-            || !config.interOnboardingOn
-            || (!ignoreLimit && !activity.getShouldDisplayInterOnboarding())
+            || !cfg.isEnable
+            || (!ignoreLimit && !(ERainAd.getInstance().getShouldDisplayInterOnboarding(true) == true))
         ) {
             interOnboarding = null
             return
         }
         interOnboarding = ERainAd.getInstance()
-            .getInterstitialAds(activity, AdsId.interOnboarding, object : AdCallback() {})
+            .getInterstitialAds(activity, cfg.id, object : AdCallback() {})
     }
 
     fun showInterOnboarding(activity: Activity, ignoreLimit: Boolean = false, onAction: () -> Unit) {
@@ -146,18 +189,28 @@ object AdsManager {
         if (interstitial != null
             && interstitial.isReady
             && RemoteConfigdata(activity).isNeedToShowADs
-            && (ignoreLimit || activity.getShouldDisplayInterOnboarding())
+            && (ignoreLimit || ERainAd.getInstance().getShouldDisplayInterOnboarding(true) == true)
         ) {
-            ERainAd.getInstance()
-                .forceShowInterstitial(activity, interstitial, object : AdCallback() {
-                    override fun onNextAction() {
-                        super.onNextAction()
-                        onAction()
-                    }
-                }, true)
+            showInterIgnoreGap(activity, interstitial, onAction)
         } else {
             onAction()
         }
+    }
+
+    // inter_onboarding ne 30s gap VAGAR j batavo -> splash na inter no 30s count ene block
+    // na kare. Interval temporary 0 kari, show kari, pachho restore -> bija inter (back/home/
+    // click) no 30s gap jem no tem rahe.
+    private fun showInterIgnoreGap(activity: Activity, ad: ApInterstitialAd, onAction: () -> Unit) {
+        val cfg = ERainAd.getInstance().adConfig
+        val orig = cfg.intervalInterstitialAd
+        cfg.intervalInterstitialAd = 0
+        ERainAd.getInstance().forceShowInterstitial(activity, ad, object : AdCallback() {
+            override fun onNextAction() {
+                super.onNextAction()
+                onAction()
+            }
+        }, true)
+        cfg.intervalInterstitialAd = orig
     }
 
     private val interAdMap = mutableMapOf<String, ApInterstitialAd?>()
@@ -189,36 +242,45 @@ object AdsManager {
     }
 
     fun loadInterBack(activity: Activity) =
-        loadInterCentralized(activity, "interback", AdsId.interback, RemoteConfigdata(activity).interback)
+        AdRemoteConfig.getInstance().inter_back.let {
+            loadInterCentralized(activity, "interback", it.id, it.isEnable)
+        }
 
     fun showInterBack(activity: Activity, onAction: () -> Unit) =
-        showInterCentralized(activity, "interback", RemoteConfigdata(activity).interback, onAction)
+        showInterCentralized(activity, "interback", AdRemoteConfig.getInstance().inter_back.isEnable, onAction)
 
     fun loadInterHome(activity: Activity) =
-        loadInterCentralized(activity, "interHome", AdsId.interHome, RemoteConfigdata(activity).interHomeOn)
+        AdRemoteConfig.getInstance().inter_home.let {
+            loadInterCentralized(activity, "interHome", it.id, it.isEnable)
+        }
 
     fun showInterHome(activity: Activity, onAction: () -> Unit) =
-        showInterCentralized(activity, "interHome", RemoteConfigdata(activity).interHomeOn, onAction)
+        showInterCentralized(activity, "interHome", AdRemoteConfig.getInstance().inter_home.isEnable, onAction)
 
     fun loadInterMirroring(activity: Activity) =
-        loadInterCentralized(activity, "interMirroring", AdsId.INTER_MIRRORING, RemoteConfigdata(activity).interMirroring)
+        AdRemoteConfig.getInstance().inter_mirroring.let {
+            loadInterCentralized(activity, "interMirroring", it.id, it.isEnable)
+        }
 
     fun showInterMirroring(activity: Activity, onAction: () -> Unit) =
-        showInterCentralized(activity, "interMirroring", RemoteConfigdata(activity).interMirroring, onAction)
+        showInterCentralized(activity, "interMirroring", AdRemoteConfig.getInstance().inter_mirroring.isEnable, onAction)
 
     fun loadInterAddPlaylist(activity: Activity) =
-        loadInterCentralized(activity, "interAddPlaylist", AdsId.INTER_ADD_PLAYLIST, RemoteConfigdata(activity).interAddPlaylist)
+        AdRemoteConfig.getInstance().inter_add_playlist.let {
+            loadInterCentralized(activity, "interAddPlaylist", it.id, it.isEnable)
+        }
 
     fun showInterAddPlaylist(activity: Activity, onAction: () -> Unit) =
-        showInterCentralized(activity, "interAddPlaylist", RemoteConfigdata(activity).interAddPlaylist, onAction)
+        showInterCentralized(activity, "interAddPlaylist", AdRemoteConfig.getInstance().inter_add_playlist.isEnable, onAction)
 
     fun Activity.loadAndShowCollapsingBanner(adLayout: View) {
         val config = RemoteConfigdata(this)
-        val adId = AdsId.banner_collap_home
+        val cfg = AdRemoteConfig.getInstance().banner_collapsible_home
+        val adId = cfg.id
 
         Log.d("AdManager123", "Attempting to load Collapsible Banner: $adId")
 
-        if (config.isNeedToShowADs) {
+        if (config.isNeedToShowADs && cfg.isEnable) {
             // Container turat batavo -> shimmer instant dekhay, pachi banner emma aave.
             adLayout.visible
 

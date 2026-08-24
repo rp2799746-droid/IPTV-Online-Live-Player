@@ -1,4 +1,5 @@
 package com.iptv.online.smart.liveplayer.tv.Fregmnet
+import com.iptv.online.smart.liveplayer.tv.adsutils.populateNativeAdView
 
 import android.content.Intent
 import android.os.Bundle
@@ -22,17 +23,20 @@ import com.iptv.online.smart.liveplayer.tv.Adapter.BannerAdapter
 import com.iptv.online.smart.liveplayer.tv.Adapter.PlaylistAdapter
 import com.iptv.online.smart.liveplayer.tv.Model.AppDatabase
 import com.iptv.online.smart.liveplayer.tv.Model.BannerItem
+import com.iptv.online.smart.liveplayer.tv.Model.DbCache
 import com.iptv.online.smart.liveplayer.tv.Model.PlaylistGroup
 import com.iptv.online.smart.liveplayer.tv.R
-import com.iptv.online.smart.liveplayer.tv.adsutils.AdsId
+import com.iptv.online.smart.liveplayer.tv.adsutils.AdRemoteConfig
 import com.iptv.online.smart.liveplayer.tv.Ads.AdsManager
 import com.iptv.online.smart.liveplayer.tv.adsutils.NativeAdUiState
 import com.iptv.online.smart.liveplayer.tv.adsutils.RemoteConfigdata
-import com.iptv.online.smart.liveplayer.tv.adsutils.getShouldDisplayNativeHome
 import com.iptv.online.smart.liveplayer.tv.adsutils.isInternetAvailable
 import com.iptv.online.smart.liveplayer.tv.databinding.FragmentPlaylistBinding
 import com.iptv.online.smart.liveplayer.tv.utils.gone
 import com.iptv.online.smart.liveplayer.tv.utils.visible
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.Collections
 import kotlin.text.trim
 
@@ -154,15 +158,14 @@ class PlaylistFragment : Fragment() {
 
     private fun nativeAds() {
 
-        Log.d("hh", "nativeAds: "+requireActivity().getShouldDisplayNativeHome())
-        if (!requireActivity().getShouldDisplayNativeHome()) {
+        if (!(ERainAd.getInstance().getShouldDisplayNativeHome(AdRemoteConfig.getInstance().native_home.enableUaCheck) == true)) {
             binding?.adShimmer?.root?.gone
             binding?.frAds?.gone
             return
         }
         configScript?.let {
             if (it.isNeedToShowADs) {
-                if (configScript!!.nativehome2005) {
+                if (AdRemoteConfig.getInstance().native_home.isEnable) {
 
                     val handledAds = mutableSetOf<String>()
                     val retriedTags = mutableSetOf<String>()
@@ -215,7 +218,7 @@ class PlaylistFragment : Fragment() {
                                     binding?.frAds?.visible
                                     AdsManager.loadAd(
                                         requireActivity(),
-                                        AdsId.nativehome2005,
+                                        AdRemoteConfig.getInstance().native_home.id,
                                         R.layout.layout_native_ad_medium,
                                         tag
                                     )
@@ -240,36 +243,33 @@ class PlaylistFragment : Fragment() {
         }
     }
 
+    // allHistory1 badhi j channel return kare chhe (M3U ma hajaro hoy shake), etle
+    // DB read ane counting IO thread par. Cache hoy to list TARAT dekhay chhe ane
+    // background nu fresh data aave etle update thai jaay chhe.
     private fun updatePlaylists() {
-        viewLifecycleOwner.lifecycleScope.launchWhenResumed {
-            val context = context ?: return@launchWhenResumed
-            val allChannels = AppDatabase.getInstance(context).historyDao().allHistory1
+        val context = context ?: return
+        val dao = AppDatabase.getInstance(context).historyDao()
 
-            if (!allChannels.isNullOrEmpty()) {
-                val map = HashMap<String, Int>()
+        DbCache.getPlaylists()?.let { showPlaylists(it) }
 
-                for (c in allChannels) {
-                    val pName = c.playlistName ?: "Local Playlist"
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+            // SQLite pote GROUP BY + COUNT + sort kari aape chhe (jo pehla badhi j
+            // channel - hajaro rows - memory ma laavi ne Kotlin ma ganta hata).
+            val tempList: List<PlaylistGroup?> = dao.playlistCounts ?: emptyList()
+            DbCache.putPlaylists(tempList)
 
-
-                    if (pName == "Cloud_Playlist") continue
-
-                    map[pName] = map.getOrDefault(pName, 0) + 1
-                }
-
-                playlistList.clear()
-                for ((key, value) in map) {
-                    playlistList.add(PlaylistGroup(key, value))
-                }
-
-                playlistList.sortBy { it?.name?.lowercase() }
-
-                adapter?.notifyDataSetChanged()
-                showNoData(playlistList.isEmpty())
-            } else {
-                showNoData(true)
-            }
+            withContext(Dispatchers.Main) { showPlaylists(tempList) }
         }
+    }
+
+    private fun showPlaylists(list: List<PlaylistGroup?>) {
+        if (binding == null) return
+
+        playlistList.clear()
+        playlistList.addAll(list)
+
+        adapter?.notifyDataSetChanged()
+        showNoData(playlistList.isEmpty())
     }
 
     private fun showNoData(isEmpty: Boolean) {

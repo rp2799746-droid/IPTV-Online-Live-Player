@@ -8,6 +8,7 @@ import com.ads.module.ads.wrapper.ApInterstitialAd
 import com.iptv.online.smart.liveplayer.tv.Activity.MainActivity
 import com.iptv.online.smart.liveplayer.tv.Model.AppDatabase
 import com.iptv.online.smart.liveplayer.tv.Model.Channel
+import com.iptv.online.smart.liveplayer.tv.Model.DbCache
 import com.iptv.online.smart.liveplayer.tv.R
 import java.io.BufferedReader
 import java.io.InputStream
@@ -149,6 +150,7 @@ class FileReader(
                for (channel in list) {
                    AppDatabase.getInstance(activity).historyDao().insertHistory(channel)
                }
+               DbCache.invalidate()
                activity.runOnUiThread {
                    listener?.onFinish(playlistName, fileUri.toString())
                }

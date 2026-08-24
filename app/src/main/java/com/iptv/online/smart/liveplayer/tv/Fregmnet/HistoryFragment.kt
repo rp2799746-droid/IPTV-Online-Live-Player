@@ -12,13 +12,21 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.iptv.online.smart.liveplayer.tv.Adapter.Historychannel
 import com.iptv.online.smart.liveplayer.tv.Model.AppDatabase
+import com.iptv.online.smart.liveplayer.tv.Model.Channel
+import com.iptv.online.smart.liveplayer.tv.Model.DbCache
 import com.iptv.online.smart.liveplayer.tv.R
-import com.iptv.online.smart.liveplayer.tv.adsutils.AdsId
 import com.iptv.online.smart.liveplayer.tv.Ads.AdsManager
 import com.iptv.online.smart.liveplayer.tv.adsutils.NativeAdUiState
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 class HistoryFragment : Fragment() {
+    private companion object {
+        const val CACHE_KEY = "history"
+    }
+
     private var rvHistory: RecyclerView? = null
     private var layoutNoData: LinearLayout? = null
     private var adapter: Historychannel? = null
@@ -53,11 +61,23 @@ class HistoryFragment : Fragment() {
     }
 
 
+  // Cache ma data hoy to TARAT batavi daie, ane saathe background ma
+  // DB mathi fresh data vanchi ne update kari daie (main thread block na thay).
   private fun loadHistory() {
+      val dao = AppDatabase.getInstance(requireContext()).historyDao()
 
-      val historyList = AppDatabase.getInstance(requireContext()).historyDao().allHistory
+      DbCache.getChannels(CACHE_KEY)?.let { showHistory(it) }
 
-      if (historyList.isNullOrEmpty()) {
+      viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+          val historyList = dao.allHistory ?: emptyList()
+          DbCache.putChannels(CACHE_KEY, historyList)
+
+          withContext(Dispatchers.Main) { showHistory(historyList) }
+      }
+  }
+
+  private fun showHistory(historyList: List<Channel>) {
+      if (historyList.isEmpty()) {
           rvHistory?.visibility = View.GONE
           layoutNoData?.visibility = View.VISIBLE
       } else {

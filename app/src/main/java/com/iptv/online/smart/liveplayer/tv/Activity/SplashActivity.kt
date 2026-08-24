@@ -40,13 +40,12 @@ import com.google.android.ump.FormError
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.iptv.online.smart.liveplayer.tv.App
 import com.iptv.online.smart.liveplayer.tv.R
-import com.iptv.online.smart.liveplayer.tv.adsutils.AdsId
+import com.iptv.online.smart.liveplayer.tv.adsutils.AdRemoteConfig
 import com.iptv.online.smart.liveplayer.tv.adsutils.EasyPreferences
 import com.iptv.online.smart.liveplayer.tv.adsutils.EasyPreferences.set
 import com.iptv.online.smart.liveplayer.tv.Ads.AdsManager
 import com.iptv.online.smart.liveplayer.tv.BuildConfig
 import com.iptv.online.smart.liveplayer.tv.adsutils.RemoteConfigdata
-import com.iptv.online.smart.liveplayer.tv.adsutils.getShouldDisplayWidgetUninstall
 import com.iptv.online.smart.liveplayer.tv.databinding.ActivitySplashBinding
 import com.iptv.online.smart.liveplayer.tv.utils.gone
 import com.iptv.online.smart.liveplayer.tv.utils.isIntroFlowDone
@@ -67,6 +66,21 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
     private var noInternetDialog: Dialog? = null
     private var networkCallback: ConnectivityManager.NetworkCallback? = null
     private var isRemoteConfigLoading = false
+
+    // Home dabavi background karyu hoy tyare splash inter background ma show
+    // na thay ne flow atki jato. Aa flag thi ad-show + next navigation ne
+    // foreground (onResume) sudhi wait karavie -> pachi j ad dekhay ne aagal jay.
+    private var splashResumed = false
+    private var pendingProceed: (() -> Unit)? = null
+
+    // Ek j var navigate thay (safety-net + ad callback banne goNextScreen kare to pan
+    // 2 activity na khule). goNextScreen idempotent banave.
+    private var hasNavigated = false
+
+    private fun runWhenResumed(action: () -> Unit) {
+        if (splashResumed) action() else pendingProceed = action
+    }
+
     companion object {
         var screenCount = 1     // 👈 static thai gayu
     }
@@ -78,7 +92,11 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
 
         binding.btnSettings.isSelected = true
         appUpdate_Manager = AppUpdateManagerFactory.create(this)
-        manageAppShortcuts()
+        // Shortcut setup ne first frame pachi defer kariye — aa system ne IPC
+        // call kare che, etle onCreate no critical path block na thay (ANR ghate).
+        binding.root.post {
+            manageAppShortcuts()
+        }
 
     }
 
@@ -113,7 +131,7 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
             val shortcutManager = getSystemService(ShortcutManager::class.java)
 
-            val shouldShowShortcuts = getShouldDisplayWidgetUninstall()
+            val shouldShowShortcuts = ERainAd.getInstance().getShouldDisplayWidgetUninstall(true) == true
 
             if (shouldShowShortcuts) {
                 val shortcutList = mutableListOf<ShortcutInfo>()
@@ -280,8 +298,32 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
         }
     }
 
+    override fun onPause() {
+        super.onPause()
+        splashResumed = false
+    }
+
     protected override fun onResume() {
         super.onResume()
+        splashResumed = true
+        // Background ma jyare flow ready thai gayo hato (ad show / navigate) te
+        // have foreground ma chalavie.
+        pendingProceed?.let { proceed ->
+            pendingProceed = null
+            proceed()
+        }
+
+        // IPTV2 jevu safety-net: flow start thai gayo hoy pan splash ad fail/interrupt thai ne
+        // callback na aavyo hoy to app splash par stuck rahe. onCheckShowSplashWhenFail ad FAIL
+        // hoy TO J (showing ad ne interrupt karya vagar) 1 sec pachi jate aagal moklे.
+        if (isFlowStarted && !hasNavigated) {
+            ERainAd.getInstance().onCheckShowSplashWhenFail(this@SplashActivity, object : AdCallback() {
+                override fun onNextAction() {
+                    super.onNextAction()
+                    goNextScreen()
+                }
+            }, 1000)
+        }
 
         if (isNetworkAvailable(this)) {
             if (noInternetDialog != null && noInternetDialog!!.isShowing()) {
@@ -427,7 +469,7 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
         Log.e("kk", "loadInfinityFlow: Started, Ads Enabled: ${remoteData.isNeedToShowADs}")
 
         var currentFlow = widgetFlow
-        if (getShouldDisplayWidgetUninstall()) {
+        if (ERainAd.getInstance().getShouldDisplayWidgetUninstall(true) == true) {
             Log.d("AdManager123", "Widget flow active: Options will be shown.")
         } else {
             currentFlow = null
@@ -436,9 +478,9 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
         if (remoteData.isNeedToShowADs) {
             val isUninstallFlow = currentFlow == "flow_uninstall"
             val shouldShowBanner = if (isUninstallFlow) {
-                remoteData.bannerSplashUninstall
+                AdRemoteConfig.getInstance().banner_splash_uninstall.isEnable
             } else {
-                remoteData.bannerSplashOn
+                AdRemoteConfig.getInstance().banner_splash.isEnable
             }
             if (remoteData.isNeedToShowADs && shouldShowBanner) {
                 binding.bannerAdLayout.visible
@@ -446,11 +488,11 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
                 val bannerIdToUse = if (isUninstallFlow) {
                     Log.d("AdManager123", "loadInfinityFlow: " + "AdsId.BANNER_SPLASH_UNINSTALL")
 
-                    AdsId.BANNER_SPLASH_UNINSTALL
+                    AdRemoteConfig.getInstance().banner_splash_uninstall.id
                 } else {
                     Log.d("AdManager123", "loadInfinityFlow: " + " AdsId.bannerSplash")
 
-                    AdsId.bannerSplash
+                    AdRemoteConfig.getInstance().banner_splash.id
 
                 }
 
@@ -461,9 +503,9 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
 
 
             if (widgetFlow == "flow_uninstall") {
-                if (remoteData.interSplashUninstall) {
+                if (AdRemoteConfig.getInstance().inter_splash_uninstall.isEnable) {
                     ERainAd.getInstance().loadSplashInterstitialAds(
-                        this, AdsId.INTER_SPLASH_UNINSTALL, 30000, 5000, object : AdCallback() {
+                        this, AdRemoteConfig.getInstance().inter_splash_uninstall.id, 30000, 5000, object : AdCallback() {
                             override fun onNextAction() {
                                 goNextScreen()
                             }
@@ -479,9 +521,9 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
                 return
             }
 
-            if (widgetFlow != null && remoteData.interSplashOn) {
+            if (widgetFlow != null && AdRemoteConfig.getInstance().inter_splash.isEnable) {
                 ERainAd.getInstance().loadSplashInterstitialAds(
-                    this, AdsId.interSplash, 30000, 5000, object : AdCallback() {
+                    this, AdRemoteConfig.getInstance().inter_splash.id, 30000, 5000, object : AdCallback() {
                         override fun onNextAction() {
                             goNextScreen()
                         }
@@ -494,14 +536,14 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
                 return
             }
 
-            if (remoteData.interSplashOn) {
+            if (AdRemoteConfig.getInstance().inter_splash.isEnable) {
                 Log.w(
                     TAG,
                     "loadInfinityFlow: remoteData.isInterOnSplash -> ${remoteData.isInterOnSplash}"
                 )
                 if (remoteData.isInterOnSplash) {
                     ERainAd.getInstance().loadSplashInterstitialAds(
-                        this, AdsId.interSplash, 30000, 5000, object : AdCallback() {
+                        this, AdRemoteConfig.getInstance().inter_splash.id, 30000, 5000, object : AdCallback() {
                             override fun onNextAction() {
                                 super.onNextAction()
                                 Log.w(TAG, "loadInfinityFlow: onNextAction")
@@ -516,7 +558,7 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
                 } else {
                     AppOpenManager.getInstance().loadOpenAppAdSplash(
                         this,
-                        AdsId.openSplash,
+                        AdRemoteConfig.getInstance().open_resume.id,
                         30000, 5000, true, object : AdCallback() {
                             override fun onNextAction() {
                                 super.onNextAction()
@@ -551,6 +593,15 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
     }
 
     private fun goNextScreen() {
+        // Background (home dabayelu) hoy to startActivity block thay -> foreground
+        // (onResume) sudhi wait karavie, pachi j next screen kholie.
+        if (!splashResumed) {
+            pendingProceed = { goNextScreen() }
+            return
+        }
+        // Ek j var navigate: real ad-callback ke resume safety-net, je pehla aave e j chale.
+        if (hasNavigated) return
+        hasNavigated = true
         printHashKey()
         val widgetFlow = intent.getStringExtra("widget_flow")
 
@@ -580,14 +631,20 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
                     Intent(this, MainActivity::class.java)
                 } else {
                     preloadLanguageAdInApp()
-                    Intent(this, Language_Activity::class.java).apply {
+                    Intent(this, LanguageActivity::class.java).apply {
                         putExtra("isFromSplash", true)
                     }
                 }
             }
         }
 
-        startActivity(intent)
+        // Amuk device par startActivity vakhte system_server (WindowManager Transition)
+        // ma NPE aave che — OS no bug che pan app crash kare. try-catch thi crash atkave.
+        try {
+            startActivity(intent)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
         finish()
     }
 
@@ -617,83 +674,75 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
         RemoteConfigdata(this)
     }
     private fun preloadLanguageAdInApp() {
+        // Pehli j vaar native_language_1, tya pachi hammesha native_language_2.
+        // Screen 1 no ad AHIYA J preload thay chhe, etle decision ahiya j leva nu.
+        // Aa J screenCount (companion) ne LanguageActivity vaapre -> lang ad ane
+        // click ad banne same variant batave (consistent).
+        // prev == 0 => sauthi pehli vaar -> _1. Pachi (prev 1 ke 2) -> hammesha _2.
+        val sp = getSharedPreferences(packageName, 0)
+        val prevLangCount = sp.getInt("lang_screen_count", 0)
+        screenCount = if (prevLangCount == 0) 1 else 2
+        sp.edit().putInt("lang_screen_count", screenCount).apply()
+
         AdsManager.loadNativeLanguage(this, screenCount)
-
-
-
-
     }
     private fun setConfigData(config: FirebaseRemoteConfig) {
         Log.i(TAG, "setConfigData: $config")
+
+        // iptv2 jevu: aakho ad config JSON Firebase mathi lai AdRemoteConfig re-init karo.
+        // debug -> "ad_rem_dup" (test ids), release -> "ad_remote_config" (live). Blank thay to asset.
+        val adRemoteJson = if (BuildConfig.DEBUG) config.getString("ad_rem_dup")
+        else config.getString("ad_remote_config")
+        AdRemoteConfig.initialize(this, adRemoteJson)
         remoteData.delayButtonDoneLanguage = config.getBoolean("delay_button_done_language")
         remoteData.privacyLink = config.getString("privacy_policy")
         remoteData.height_button_cta = config.getString("height_button_cta")
-        remoteData.isNeedToShowADs = config.getBoolean("is_need_to_show_ads")
 
+        // iptv2 jevu: is_intro_page -> false hoy to onboarding skip. Firebase console ma key
+        // HOY (VALUE_SOURCE_REMOTE) to j override -> nahi to key missing e getBoolean() false
+        // aape ne onboarding kayamI skip thai jay (aa bug taalva mate).
+        val introPageValue = config.getValue("is_intro_page")
+        if (introPageValue.source == FirebaseRemoteConfig.VALUE_SOURCE_REMOTE) {
+            remoteData.isIntroPage = introPageValue.asBoolean()
+        }
 
-        // ---------- Splash ----------
-        remoteData.interSplashOn = config.getBoolean("ad_inter_splash_on")
-        remoteData.bannerSplashOn = config.getBoolean("ad_banner_splash_on")
-        remoteData.appOpenOn = config.getBoolean("ad_app_open_on")
+        // iptv2 jevu: show_full_native_close_btn -> fullscreen ad par close button on/off.
+        // REMOTE guard: Firebase ma key hoy to j override, nahi to default true (close batavo,
+        // nahi to aa project ma btnNext na hoy etle user trap thay).
+        val closeBtnValue = config.getValue("show_full_native_close_btn")
+        if (closeBtnValue.source == FirebaseRemoteConfig.VALUE_SOURCE_REMOTE) {
+            remoteData.isFullNativeCloseBtn = closeBtnValue.asBoolean()
+        }
 
-        // ---------- Language Screen ----------
-        remoteData.nativeLang1On = config.getBoolean("ad_native_lang1_on")
-        remoteData.nativeLang2On = config.getBoolean("ad_native_lang2_on")
-        remoteData.nativeLang1ClickOn = config.getBoolean("ad_native_lang1_click_on")
-        remoteData.nativeLang2ClickOn = config.getBoolean("ad_native_lang2_click_on")
+        // iptv2 jevu: is_in_app_update -> fakt fetch (use nathi, IPTV2 ma pan em j).
+        remoteData.isInAppUpdate = config.getBoolean("is_in_app_update")
 
-        // ---------- Onboarding ----------
-        remoteData.nativeOnb11On = config.getBoolean("ad_native_onb_1_1_on")
-        remoteData.nativeOnbFull1On = config.getBoolean("ad_native_onb_full_1_on")
-        remoteData.nativeOnb14On = config.getBoolean("ad_native_onb_1_4_on")
-        remoteData.nativeOnbFull2On = config.getBoolean("ad_native_onb_full_2_on")
-        remoteData.nativeOnb21On = config.getBoolean("native_onboarding_2_1_on")
-        remoteData.nativeOnb24On = config.getBoolean("ad_native_onb_2_4_on")
-        remoteData.interOnboardingOn = config.getBoolean("ad_inter_onb_on")
+        // iptv2 jevu: language Done button delay (ms). REMOTE guard -> key hoy to j override,
+        // nahi to default 2000 (2 sec).
+        val delayTimeValue = config.getValue("time_delay_show_language_done_button")
+        if (delayTimeValue.source == FirebaseRemoteConfig.VALUE_SOURCE_REMOTE) {
+            remoteData.timeDelayLanguageDone = delayTimeValue.asLong()
+        }
 
-        // ---------- Home ----------
-        remoteData.interHomeOn = config.getBoolean("ad_inter_home_on")
+        // iptv2 jevu: is_all_ads_show -> fakt fetch (IPTV2 ma pan use nathi thatu, master
+        // switch tarike wire NATHI karyu). Default true.
+        remoteData.isAllAdsShow = config.getBoolean("is_all_ads_show")
 
-        // ---------- Collapsible Banner ----------
-        remoteData.bannerCollapsehomeOn = config.getBoolean("ad_banner_collapse_home_on")
-
-        // ---------- Reward ----------
-        remoteData.rewardOn = config.getBoolean("ad_reward_on")
-
-        //Add
-        remoteData.interback = config.getBoolean("inter_back")
-
-        remoteData.nativePlaylist = config.getBoolean("native_playlist")
-        remoteData.interMirroring = config.getBoolean("inter_mirroring")
-        remoteData.nativeMirroring = config.getBoolean("native_mirroring")
-        remoteData.nativeChannelList = config.getBoolean("native_channel_list")
-        remoteData.interAddPlaylist = config.getBoolean("inter_add_playlist")
-        remoteData.interSplashUninstall = config.getBoolean("inter_splash_uninstall")
-        remoteData.bannerSplashUninstall = config.getBoolean("banner_splash_uninstall")
-        remoteData.nativeUninstall = config.getBoolean("native_uninstall")
-        remoteData.nativesurveyUninstall = config.getBoolean("native_survey_uninstall")
-
-        remoteData.nativehome2005 = config.getBoolean("native_home_2005")
-        remoteData.nativechannel2005 = config.getBoolean("native_channel_2005")
-        remoteData.nativefavorite2005 = config.getBoolean("native_favorite_2005")
-        remoteData.nativehistory2005 = config.getBoolean("native_history_2005")
-
-        //welcome
-        remoteData.interwelcomeback = config.getBoolean("interwelcomeback")
-
-
-        remoteData.isInterOnSplash = config.getBoolean("is_inter_on_splash")
+        // ===== iptv2 jevu: badha ad on/off flags have JSON (AdRemoteConfig / ad_config.json)
+        // mathi aave chhe -> ahiya Firebase mathi fetch KADHI NAKHYA chhe.
+        // RemoteConfigdata na properties default 'true' aape chhe, etle ad gating have
+        // JSON (AdRemoteConfig) par j depend kare. Firebase ma fakt meta keys rahe:
+        //   delay_button_done_language, privacy_policy, height_button_cta,
+        //   ad_remote_config / ad_rem_dup (JSON ad config), is_inter_on_splash sudhi na
+        //   badha per-ad flags KADHI didha. =====
 
         if (isPurchased(this)) {
             remoteData.isNeedToShowADs = false
         }
 
-        // App resume par Welcome Screen flow use thay che, etle App-Open resume ad
-        // disable j rakhiye (WelcomeScreen pote welcome-back interstitial batave che).
+
         AppOpenManager.getInstance().disableAppResume()
-
-
-        loadInfinityFlow()
+        runWhenResumed { loadInfinityFlow() }
     }
 
 }

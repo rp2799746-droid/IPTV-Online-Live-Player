@@ -21,6 +21,8 @@ class IntroFragment2 : BaseFragment<FragmentIntro2Binding>() {
         binding.btnNext.triggerClick {
             (activity as? IntroActivity)?.getNextFragment()
         }
+        // Lambo translated text single line ma marquee (scroll) thava mate.
+        binding.tvNext.isSelected = true
     }
 
     override fun bindMethod() {

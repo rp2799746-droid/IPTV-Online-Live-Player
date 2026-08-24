@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Language screen (screen 1 native_language_1 ANE screen 2 native_language_1_click)
+    mate no shimmer. Banne ad ni height same (media 80dp) chhe etle ek j shimmer chale.
+    ad_shimmer_native_ad_large (media 140dp) na badle aa vaparay -> ad aave tyare jump nahi.
+-->
+<com.facebook.shimmer.ShimmerFrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/unified"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:shimmer_auto_start="true"
+    app:shimmer_duration="1000">
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/shimmer_card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        app:cardBackgroundColor="#EDEDED"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="5dp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="8dp">
+
+            <View
+                android:id="@+id/shimmer_ad_app_icon"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:layout_marginStart="@dimen/_10sdp"
+                android:background="@color/darker_gray"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <View
+                android:id="@+id/shimmer_ad_icon"
+                android:layout_width="25dp"
+                android:layout_height="16dp"
+                android:layout_marginStart="@dimen/_10sdp"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:background="@drawable/bg_ad_icon"
+                android:backgroundTint="@color/darker_gray"
+                app:layout_constraintStart_toEndOf="@id/shimmer_ad_app_icon"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <View
+                android:id="@+id/shimmer_ad_headline"
+                android:layout_width="0dp"
+                android:layout_height="16dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="8dp"
+                android:background="@color/darker_gray"
+                app:layout_constraintBottom_toBottomOf="@id/shimmer_ad_icon"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/shimmer_ad_icon"
+                app:layout_constraintTop_toTopOf="@id/shimmer_ad_icon" />
+
+            <View
+                android:id="@+id/shimmer_ad_advertiser"
+                android:layout_width="0dp"
+                android:layout_height="14dp"
+                android:layout_marginStart="2dp"
+                android:layout_marginTop="5dp"
+                android:background="@color/darker_gray"
+                app:layout_constraintEnd_toEndOf="@id/shimmer_ad_headline"
+                app:layout_constraintStart_toStartOf="@id/shimmer_ad_icon"
+                app:layout_constraintTop_toBottomOf="@id/shimmer_ad_headline" />
+
+            <View
+                android:id="@+id/shimmer_ad_body"
+                android:layout_width="0dp"
+                android:layout_height="14dp"
+                android:layout_marginHorizontal="@dimen/_5sdp"
+                android:layout_marginTop="6dp"
+                android:background="@color/darker_gray"
+                app:layout_constraintEnd_toEndOf="@id/shimmer_ad_advertiser"
+                app:layout_constraintStart_toStartOf="@id/shimmer_ad_app_icon"
+                app:layout_constraintTop_toBottomOf="@id/shimmer_ad_advertiser" />
+
+            <!-- media height ad jevi j 80dp (large ma 140dp hato) -->
+            <View
+                android:id="@+id/shimmer_ad_media"
+                android:layout_width="0dp"
+                android:layout_height="80dp"
+                android:layout_marginHorizontal="8dp"
+                android:layout_marginTop="6dp"
+                android:background="@color/darker_gray"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/shimmer_ad_body" />
+
+            <View
+                android:id="@+id/shimmer_ad_call_to_action"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="4dp"
+                android:layout_marginHorizontal="8dp"
+                android:background="@drawable/bg_btn_native_cta"
+                android:backgroundTint="@color/darker_gray"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/shimmer_ad_media" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
+</com.facebook.shimmer.ShimmerFrameLayout>

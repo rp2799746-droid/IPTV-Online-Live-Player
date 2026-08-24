@@ -36,5 +36,3 @@ dependencyResolutionManagement {
 
 rootProject.name = "IPTV Online Live Player"
 include ':app'
-include ':ads'
-include ':iauModule'

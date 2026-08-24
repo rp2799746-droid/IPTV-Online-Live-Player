@@ -1,4 +1,5 @@
 package com.iptv.online.smart.liveplayer.tv.Adapter
+import com.iptv.online.smart.liveplayer.tv.adsutils.populateNativeAdView
 
 import android.app.Activity
 import android.content.Context
@@ -18,6 +19,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.facebook.shimmer.ShimmerFrameLayout
 import com.iptv.online.smart.liveplayer.tv.Activity.PlayerActivity
 import com.iptv.online.smart.liveplayer.tv.Model.Channel
+import com.iptv.online.smart.liveplayer.tv.Model.DbCache
 import com.iptv.online.smart.liveplayer.tv.R
 import com.iptv.online.smart.liveplayer.tv.Ads.AdsManager
 import com.iptv.online.smart.liveplayer.tv.adsutils.NativeAdUiState
@@ -90,6 +92,7 @@ class Historychannel(private val context: Context, private val channelList: Muta
                 channel.id = primaryKey
                 channel.historyTimestamp = System.currentTimeMillis()
                 db.historyDao().insertHistory(channel)
+                DbCache.invalidate()
                 notifyItemChanged(position)
             }
 

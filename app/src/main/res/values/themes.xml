@@ -31,4 +31,7 @@
         <item name="cornerSize">8dp</item>
     </style>
 
+    <!-- iptv2 jevu: DevConfig checklist activity no theme (edge-to-edge fix values-v35 ma). -->
+    <style name="ThemeDevConfigInsetFix" parent="ThemeDevConfig" />
+
 </resources>

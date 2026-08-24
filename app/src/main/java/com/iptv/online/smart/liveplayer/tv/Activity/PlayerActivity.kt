@@ -28,6 +28,7 @@ import com.iptv.online.smart.liveplayer.tv.Activity.MainActivity.Companion.isRat
 import com.iptv.online.smart.liveplayer.tv.Adapter.ChannelAdapter
 import com.iptv.online.smart.liveplayer.tv.Model.AppDatabase
 import com.iptv.online.smart.liveplayer.tv.Model.Channel
+import com.iptv.online.smart.liveplayer.tv.Model.DbCache
 import com.iptv.online.smart.liveplayer.tv.R
 import com.iptv.online.smart.liveplayer.tv.databinding.ActivityPlayerBinding
 
@@ -241,6 +242,9 @@ class PlayerActivity : Base__Activity<ActivityPlayerBinding>() {
         AppDatabase.getInstance(this).historyDao().insertHistory(dbData)
 
 
+        DbCache.invalidate()
+
+
         channel.setFavorite(newFavoriteStatus)
         updateFavoriteIcon(newFavoriteStatus)
 
@@ -269,6 +273,7 @@ class PlayerActivity : Base__Activity<ActivityPlayerBinding>() {
 
         // Room માં સેવ કરો - આ ડેટા ક્યારેય ગાયબ નહીં થાય
         AppDatabase.getInstance(this).historyDao().insertHistory(channel)
+        DbCache.invalidate()
 
         Log.d("ROOM_SAVE", "History saved for: " + channel.getChannelName())
     }

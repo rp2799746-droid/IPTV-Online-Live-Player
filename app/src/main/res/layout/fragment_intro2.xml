@@ -97,14 +97,18 @@
                     android:id="@+id/tvNext"
                     android:layout_width="110dp"
                     android:layout_height="@dimen/_35sdp"
-                    android:layout_marginEnd="@dimen/_20sdp"
                     android:background="@drawable/bg_btn_native_cta"
-                    android:textColor="@color/white"
-
                     android:fontFamily="@font/sf_pro_text_bold"
+
                     android:gravity="center"
                     android:text="@string/next"
-                    android:textSize="@dimen/_14ssp" />
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/_14ssp"
+                    android:singleLine="true"
+                    android:ellipsize="marquee"
+                    android:marqueeRepeatLimit="marquee_forever"
+                    tools:layout_editor_absoluteX="0dp"
+                    tools:layout_editor_absoluteY="0dp" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
         </LinearLayout>

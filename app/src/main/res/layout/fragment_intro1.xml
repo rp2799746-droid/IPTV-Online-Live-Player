@@ -53,7 +53,7 @@
             android:text="@string/enjoy_your_favorite_channels_with_smooth_and_easy_streaming"
             android:textColor="@color/hinttext"
             android:textSize="@dimen/_11sdp"
-            app:layout_constraintBottom_toTopOf="@id/layoutNext"
+            app:layout_constraintBottom_toTopOf="@id/layoutNext_1"
             app:layout_constraintStart_toStartOf="parent" />
 
         <LinearLayout
@@ -64,6 +64,7 @@
             android:layout_marginBottom="@dimen/_10sdp"
             app:layout_constraintBottom_toTopOf="@id/layoutAds"
             app:layout_constraintEnd_toEndOf="parent"
+            android:visibility="gone"
             app:layout_constraintStart_toStartOf="parent">
 
             <ImageView
@@ -96,6 +97,65 @@
                     android:gravity="center"
                     android:text="@string/next"
                     android:textSize="@dimen/_14ssp"
+                    android:singleLine="true"
+                    android:ellipsize="marquee"
+                    android:marqueeRepeatLimit="marquee_forever"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layoutNext_1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/_15sdp"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toTopOf="@id/layoutAds"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <ImageView
+                android:id="@+id/dots_indicator_1"
+                android:layout_width="@dimen/_60sdp"
+                android:layout_height="@dimen/_60sdp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_inro_dot_1" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="@dimen/_1sdp"
+                android:layout_weight="1" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/btnNext_1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+
+                android:layout_marginHorizontal="@dimen/_10sdp">
+
+                <TextView
+                    android:id="@+id/tvNext_1"
+                    android:layout_width="75dp"
+                    android:layout_height="@dimen/_25sdp"
+                    android:background="@drawable/bg_spent_card2"
+                    android:ellipsize="marquee"
+                    android:fontFamily="@font/sf_pro_text_bold"
+                    android:gravity="center"
+                    android:marqueeRepeatLimit="marquee_forever"
+                    android:paddingHorizontal="@dimen/_2sdp"
+                    android:paddingVertical="@dimen/_4sdp"
+                    android:singleLine="true"
+                    android:text="@string/next"
+                    android:textAllCaps="true"
+                    android:textColor="@color/gray"
+                    android:textSize="@dimen/_11ssp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"

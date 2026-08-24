@@ -67,14 +67,38 @@
 
     </LinearLayout>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="6.50dp"
-        android:layout_marginVertical="6.50dp"
-        android:layout_weight="1"
-        android:contentDescription="@null" />
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginHorizontal="6.50dp"
+            android:layout_marginVertical="6.50dp"
+            android:contentDescription="@null" />
+
+        <!--
+            Ad-review: native ad ni bilkul uper, jamni bajue swipe hint (vertical
+            scroll suchave chhe). List par overlay thay chhe. Fakt language screen 1
+            (native_language_1) par dekhay chhe ane user list na chhelle pahonche
+            etle jato rahe chhe. - LanguageActivity ma logic.
+        -->
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/swipeHint"
+            android:layout_width="@dimen/_200sdp"
+            android:layout_height="@dimen/_200sdp"
+            android:layout_gravity="bottom|end"
+            android:contentDescription="@null"
+            android:visibility="gone"
+            android:layout_marginEnd="-30dp"
+            android:layout_marginBottom="-40dp"
+            app:lottie_autoPlay="true"
+            app:lottie_loop="true"
+            app:lottie_rawRes="@raw/swipeup" />
+    </FrameLayout>
 
     <FrameLayout
         android:id="@+id/layoutAds"
@@ -90,7 +114,7 @@
 
             <include
                 android:id="@+id/adShimmer"
-                layout="@layout/ad_shimmer_native_ad_large" />
+                layout="@layout/ad_shimmer_native_ad_lang" />
         </FrameLayout>
     </FrameLayout>
 

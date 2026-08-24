@@ -12,13 +12,21 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.iptv.online.smart.liveplayer.tv.Adapter.FavoriteAdapter
 import com.iptv.online.smart.liveplayer.tv.Model.AppDatabase
+import com.iptv.online.smart.liveplayer.tv.Model.Channel
+import com.iptv.online.smart.liveplayer.tv.Model.DbCache
 import com.iptv.online.smart.liveplayer.tv.R
-import com.iptv.online.smart.liveplayer.tv.adsutils.AdsId
 import com.iptv.online.smart.liveplayer.tv.Ads.AdsManager
 import com.iptv.online.smart.liveplayer.tv.adsutils.NativeAdUiState
 import com.iptv.online.smart.liveplayer.tv.adsutils.RemoteConfigdata
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class FavoriteFragment : Fragment() {
+    private companion object {
+        const val CACHE_KEY = "favorite"
+    }
+
     private var rvFav: RecyclerView? = null
     private var adapter: FavoriteAdapter? = null
     private var tvNoData: LinearLayout? = null
@@ -57,16 +65,27 @@ class FavoriteFragment : Fragment() {
 
         rvFav!!.setLayoutManager(LinearLayoutManager(getContext()))
 
-        loadFavoriteChannels()
-
+        // onResume ma pan aa j load thay chhe, etle ahi bijivar call nathi karvi.
         return view
     }
 
+// Cache ma data hoy to TARAT batavi daie, ane saathe background ma DB mathi
+// fresh data vanchi ne update kari daie (main thread block na thay - ANR).
 private fun loadFavoriteChannels() {
+    val dao = AppDatabase.getInstance(requireContext()).historyDao()
 
-    val favList = AppDatabase.getInstance(requireContext()).historyDao().favoriteChannels
+    DbCache.getChannels(CACHE_KEY)?.let { showFavorites(it) }
 
-    if (favList.isNullOrEmpty()) {
+    viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+        val favList = dao.favoriteChannels ?: emptyList()
+        DbCache.putChannels(CACHE_KEY, favList)
+
+        withContext(Dispatchers.Main) { showFavorites(favList) }
+    }
+}
+
+private fun showFavorites(favList: List<Channel>) {
+    if (favList.isEmpty()) {
         tvNoData?.visibility = View.VISIBLE
         rvFav?.visibility = View.GONE
     } else {

@@ -1,0 +1,38 @@
+{
+  "inter_splash":            { "id": "ca-app-pub-2864154863223892/7338519873", "isEnable": true, "enable_ua_check": false },
+  "banner_splash":           { "id": "ca-app-pub-2864154863223892/2366025684", "isEnable": true, "reloadIntervalSeconds": 30, "enable_ua_check": false },
+  "open_resume":             { "id": "ca-app-pub-2864154863223892/9493127079", "isEnable": true, "enable_ua_check": false },
+
+  "native_language_1":       { "id": "ca-app-pub-2864154863223892/8769548860", "isEnable": true, "colorCTA": "default", "heightCTA": 40, "positionCTA": "BOTTOM", "components": ["icon_headline","body","media","cta"], "enable_ua_check": false },
+  "native_language_1_click": { "id": "ca-app-pub-2864154863223892/6143385528", "isEnable": true, "colorCTA": "default", "heightCTA": 40, "positionCTA": "BOTTOM", "components": ["icon_headline","body","media","cta"], "enable_ua_check": false },
+  "native_language_2":       { "id": "ca-app-pub-2864154863223892/2062142460", "isEnable": true, "colorCTA": "default", "heightCTA": 40, "positionCTA": "BOTTOM", "components": ["icon_headline","body","media","cta"], "enable_ua_check": false },
+  "native_language_2_click": { "id": "ca-app-pub-2864154863223892/1493694077", "isEnable": true, "colorCTA": "default", "heightCTA": 40, "positionCTA": "BOTTOM", "components": ["icon_headline","body","media","cta"], "enable_ua_check": false },
+
+  "native_onboarding_1_1":   { "id": "ca-app-pub-2864154863223892/9290526689", "isEnable": true, "colorCTA": "default", "heightCTA": 40, "positionCTA": "BOTTOM", "components": ["icon_headline","body","media","cta"], "enable_ua_check": false },
+  "native_onboarding_2_1":   { "id": "ca-app-pub-2864154863223892/4800617334", "isEnable": true, "colorCTA": "default", "heightCTA": 40, "positionCTA": "BOTTOM", "components": ["icon_headline","body","media","cta"], "enable_ua_check": false },
+  "native_onboarding_1_4":   { "id": "ca-app-pub-2864154863223892/4038200002", "isEnable": true, "colorCTA": "default", "heightCTA": 40, "positionCTA": "BOTTOM", "components": ["icon_headline","body","media","cta"], "enable_ua_check": false },
+  "native_onboarding_2_4":   { "id": "ca-app-pub-2864154863223892/4496734116", "isEnable": true, "colorCTA": "default", "heightCTA": 40, "positionCTA": "BOTTOM", "components": ["icon_headline","body","media","cta"], "enable_ua_check": false },
+  "native_onboarding_fullscreen_1_2": { "id": "ca-app-pub-2864154863223892/3295963974", "isEnable": true, "colorCTA": "default", "heightCTA": 40, "positionCTA": "BOTTOM", "components": ["icon_headline","body","media","cta"], "enable_ua_check": false },
+  "native_onboarding_fullscreen_2_2": { "id": "ca-app-pub-2864154863223892/8603500089", "isEnable": true, "colorCTA": "default", "heightCTA": 40, "positionCTA": "BOTTOM", "components": ["icon_headline","body","media","cta"], "enable_ua_check": false },
+  "inter_onboarding":        { "id": "ca-app-pub-2864154863223892/5730555625", "isEnable": true, "enable_ua_check": false },
+
+  "inter_home":              { "id": "ca-app-pub-2864154863223892/4118686863", "isEnable": true, "enable_ua_check": false },
+  "inter_back":              { "id": "ca-app-pub-2864154863223892/9581539835", "isEnable": true, "enable_ua_check": false },
+  "banner_collapsible_home": { "id": "ca-app-pub-2864154863223892/7785873321", "isEnable": true, "enable_ua_check": false },
+  "native_home":             { "id": "ca-app-pub-2864154863223892/1230304300", "isEnable": true, "colorCTA": "default", "heightCTA": 40, "positionCTA": "BOTTOM", "components": ["icon_headline","body","media","cta"], "enable_ua_check": false },
+  "native_channel":          { "id": "ca-app-pub-2864154863223892/6291059299", "isEnable": true, "colorCTA": "default", "heightCTA": 40, "positionCTA": "BOTTOM", "components": ["icon_headline","body","media","cta"], "enable_ua_check": false },
+  "native_favorite":         { "id": "ca-app-pub-2864154863223892/2207132600", "isEnable": true, "colorCTA": "default", "heightCTA": 40, "positionCTA": "BOTTOM", "components": ["icon_headline","body","media","cta"], "enable_ua_check": false },
+  "native_history":          { "id": "ca-app-pub-2864154863223892/3124628450", "isEnable": true, "colorCTA": "default", "heightCTA": 40, "positionCTA": "BOTTOM", "components": ["icon_headline","body","media","cta"], "enable_ua_check": false },
+
+  "native_playlist":         { "id": "ca-app-pub-2864154863223892/3561318166", "isEnable": true, "colorCTA": "default", "heightCTA": 40, "positionCTA": "BOTTOM", "components": ["icon_headline","body","media","cta"], "enable_ua_check": false },
+  "native_channellist":      { "id": "ca-app-pub-2864154863223892/6325427310", "isEnable": true, "colorCTA": "default", "heightCTA": 40, "positionCTA": "BOTTOM", "components": ["icon_headline","body","media","cta"], "enable_ua_check": false },
+  "inter_add_playlist":      { "id": "ca-app-pub-2864154863223892/1204128423", "isEnable": true, "enable_ua_check": false },
+  "inter_mirroring":         { "id": "ca-app-pub-2864154863223892/1264672324", "isEnable": true, "enable_ua_check": false },
+  "native_mirroring":        { "id": "ca-app-pub-2864154863223892/7638508982", "isEnable": true, "colorCTA": "default", "heightCTA": 40, "positionCTA": "BOTTOM", "components": ["icon_headline","body","media","cta"], "enable_ua_check": false },
+
+  "inter_welcome_back":      { "id": "ca-app-pub-2864154863223892/7166347602", "isEnable": true, "enable_ua_check": false },
+  "inter_splash_uninstall":  { "id": "ca-app-pub-2864154863223892/6002205712", "isEnable": true, "enable_ua_check": false },
+  "banner_splash_uninstall": { "id": "ca-app-pub-2864154863223892/5012345649", "isEnable": true, "enable_ua_check": false },
+  "native_uninstall":        { "id": "ca-app-pub-2864154863223892/2248236490", "isEnable": true, "colorCTA": "default", "heightCTA": 40, "positionCTA": "BOTTOM", "components": ["icon_headline","body","media","cta"], "enable_ua_check": false },
+  "native_survey_uninstall": { "id": "ca-app-pub-2864154863223892/9935154824", "isEnable": true, "colorCTA": "default", "heightCTA": 40, "positionCTA": "BOTTOM", "components": ["icon_headline","body","media","cta"], "enable_ua_check": false }
+}

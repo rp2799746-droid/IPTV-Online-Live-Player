@@ -1,8 +1,10 @@
 package com.iptv.online.smart.liveplayer.tv.activities.forIntro
+import com.iptv.online.smart.liveplayer.tv.adsutils.populateNativeAdView
 
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.ads.module.ads.ERainAd
@@ -18,8 +20,8 @@ import com.iptv.online.smart.liveplayer.tv.utils.triggerClick
 import com.iptv.online.smart.liveplayer.tv.utils.visible
 import com.iptv.online.smart.liveplayer.tv.Activity.IntroActivity
 import com.iptv.online.smart.liveplayer.tv.R
-import com.iptv.online.smart.liveplayer.tv.adsutils.AdsId
-import com.iptv.online.smart.liveplayer.tv.adsutils.getShouldDisplayNativeOnboardingNormal2
+import com.iptv.online.smart.liveplayer.tv.adsutils.AdRemoteConfig
+import com.iptv.online.smart.liveplayer.tv.utils.invisible
 
 
 class IntroFragment4 : BaseFragment<FragmentIntro4Binding>(), LazyShowAds {
@@ -32,11 +34,29 @@ class IntroFragment4 : BaseFragment<FragmentIntro4Binding>(), LazyShowAds {
     override fun setViewBinding() = FragmentIntro4Binding.inflate(layoutInflater)
 
     override fun bindObjects() {
+        // Next button SAUTHI PEHLA wire karo (btnNext + btnNext1 banne) -> je visible hoy e
+        // wired rahe, ane niche ad code throw thay to pan Next hammesha kaam kare.
+        binding.btnNext.triggerClick { (activity as? IntroActivity)?.getNextFragment() }
+        binding.btnNext1.triggerClick { (activity as? IntroActivity)?.getNextFragment() }
 
-        if (configScript!!.nativehome2005) {
+        val isDone = requireActivity().isIntroFlowDone()
+
+
+        if (isDone) {
+            binding.layoutNext.visible
+            binding.layoutNext1.invisible
+        } else {
+            binding.layoutNext.invisible
+            binding.layoutNext1.visible
+        }
+
+
+
+
+        if (AdRemoteConfig.getInstance().native_home.isEnable) {
             AdsManager.loadAd(
                 requireActivity(),
-                AdsId.nativehome2005,
+                AdRemoteConfig.getInstance().native_home.id,
                 R.layout.layout_native_ad_medium,
                 "native_home_2005"
             )
@@ -45,7 +65,12 @@ class IntroFragment4 : BaseFragment<FragmentIntro4Binding>(), LazyShowAds {
     }
 
     override fun bindListener() {
-        binding.btnNext.triggerClick { (activity as? IntroActivity)?.getNextFragment() }
+        binding.btnNext.triggerClick { (activity as? IntroActivity)?.getNextFragment()
+            binding.btnNext1.triggerClick { (activity as? IntroActivity)?.getNextFragment() }
+        }
+        // Lambo translated text single line ma marquee (scroll) thava mate.
+        binding.tvNext.isSelected = true
+        binding.tvNext1.isSelected = true
     }
 
     override fun bindMethod() {
@@ -56,13 +81,19 @@ class IntroFragment4 : BaseFragment<FragmentIntro4Binding>(), LazyShowAds {
         nativeAds()
 
     }
-
-
+    private fun setNextRowBottomMarginPx(px: Int) {
+        val lp = binding.layoutNext1.layoutParams as? ViewGroup.MarginLayoutParams ?: return
+        lp.bottomMargin = px
+        binding.layoutNext1.layoutParams = lp
+    }
     private fun nativeAds() {
         if (!isAdded) return
         val currentActivity = activity ?: return
 
-        if (!currentActivity    .getShouldDisplayNativeOnboardingNormal2()) {
+        val cfg4 = if (requireActivity().isIntroFlowDone())
+            AdRemoteConfig.getInstance().native_onboarding_2_4
+        else AdRemoteConfig.getInstance().native_onboarding_1_4
+        if (!(ERainAd.getInstance().getShouldDisplayNativeOnboardingNormal2(cfg4.enableUaCheck) == true)) {
             binding.adShimmer.root.gone
             binding.frAds.gone
             return
@@ -71,7 +102,8 @@ class IntroFragment4 : BaseFragment<FragmentIntro4Binding>(), LazyShowAds {
         val currentConfig = configScript ?: return
 
         if (currentConfig.isNeedToShowADs) {
-            if (currentConfig.nativeOnb14On) {
+            val onb4Enabled = cfg4.isEnable
+            if (onb4Enabled) {
                 val handledAds = mutableSetOf<String>()
                 val retriedTags = mutableSetOf<String>()
                 val activeActivity = activity ?: return
@@ -86,6 +118,25 @@ class IntroFragment4 : BaseFragment<FragmentIntro4Binding>(), LazyShowAds {
                             Log.d("AdManager123", "[$tag] Success, 🚀 showing: [${state.adsID}]")
                             binding.adShimmer.root.gone
                             binding.frAds.visible
+
+
+
+
+                            if (tag == "native_onboarding_1_4") {
+                                // Ad thi thodu j uper - sdp vapriye chhe etle badha
+                                // device par sarkhu rahe ane ad ne touch na thay.
+                                setNextRowBottomMarginPx(
+                                    resources.getDimensionPixelSize(com.intuit.sdp.R.dimen._2sdp)
+                                )
+                                // Dots image 60sdp unchi chhe etle row unchi thati hati ane
+                                // button ni niche khali jagya dekhati hati. Dots ni height
+                                // button jetli (35sdp) kari do - banne center ma ek line ma
+                                // rahe ane aakhi row ad ni adine aavi jay.
+                                binding.dotsIndicator1.layoutParams?.let { lp ->
+                                    lp.height = resources.getDimensionPixelSize(com.intuit.sdp.R.dimen._35sdp)
+                                    binding.dotsIndicator1.layoutParams = lp
+                                }
+                            }
                             ERainAd.getInstance().populateNativeAdView(
                                 activeActivity,
                                 state.ad,
@@ -93,6 +144,15 @@ class IntroFragment4 : BaseFragment<FragmentIntro4Binding>(), LazyShowAds {
                                 binding.adShimmer.root
 
                             )
+
+                            if (tag == "native_onboarding_1_4") {
+                                binding.frAds.findViewById<View>(R.id.ad_card)?.let { card ->
+                                    (card.layoutParams as? ViewGroup.MarginLayoutParams)?.let { lp ->
+                                        lp.topMargin = 0
+                                        card.layoutParams = lp
+                                    }
+                                }
+                            }
                             //// Height cta
                             val remoteHeightDp = state.ctaHeight
                             val adBtn = binding.frAds.findViewById<View>(R.id.ad_call_to_action)
@@ -110,6 +170,13 @@ class IntroFragment4 : BaseFragment<FragmentIntro4Binding>(), LazyShowAds {
                                         "AdManager123",
                                         "Height set to: $heightInPx px for tag: $tag"
                                     )
+                                }
+                                // Ad-review: native_onboarding_1_4 nu CTA gradient
+                                // #2663FF -> #7BD5F5. layout_native_ad_large bija unit
+                                // pan vaapre chhe etle XML ma nahi, ahiya J lagavie.
+                                if (tag == "native_onboarding_1_4") {
+                                    adBtn.backgroundTintList = null
+                                    adBtn.setBackgroundResource(R.drawable.bg_btn_native_cta_review)
                                 }
                             } else {
                                 Log.e(
@@ -129,7 +196,7 @@ class IntroFragment4 : BaseFragment<FragmentIntro4Binding>(), LazyShowAds {
                                 if (retriedTags.add(tag)) {
                                     binding.adShimmer.root.visible
                                     val adId = if (activeActivity.isIntroFlowDone())
-                                        AdsId.nativeOnboarding2_4 else AdsId.nativeOnboarding1_4
+                                        AdRemoteConfig.getInstance().native_onboarding_2_4.id else AdRemoteConfig.getInstance().native_onboarding_1_4.id
                                     AdsManager.loadAd(
                                         activeActivity, adId, R.layout.layout_native_ad_large, tag
                                     )

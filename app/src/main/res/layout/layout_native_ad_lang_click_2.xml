@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    Language screen 2 (CLICK) nu native ad design.
-    GpsTracker na layout_native_ad_medium_lang jevu - alag file rakhi
-    jethi click ad nu design normal ad thi independent-ly change kari sakay.
+    Language CLICK ad - SCREEN 2 nu design.
+    Juno look: card no margin, corner radius, elevation
+    ane button na margins + rounded corner.
 -->
 <com.google.android.gms.ads.nativead.NativeAdView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -14,7 +14,7 @@
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="2dp"
+        android:layout_margin="8dp"
         app:cardBackgroundColor="#EDEDED"
         app:cardCornerRadius="20dp"
         app:cardElevation="5dp">
@@ -94,13 +94,12 @@
                 app:layout_constraintTop_toBottomOf="@id/ad_advertiser"
                 tools:text="ad body" />
 
-            <!-- ad-review: height ochhi -> media 90dp -> 80dp -->
             <com.google.android.gms.ads.nativead.MediaView
                 android:id="@+id/ad_media"
                 android:layout_width="0dp"
-                android:layout_height="80dp"
+                android:layout_height="130dp"
                 android:layout_marginHorizontal="8dp"
-                android:layout_marginTop="6dp"
+                android:layout_marginTop="8dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/ad_body" />
@@ -109,14 +108,13 @@
                 android:id="@+id/ad_call_to_action"
                 android:layout_width="0dp"
                 android:layout_height="40dp"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="16dp"
                 android:layout_marginBottom="4dp"
-                android:background="@drawable/bg_btn_native_cta_review"
+                android:layout_marginHorizontal="8dp"
+                android:background="@drawable/bg_btn_native_cta"
                 android:textAllCaps="false"
                 android:textColor="#ffffff"
                 android:textSize="16dp"
-                android:layout_marginHorizontal="8dp"
-
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

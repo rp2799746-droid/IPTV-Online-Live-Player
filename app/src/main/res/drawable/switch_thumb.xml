@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Custom switch thumb — default abc_switch_thumb_material amuk device par load nathi
+     thato (Resources NotFoundException), etle potanu simple thumb aapie. thumbTint color
+     lagave che. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <solid android:color="@android:color/white" />
+    <size
+        android:width="20dp"
+        android:height="20dp" />
+</shape>

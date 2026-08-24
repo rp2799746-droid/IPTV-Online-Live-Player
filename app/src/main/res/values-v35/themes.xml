@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- iptv2 jevu: Android 15+ (targetSdk 35) edge-to-edge enforce kare chhe; DevConfig
+         library ni activity insets apply nathi karti, etle opt-out kariye jethi checklist
+         content status bar niche rahe ane dialog barabar khule. -->
+    <style name="ThemeDevConfigInsetFix" parent="ThemeDevConfig">
+        <item name="android:windowOptOutEdgeToEdgeEnforcement">true</item>
+    </style>
+</resources>

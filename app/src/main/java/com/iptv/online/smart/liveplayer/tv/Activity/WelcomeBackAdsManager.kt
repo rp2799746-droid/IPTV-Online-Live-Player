@@ -6,7 +6,7 @@ import android.util.Log
 import com.ads.module.ads.ERainAd
 import com.ads.module.ads.wrapper.ApInterstitialAd
 import com.ads.module.funtion.AdCallback
-import com.iptv.online.smart.liveplayer.tv.adsutils.AdsId
+import com.iptv.online.smart.liveplayer.tv.adsutils.AdRemoteConfig
 import com.iptv.online.smart.liveplayer.tv.adsutils.RemoteConfigdata
 import com.iptv.online.smart.liveplayer.tv.adsutils.isInternetAvailable
 
@@ -18,7 +18,7 @@ object WelcomeBackAdsManager {
 
     fun preload(context: Context) {
         val config = RemoteConfigdata(context)
-        if (!config.isNeedToShowADs || !config.interwelcomeback) {
+        if (!config.isNeedToShowADs || !AdRemoteConfig.getInstance().inter_welcome_back.isEnable) {
             Log.d(TAG, "preload skipped: ads/config off")
             return
         }
@@ -27,7 +27,7 @@ object WelcomeBackAdsManager {
             return
         }
         ERainAd.getInstance().getInterstitialAds(
-            context, AdsId.interwelcomeback, object : AdCallback() {
+            context, AdRemoteConfig.getInstance().inter_welcome_back.id, object : AdCallback() {
                 override fun onApInterstitialLoad(apInterstitialAd: ApInterstitialAd?) {
                     super.onApInterstitialLoad(apInterstitialAd)
                     interAd = apInterstitialAd

@@ -16,7 +16,6 @@ import com.ads.module.ads.ERainAd
 import com.ads.module.ads.wrapper.ApInterstitialAd
 import com.ads.module.funtion.AdCallback
 import com.iptv.online.smart.liveplayer.tv.Ads.AdsManager
-import com.iptv.online.smart.liveplayer.tv.adsutils.AdsId
 import com.iptv.online.smart.liveplayer.tv.adsutils.RemoteConfigdata
 import com.iptv.online.smart.liveplayer.tv.adsutils.isInternetAvailable
 import com.iptv.online.smart.liveplayer.tv.utils.CustomLoader
@@ -38,6 +37,11 @@ abstract class Base__Activity<actBinding : ViewBinding> : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // BadParcelableException fix: recreate vakhtे saved fragment-state khota
+        // classloader thi read thay ne "ClassNotFoundException unmarshalling
+        // FragmentManagerState" crash aave. App no classLoader set karie etle
+        // nested Parcelable barabar read thay.
+        savedInstanceState?.classLoader = classLoader
         super.onCreate(savedInstanceState)
 
         val windowInsetsController =

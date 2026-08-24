@@ -1,4 +1,5 @@
 package com.iptv.online.smart.liveplayer.tv.Activity
+import com.iptv.online.smart.liveplayer.tv.adsutils.populateNativeAdView
 
 import android.content.Intent
 import android.text.Editable
@@ -12,13 +13,16 @@ import com.iptv.online.smart.liveplayer.tv.Adapter.GroupAdapter
 import com.iptv.online.smart.liveplayer.tv.Ads.AdsManager
 import com.iptv.online.smart.liveplayer.tv.Model.AppDatabase
 import com.iptv.online.smart.liveplayer.tv.Model.ChannelGroup
+import com.iptv.online.smart.liveplayer.tv.Model.DbCache
 import com.iptv.online.smart.liveplayer.tv.R
-import com.iptv.online.smart.liveplayer.tv.adsutils.AdsId
 import com.iptv.online.smart.liveplayer.tv.adsutils.NativeAdUiState
 import com.iptv.online.smart.liveplayer.tv.adsutils.RemoteConfigdata
 import com.iptv.online.smart.liveplayer.tv.databinding.ActivityCategoryBinding
 import com.iptv.online.smart.liveplayer.tv.utils.gone
 import com.iptv.online.smart.liveplayer.tv.utils.visible
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.Collections
 
 class CategoryActivity : Base__Activity<ActivityCategoryBinding>() {
@@ -154,11 +158,28 @@ class CategoryActivity : Base__Activity<ActivityCategoryBinding>() {
         loadGroups()
     }
 
+    // Playlist ni badhi channel DB mathi vanchi ne group count kariye chhe.
+    // Ae kaam IO thread par. Cache hoy to list TARAT dekhay ane fresh data
+    // aave etle update thai jaay - main thread kyare y block na thay (ANR).
     private fun loadGroups() {
-        val channels =
-            AppDatabase.getInstance(this).historyDao().getChannelsByPlaylist(playlistName)
+        val dao = AppDatabase.getInstance(this).historyDao()
+        val pName = playlistName
+        val cacheKey = "cat:$pName"
 
-        if (channels == null || channels.isEmpty()) {
+        DbCache.getGroups(cacheKey)?.let { showGroups(it) }
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            // SQLite pote GROUP BY + COUNT + sort kari aape chhe (jo pehla aakhi
+            // channel list memory ma laavi ne Kotlin ma ganta hata - e bov dhimu hatu).
+            val tempList: List<ChannelGroup?> = dao.getGroupCounts(pName) ?: emptyList()
+            DbCache.putGroups(cacheKey, tempList)
+
+            withContext(Dispatchers.Main) { showGroups(tempList) }
+        }
+    }
+
+    private fun showGroups(list: List<ChannelGroup?>) {
+        if (list.isEmpty()) {
             binding.rvCategories.setVisibility(View.GONE)
             binding.layoutNoData.setVisibility(View.VISIBLE)
             return
@@ -168,26 +189,8 @@ class CategoryActivity : Base__Activity<ActivityCategoryBinding>() {
         binding.rvCategories.setVisibility(View.VISIBLE)
         binding.layoutNoData.setVisibility(View.GONE)
 
-        val map = HashMap<String?, Int?>()
-        for (c in channels) {
-            val gName = if (c.getChannelGroup() == null || c.getChannelGroup()
-                    .isEmpty()
-            ) "Other" else c.getChannelGroup()
-            map.put(gName, map.getOrDefault(gName, 0)!! + 1)
-        }
-
         groupList.clear()
-        for (entry in map.entries) {
-            groupList.add(ChannelGroup(entry.key, entry.value!!))
-        }
-
-        Collections.sort<ChannelGroup?>(
-            groupList,
-            Comparator { g1: ChannelGroup?, g2: ChannelGroup? ->
-                g1!!.getName().compareTo(
-                    g2!!.getName(), ignoreCase = true
-                )
-            })
+        groupList.addAll(list)
 
         adapter!!.updateList(groupList)
     }
