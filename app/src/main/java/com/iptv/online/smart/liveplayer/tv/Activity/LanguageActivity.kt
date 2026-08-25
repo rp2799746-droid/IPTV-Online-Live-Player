@@ -194,9 +194,12 @@ class LanguageActivity : Base__Activity<ActivityLanguageBinding>(),
 
         startAdFlow(TAG_LANG)
 
-        // Click-ad ne pehla thi preload karo -> click pachi turat dekhay.
-        Log.d(AD_LOG, "STEP 2 | [$TAG_LANG_CLICK] preload chalu")
-        AdsManager.loadNativeLanguageClick(this, screenCount)
+        // Reviewer: click-ad ne screen enter thatan EK J VAR, ~100ms delay sathe preload karo.
+        // (Fail thay to language select vakhte FARI load nathi karvano -> retry kadhi nakhyo.)
+        Log.d(AD_LOG, "STEP 2 | [$TAG_LANG_CLICK] preload chalu (100ms delay)")
+        binding.root.postDelayed({
+            AdsManager.loadNativeLanguageClick(this@LanguageActivity, screenCount)
+        }, 100)
     }
 
     // Language click pachi E J screen par click-ad batavo:
@@ -327,17 +330,16 @@ class LanguageActivity : Base__Activity<ActivityLanguageBinding>(),
                                 binding.adShimmer.root.visibility = View.VISIBLE
                             }
                         } else if (state == null || state is NativeAdUiState.Failed || state is NativeAdUiState.Empty) {
-                            // Fallback: preload fail thay to ek j var fari load (same tag ->
-                            // loadNativeLanguage sacho layout_native_ad_lang_1 vaapre screen 1 mate).
                             if (binding.frAds.visibility != View.VISIBLE) {
-                                if (retriedTags.add(tag)) {
+                                // Reviewer: click-ad (TAG_LANG_CLICK) fail thay to FARI load NAHI
+                                // (duplicate request atkave). Fakt native ad (TAG_LANG) mate ek j
+                                // var fallback reload rahe.
+                                if (tag == TAG_LANG && retriedTags.add(tag)) {
                                     binding.adShimmer.root.visibility = View.VISIBLE
-                                    if (tag == TAG_LANG)
-                                        AdsManager.loadNativeLanguage(this@LanguageActivity, screenCount)
-                                    else if (tag == TAG_LANG_CLICK)
-                                        AdsManager.loadNativeLanguageClick(this@LanguageActivity, screenCount)
+                                    AdsManager.loadNativeLanguage(this@LanguageActivity, screenCount)
                                     Log.d("AdManager123", "[$tag] fallback reload triggered")
                                 } else {
+                                    // click fail (ke native retry pachi pan fail) -> ad slot band
                                     binding.adShimmer.root.visibility = View.GONE
                                     binding.frAds.visibility = View.GONE
                                 }

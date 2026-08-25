@@ -544,6 +544,13 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
                 if (remoteData.isInterOnSplash) {
                     ERainAd.getInstance().loadSplashInterstitialAds(
                         this, AdRemoteConfig.getInstance().inter_splash.id, 30000, 5000, object : AdCallback() {
+                            override fun onAdLoaded() {
+                                super.onAdLoaded()
+                                // Reviewer: inter_splash load thatan J language ad preload chalu
+                                // -> inter dekhay e darmiyan language ad ready thai jay.
+                                preloadLanguageAdInApp()
+                            }
+
                             override fun onNextAction() {
                                 super.onNextAction()
                                 Log.w(TAG, "loadInfinityFlow: onNextAction")
@@ -560,6 +567,12 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
                         this,
                         AdRemoteConfig.getInstance().open_resume.id,
                         30000, 5000, true, object : AdCallback() {
+                            override fun onAdLoaded() {
+                                super.onAdLoaded()
+                                // Reviewer: splash ad load thatan J language ad vhela preload.
+                                preloadLanguageAdInApp()
+                            }
+
                             override fun onNextAction() {
                                 super.onNextAction()
                                 Log.w(TAG, "loadInfinityFlow: onNextAction-else")
@@ -630,6 +643,9 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
                 if (isPurchased(this)) {
                     Intent(this, MainActivity::class.java)
                 } else {
+                    // Fallback: normal ma inter onAdLoaded() e J preload kari didhu hoy (guard
+                    // thi ahiya no-op). PAN inter load J na thayo hoy (fail/disabled) to ahiya
+                    // preload + screenCount decision thay -> LanguageActivity kyarey khali na rahe.
                     preloadLanguageAdInApp()
                     Intent(this, LanguageActivity::class.java).apply {
                         putExtra("isFromSplash", true)
@@ -673,9 +689,15 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
     private val remoteData: RemoteConfigdata by lazy {
         RemoteConfigdata(this)
     }
+    // Reviewer: language ad ne inter_splash onAdLoaded() thi vhela preload karo (goNextScreen
+    // ni badle). Aa flag thi ek j var chale -> onAdLoaded vhela call kare; jo inter load J na
+    // thay (fail/disabled) to goNextScreen fallback tarike call kare -> screenCount decision +
+    // preload banne case ma thay.
+    private var langPreloaded = false
     private fun preloadLanguageAdInApp() {
+        if (langPreloaded) return
+        langPreloaded = true
         // Pehli j vaar native_language_1, tya pachi hammesha native_language_2.
-        // Screen 1 no ad AHIYA J preload thay chhe, etle decision ahiya j leva nu.
         // Aa J screenCount (companion) ne LanguageActivity vaapre -> lang ad ane
         // click ad banne same variant batave (consistent).
         // prev == 0 => sauthi pehli vaar -> _1. Pachi (prev 1 ke 2) -> hammesha _2.

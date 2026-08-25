@@ -43,11 +43,7 @@
         android:textColor="@color/black"
         android:textSize="14sp" />
 
-    <!--
-        Language pasand karvanu suchan (hand-click). Swipe hint puro thay pachi
-        J dekhay chhe ane koi language click karta gayab thai jay chhe.
-        - LanguageAdapter.setShowClickHint() thi control thay chhe.
-    -->
+
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/click_hint"
         android:layout_width="@dimen/_200sdp"
