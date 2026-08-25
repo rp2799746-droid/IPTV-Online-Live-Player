@@ -64,6 +64,9 @@ class LanguageActivity : Base__Activity<ActivityLanguageBinding>(),
     private var isOnboardingAdRequested = false
     private val doneHandler = Handler(Looper.getMainLooper())
 
+    // Ad na kaam mate alag handler - doneHandler na callback sathe bhelsel na thay.
+    private val adHandler = Handler(Looper.getMainLooper())
+
     // Settings mathi aavya hoy tya J back par inter_back joie -> Base e preload kare chhe.
     override val needBackInterAd: Boolean
         get() = intent.getBooleanExtra("settingss", false)
@@ -74,6 +77,9 @@ class LanguageActivity : Base__Activity<ActivityLanguageBinding>(),
 
         // Language screen na ad flow no logcat tag - logcat ma "LangAd" filter karo.
         private const val AD_LOG = "LangAd"
+
+        // Aatla time ma ad na aave to shimmer band (navo request NAHI).
+        private const val SHIMMER_TIMEOUT_MS = 10_000L
     }
 
     override fun setViewBinding(): ActivityLanguageBinding {
@@ -187,6 +193,20 @@ class LanguageActivity : Base__Activity<ActivityLanguageBinding>(),
         binding.swipeHint.visibility = View.GONE
     }
 
+    // Ad na aave to shimmer kayam ferato rahe - dakhla tarike inter_splash load J na thayo
+    // hoy to native ad no preload j nathi thayo, ane LiveData khali rahe etle observer
+    // kyarey chalto nathi. Aa timeout FAKT UI band kare chhe, NAVO ad request nathi karto.
+    private fun startShimmerTimeout(tag: String) {
+        adHandler.removeCallbacksAndMessages(null)
+        adHandler.postDelayed({
+            if (binding.frAds.visibility != View.VISIBLE) {
+                Log.d(AD_LOG, "[$tag] ${SHIMMER_TIMEOUT_MS}ms ma ad na aavyo -> ad slot band")
+                binding.adShimmer.root.visibility = View.GONE
+                binding.frAds.visibility = View.GONE
+            }
+        }, SHIMMER_TIMEOUT_MS)
+    }
+
 
     private fun loadLanguageAd() {
         Log.d(AD_LOG, "STEP 1 | screen khulyu (screenCount=$screenCount) -> [$TAG_LANG] observe")
@@ -198,7 +218,9 @@ class LanguageActivity : Base__Activity<ActivityLanguageBinding>(),
         // (Fail thay to language select vakhte FARI load nathi karvano -> retry kadhi nakhyo.)
         Log.d(AD_LOG, "STEP 2 | [$TAG_LANG_CLICK] preload chalu (100ms delay)")
         binding.root.postDelayed({
-            AdsManager.loadNativeLanguageClick(this@LanguageActivity, screenCount)
+            if (!isFinishing && !isDestroyed) {
+                AdsManager.loadNativeLanguageClick(this@LanguageActivity, screenCount)
+            }
         }, 100)
     }
 
@@ -279,15 +301,12 @@ class LanguageActivity : Base__Activity<ActivityLanguageBinding>(),
             }
 
             if (config.isNeedToShowADs && isAdEnabled) {
-                // Safety: aa tag no ad kyarey request J na thayo hoy (dakhla tarike splash ma
-                // inter_splash load na thayo etle preload chuki gayo) to LiveData khali rahe
-                // -> observer kyarey na chale -> screen par kayamnu shimmer. Etle ahiya
-                // jate load kari daie.
-                if (AdsManager.getAdLive(tag).value == null) {
-                    Log.d(AD_LOG, "[$tag] preload thayo J nathi -> ahiya thi load karie")
-                    if (tag == TAG_LANG) AdsManager.loadNativeLanguage(this, screenCount)
-                    else if (tag == TAG_LANG_CLICK) AdsManager.loadNativeLanguageClick(this, screenCount)
-                }
+                // Reviewer: ahiya koi navo load NA karvo (duplicate request atke).
+                // Load fakt be jagya e thay chhe: native -> Splash nu
+                // preloadLanguageAdInApp(), click -> aa screen no 100ms valo ek j call.
+                // Ad kyarey na aave (request j na thayo hoy ke pending rahi jay) to niche
+                // no timeout shimmer band kari de chhe - navo request kar_ya vagar.
+                startShimmerTimeout(tag)
 
                 val retriedTags = mutableSetOf<String>()
                 AdsManager.getAdLive(tag).observe(this@LanguageActivity) { state ->
@@ -535,6 +554,7 @@ class LanguageActivity : Base__Activity<ActivityLanguageBinding>(),
 
     override fun onDestroy() {
         doneHandler.removeCallbacksAndMessages(null)
+        adHandler.removeCallbacksAndMessages(null)
         super.onDestroy()
     }
 
