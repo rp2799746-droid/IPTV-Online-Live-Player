@@ -279,6 +279,16 @@ class LanguageActivity : Base__Activity<ActivityLanguageBinding>(),
             }
 
             if (config.isNeedToShowADs && isAdEnabled) {
+                // Safety: aa tag no ad kyarey request J na thayo hoy (dakhla tarike splash ma
+                // inter_splash load na thayo etle preload chuki gayo) to LiveData khali rahe
+                // -> observer kyarey na chale -> screen par kayamnu shimmer. Etle ahiya
+                // jate load kari daie.
+                if (AdsManager.getAdLive(tag).value == null) {
+                    Log.d(AD_LOG, "[$tag] preload thayo J nathi -> ahiya thi load karie")
+                    if (tag == TAG_LANG) AdsManager.loadNativeLanguage(this, screenCount)
+                    else if (tag == TAG_LANG_CLICK) AdsManager.loadNativeLanguageClick(this, screenCount)
+                }
+
                 val retriedTags = mutableSetOf<String>()
                 AdsManager.getAdLive(tag).observe(this@LanguageActivity) { state ->
 
