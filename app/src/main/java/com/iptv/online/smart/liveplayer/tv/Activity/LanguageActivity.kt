@@ -308,7 +308,6 @@ class LanguageActivity : Base__Activity<ActivityLanguageBinding>(),
                 // no timeout shimmer band kari de chhe - navo request kar_ya vagar.
                 startShimmerTimeout(tag)
 
-                val retriedTags = mutableSetOf<String>()
                 AdsManager.getAdLive(tag).observe(this@LanguageActivity) { state ->
 
                         if (state is NativeAdUiState.Success) {
@@ -360,18 +359,12 @@ class LanguageActivity : Base__Activity<ActivityLanguageBinding>(),
                             }
                         } else if (state == null || state is NativeAdUiState.Failed || state is NativeAdUiState.Empty) {
                             if (binding.frAds.visibility != View.VISIBLE) {
-                                // Reviewer: click-ad (TAG_LANG_CLICK) fail thay to FARI load NAHI
-                                // (duplicate request atkave). Fakt native ad (TAG_LANG) mate ek j
-                                // var fallback reload rahe.
-                                if (tag == TAG_LANG && retriedTags.add(tag)) {
-                                    binding.adShimmer.root.visibility = View.VISIBLE
-                                    AdsManager.loadNativeLanguage(this@LanguageActivity, screenCount)
-                                    Log.d("AdManager123", "[$tag] fallback reload triggered")
-                                } else {
-                                    // click fail (ke native retry pachi pan fail) -> ad slot band
-                                    binding.adShimmer.root.visibility = View.GONE
-                                    binding.frAds.visibility = View.GONE
-                                }
+                                // Reviewer: koi pan tag fail thay to FARI load NAHI karvanu
+                                // (native ke click, banne) -> duplicate request atke chhe.
+                                // Bas ad slot band kari daie.
+                                Log.d(AD_LOG, "[$tag] fail -> ad slot band (retry nahi)")
+                                binding.adShimmer.root.visibility = View.GONE
+                                binding.frAds.visibility = View.GONE
                             }
                         }
                 }
