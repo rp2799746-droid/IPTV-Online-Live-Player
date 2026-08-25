@@ -502,48 +502,22 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
             }
 
 
-            if (widgetFlow == "flow_uninstall") {
-                if (AdRemoteConfig.getInstance().inter_splash_uninstall.isEnable) {
-                    ERainAd.getInstance().loadSplashInterstitialAds(
-                        this, AdRemoteConfig.getInstance().inter_splash_uninstall.id, 30000, 5000, object : AdCallback() {
-                            override fun onNextAction() {
-                                goNextScreen()
-                            }
-
-                            override fun onAdFailedToLoad(i: LoadAdError?) {
-                                super.onAdFailedToLoad(i)
-                                goNextScreen()
-                            }
-                        })
-                } else {
-                    goNextScreen()
-                }
-                return
+            // Reviewer: splash nu interstitial FAKT EK J VAR load karvu.
+            //   uninstall flow -> inter_splash_uninstall
+            //   baki badhu (widget hoy ke na hoy) -> hammesha inter_splash
+            // Pehla widget_flow == null / != null pramane alag-alag ternu call hatu,
+            // ane isInterOnSplash false hoy tyare open_resume (App Open) vaparatu hatu -
+            // e badhu kadhi nakhyu.
+            val splashInterConfig = if (widgetFlow == "flow_uninstall") {
+                AdRemoteConfig.getInstance().inter_splash_uninstall
+            } else {
+                AdRemoteConfig.getInstance().inter_splash
             }
 
-            if (widgetFlow != null && AdRemoteConfig.getInstance().inter_splash.isEnable) {
+            if (splashInterConfig.isEnable) {
+                Log.w(TAG, "loadInfinityFlow: splash inter load (widgetFlow=$widgetFlow)")
                 ERainAd.getInstance().loadSplashInterstitialAds(
-                    this, AdRemoteConfig.getInstance().inter_splash.id, 30000, 5000, object : AdCallback() {
-                        override fun onNextAction() {
-                            goNextScreen()
-                        }
-
-                        override fun onAdFailedToLoad(i: LoadAdError?) {
-                            super.onAdFailedToLoad(i)
-                            goNextScreen()
-                        }
-                    })
-                return
-            }
-
-            if (AdRemoteConfig.getInstance().inter_splash.isEnable) {
-                Log.w(TAG, "loadInfinityFlow: inter_splash load")
-                // Reviewer: splash par hammesha inter_splash J vaparvu. Pehla
-                // isInterOnSplash false hoy tyare open_resume.id thi App Open ad batavto
-                // hato - e id fakt "app background/recent mathi pachhi khule" tya mate
-                // chhe, splash mate nahi. Etle e branch kadhi nakhi.
-                ERainAd.getInstance().loadSplashInterstitialAds(
-                    this, AdRemoteConfig.getInstance().inter_splash.id, 30000, 5000, object : AdCallback() {
+                    this, splashInterConfig.id, 30000, 5000, object : AdCallback() {
                         override fun onAdLoaded() {
                             super.onAdLoaded()
                             // Reviewer: language ad no preload FAKT ahiya J -> inter
