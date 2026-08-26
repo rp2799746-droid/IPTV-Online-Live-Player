@@ -28,7 +28,6 @@ import com.ads.module.ads.wrapper.ApInterstitialAd
 import com.ads.module.funtion.AdCallback
 import com.ads.module.funtion.AdmobHelper.isPurchased
 import com.google.android.gms.ads.LoadAdError
-import com.google.android.gms.tasks.OnFailureListener
 import com.google.android.gms.tasks.OnSuccessListener
 import com.google.android.play.core.appupdate.AppUpdateInfo
 import com.google.android.play.core.appupdate.AppUpdateManager
@@ -62,7 +61,6 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
     private var canPersonalized = true
     private var appUpdate_Manager: AppUpdateManager? = null
     val UPDATE_REQUEST_CODE: Int = 123
-    private var isUpdateChecked = false
     private var noInternetDialog: Dialog? = null
     private var networkCallback: ConnectivityManager.NetworkCallback? = null
     private var isRemoteConfigLoading = false
@@ -279,23 +277,9 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
                         )
                     } catch (e: IntentSender.SendIntentException) {
                         e.printStackTrace()
-                        isUpdateChecked = true
-                        proceedAfterChecks()
                     }
-                } else {
-                    isUpdateChecked = true
-                    proceedAfterChecks()
                 }
-            }).addOnFailureListener(OnFailureListener { e: java.lang.Exception? ->
-                isUpdateChecked = true
-                proceedAfterChecks()
             })
-    }
-
-    private fun proceedAfterChecks() {
-        if (isUpdateChecked) {
-            check_AppUpdate()
-        }
     }
 
     override fun onPause() {
