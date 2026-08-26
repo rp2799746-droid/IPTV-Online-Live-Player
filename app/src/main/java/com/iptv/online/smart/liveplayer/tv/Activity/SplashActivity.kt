@@ -522,7 +522,18 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
                             super.onAdLoaded()
                             // Reviewer: language ad no preload FAKT ahiya J -> inter
                             // dekhay e darmiyan language ad ready thai jay.
-                            preloadLanguageAdInApp()
+                            // Pan FAKT tyare J jyare next screen kharekhar LanguageActivity
+                            // hoy (normal flow + non-purchased). flow_uninstall / flow_tv /
+                            // flow_mirror / flow_iptv ke purchased user ma language screen
+                            // aavti J nathi -> tya native_language request = waste request.
+                            if (isGoingToLanguageScreen()) {
+                                preloadLanguageAdInApp()
+                            } else {
+                                Log.w(
+                                    TAG,
+                                    "onAdLoaded: language preload skipped (next screen is not LanguageActivity)"
+                                )
+                            }
                         }
 
                         override fun onNextAction() {
@@ -638,10 +649,20 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
         RemoteConfigdata(this)
     }
     // Reviewer: language ad ne inter_splash onAdLoaded() thi vhela preload karo (goNextScreen
-    // ni badle). Aa flag thi ek j var chale -> onAdLoaded vhela call kare; jo inter load J na
-    // thay (fail/disabled) to goNextScreen fallback tarike call kare -> screenCount decision +
-    // preload banne case ma thay.
+    // ni badle). Aa flag thi ek j var chale.
     private var langPreloaded = false
+
+    // Reviewer: goNextScreen() ma je condition LanguageActivity kholi aape che e J ahiya
+    // mirror kari che. widget_flow (flow_uninstall / flow_tv / flow_mirror / flow_iptv) hoy
+    // to language screen aavti nathi, ane purchased user MainActivity ma jay che -> aa
+    // badha case ma native_language ad preload karvano koi matlab nathi.
+    private fun isGoingToLanguageScreen(): Boolean {
+        return when (intent.getStringExtra("widget_flow")) {
+            "flow_uninstall", "flow_tv", "flow_mirror", "flow_iptv" -> false
+            else -> !isPurchased(this)
+        }
+    }
+
     private fun preloadLanguageAdInApp() {
         if (langPreloaded) return
         langPreloaded = true
