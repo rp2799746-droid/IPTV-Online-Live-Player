@@ -2,8 +2,6 @@ package com.iptv.online.smart.liveplayer.tv
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.os.Handler
-import android.os.Looper
 import android.os.SystemClock
 import android.util.Log
 import com.ads.module.admob.Admob
@@ -15,35 +13,34 @@ import com.ads.module.config.ERainAdConfig
 import com.google.firebase.Firebase
 import com.google.firebase.FirebaseApp
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
-import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
 import com.google.firebase.remoteconfig.remoteConfig
 import com.google.firebase.remoteconfig.remoteConfigSettings
 import com.iptv.online.smart.liveplayer.tv.Activity.SplashActivity
 import com.iptv.online.smart.liveplayer.tv.BuildConfig
 import com.iptv.online.smart.liveplayer.tv.R
 import com.iptv.online.smart.liveplayer.tv.adsutils.AdRemoteConfig
-import com.iptv.online.smart.liveplayer.tv.adsutils.RemoteConfigdata
 import com.iptv.online.smart.liveplayer.tv.Ads.AppResumeWelcomeManager
-
 import com.itg.devconfig.DevConfig
 import com.onesignal.OneSignal
 import dagger.hilt.android.HiltAndroidApp
 import io.github.inflationx.calligraphy3.CalligraphyConfig
 import io.github.inflationx.calligraphy3.CalligraphyInterceptor
 import io.github.inflationx.viewpump.ViewPump
-
-
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 
 @HiltAndroidApp
 class App : AdsMultiDexApplication() {
+
+    private val appScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     companion object {
         @SuppressLint("StaticFieldLeak")
         var app: App? = null
         var onRemoteFetched: ((FirebaseRemoteConfig?) -> Unit)? = null
         var isNeedToStopOPenAds = false
-
-        /** Startup timing log no tag - "adb logcat -s AppStartup" thi joi shakay. */
         const val STARTUP_TAG = "AppStartup"
     }
 
@@ -54,40 +51,30 @@ class App : AdsMultiDexApplication() {
         }
         remoteConfig.setConfigSettingsAsync(configSettings)
 
-        remoteConfig.fetchAndActivate().addOnCompleteListener(mActivity) { task ->
-            if (!mActivity.isFinishing) {
+        remoteConfig.fetchAndActivate().addOnCompleteListener(mActivity) { _ ->
+            if (!mActivity.isFinishing && !mActivity.isDestroyed) {
                 onRemoteFetched?.invoke(remoteConfig)
             }
         }.addOnFailureListener(mActivity) {
-            if (!mActivity.isFinishing) {
+            if (!mActivity.isFinishing && !mActivity.isDestroyed) {
                 onRemoteFetched?.invoke(null)
             }
         }
     }
 
-    /**
-     * Startup na kaya step ma ketlo time jaay chhe e mapva mate.
-     * Logcat ma "AppStartup" filter karo - ms ma dekhashe.
-     * Je step sauthi bhare hoy e j pachi defer/background par khasedvano.
-     */
-    private inline fun <T> step(name: String, block: () -> T): T {
-        val start = SystemClock.uptimeMillis()
-        val result = block()
-        Log.d(STARTUP_TAG, "$name = ${SystemClock.uptimeMillis() - start} ms")
-        return result
-    }
-
     override fun onCreate() {
-        val onCreateStart = SystemClock.uptimeMillis()
         super.onCreate()
-        Log.d(STARTUP_TAG, "super.onCreate (ads SDK base) = ${SystemClock.uptimeMillis() - onCreateStart} ms")
         app = this
 
-        step("FirebaseApp.initializeApp") { FirebaseApp.initializeApp(this) }
+        // 1. JSON Ad Config પેહલા sync લોડ કરો જેથી AdUnitId null ના રહે અને Crash ના થાય
+        try {
+            AdRemoteConfig.initialize(this)
+        } catch (e: Exception) {
+            Log.e(STARTUP_TAG, "AdRemoteConfig init error: ${e.message}")
+        }
 
-        // ViewPump pehla j joie chhe - first Activity na view inflate thata pehla
-        // font interceptor lagelo hovo joie, nahi to font lagu na thay.
-        step("ViewPump.init (font)") {
+        // 2. ViewPump font init
+        try {
             ViewPump.init(
                 ViewPump.builder()
                     .addInterceptor(
@@ -99,92 +86,67 @@ class App : AdsMultiDexApplication() {
                     )
                     .build()
             )
+        } catch (e: Exception) {
+            Log.e(STARTUP_TAG, "ViewPump init error: ${e.message}")
         }
 
-        // iptv2 jevu JSON ad-config load (debug -> test json, release -> real json).
-        step("AdRemoteConfig.initialize (asset JSON)") { AdRemoteConfig.initialize(this) }
+        // 3. Ads Module Configuration (Splash Resume Ad Disable)
+        initAds()
 
-        // AA ONCREATE MA J RAHEVU JOIE - DEFER NA KARVU.
-        // Andar ERainAd.init() -> AppOpenManager.init() chhe, je
-        // ProcessLifecycleOwner par observer add kare chhe. Jo aa first Activity
-        // resume thaya PACHI chale, to Lifecycle turat ON_RESUME dispatch kare ane
-        // AppOpenManager.onResume() ma currentActivity null hovathi NPE crash thay:
-        //   "Failed to call observer method ... AppOpenManager.onResume"
-        // Prayog kari joyo hato - app chalu thata j crash thai gai hati.
-        step("initAds (ERainAd/Admob/Adjust/Facebook)") { initAds() }
+        // 4. ભારે SDKs (Firebase, OneSignal, DevConfig) બેકગ્રાઉન્ડ થ્રેડમાં
+        appScope.launch {
+            try {
+                FirebaseApp.initializeApp(this@App)
+            } catch (e: Exception) {
+                Log.e(STARTUP_TAG, "FirebaseApp init error: ${e.message}")
+            }
 
-        val mainHandler = Handler(Looper.getMainLooper())
+            try {
+                OneSignal.initWithContext(this@App, "9971a8a0-4bb3-48ae-bac0-30af3026640d")
+            } catch (e: Exception) {
+                Log.e(STARTUP_TAG, "OneSignal init error: ${e.message}")
+            }
 
-        // ---- WebView / Chromium warm-up: PRAYOG KARI JOYO, KAAM NA LAGYO ----
-        // Crashlytics no J.N.* ANR (J.N.OOZ/JJ/VZ/IZ, 100% background) nu karan chhe
-        // Chromium engine nu pehli-var startup main thread par:
-        //   com.google.android.gms.ads -> AwBrowserProcess.b
-        //   -> BrowserStartupControllerImpl.h -> J.N.IZ  ("Root blocking")
-        // Etle `WebView(this).destroy()` thi engine vahelu chalu karva prayatna karyo.
-        // Vivo V2037 par maapelu:
-        //   deferred ma CHHELLE  -> 31 ms  (nakamu - Chromium pehla thi chalu)
-        //   onCreate ni andar    -> 532 ms, pan TOTAL 582 -> 1115 ms. First frame 532 ms
-        //                           modu = vadhu var kori screen = user vahelo bahar
-        //                           nikle = e j background-ANR vadhe. Ulto asar.
-        //   deferred ma PEHLU    -> 44 ms (haju modu). Karan: onCreate pura thaya pachi
-        //                           main thread 1.65 s sudhi Splash + consent + ad ma
-        //                           vyast rahe chhe, ane E gaala ma j Chromium chalu thai
-        //                           jaay chhe. Handler.post e queue ma aagal kudi na shake.
-        // Nishkarsh: first frame pachi ni koi pan jagya modi chhe, ane pehla ni jagya
-        // no bhaav startup chhe. Vachche jagya j nathi. ETLE AA PRAYATNA CHHODI DIDHO -
-        // fari na karvo.
-
-        // DevConfig fakt Language screen na title par 10-tap e joie chhe,
-        // ane OneSignal pan turat nathi joito - e banne defer thai shake chhe.
-        mainHandler.post {
-            step("DevConfig.init (deferred)") {
+            try {
                 DevConfig.init(
-                    context = this,
+                    context = this@App,
                     nkhStudioVersion = "2.0",
                     playServicesAdsVersion = "24.7.0",
                     gdprModuleVersion = "2.0.2"
                 )
+            } catch (e: Exception) {
+                Log.e(STARTUP_TAG, "DevConfig init error: ${e.message}")
             }
         }
-
-        mainHandler.post {
-            step("OneSignal.initWithContext (deferred)") {
-                OneSignal.initWithContext(this, "9971a8a0-4bb3-48ae-bac0-30af3026640d")
-            }
-        }
-
-        Log.d(STARTUP_TAG, "===== App.onCreate TOTAL = ${SystemClock.uptimeMillis() - onCreateStart} ms =====")
     }
 
     private fun initAds() {
-        val environment =
-            if (BuildConfig.DEBUG) ERainAdConfig.ENVIRONMENT_DEVELOP else ERainAdConfig.ENVIRONMENT_PRODUCTION
-        mERainAdConfig = ERainAdConfig(this, environment)
+        try {
+            val environment =
+                if (BuildConfig.DEBUG) ERainAdConfig.ENVIRONMENT_DEVELOP else ERainAdConfig.ENVIRONMENT_PRODUCTION
+            mERainAdConfig = ERainAdConfig(this, environment)
 
-        mERainAdConfig.adjustConfig = AdjustConfig(true, resources.getString(R.string.adjust_token))
-        mERainAdConfig.facebookClientToken = resources.getString(R.string.facebook_client_token)
-        mERainAdConfig.adjustTokenTiktok = resources.getString(R.string.tiktok_token)
-//        mERainAdConfig.idAdResume = (AdsId.openResume)
-        mERainAdConfig.idAdResume = (AdRemoteConfig.getInstance().inter_welcome_back.id)
+            mERainAdConfig.adjustConfig = AdjustConfig(true, resources.getString(R.string.adjust_token))
+            mERainAdConfig.facebookClientToken = resources.getString(R.string.facebook_client_token)
+            mERainAdConfig.adjustTokenTiktok = resources.getString(R.string.tiktok_token)
 
-        // Be interstitial ad ni vachche ochha ma ochho 30 second no gap raakhvo.
-        // ERainAd.forceShowInterstitial aa value (second) check kare chhe, etle
-        // welcome-back ane infinity badha inter ne aa gap lagu padshe.
-        mERainAdConfig.intervalInterstitialAd = 30
+            // Safe Ad ID Check - ક્યારેય null નહીં જાય
+            val resumeId = AdRemoteConfig.getInstance()?.inter_welcome_back?.id ?: ""
+            mERainAdConfig.idAdResume = if (resumeId.isNotEmpty()) resumeId else "ca-app-pub-3940256099942544/9257395921" // Fallback Test ID if blank
 
-        ERainAd.getInstance().init(this, mERainAdConfig)
+            mERainAdConfig.intervalInterstitialAd = 30
 
-        Admob.getInstance().setDisableAdResumeWhenClickAds(true)
-        Admob.getInstance().setOpenActivityAfterShowInterAds(true)
+            ERainAd.getInstance().init(this, mERainAdConfig)
 
-        AppOpenManager.getInstance().disableAppResumeWithActivity(SplashActivity::class.java)
+            Admob.getInstance().setDisableAdResumeWhenClickAds(true)
+            Admob.getInstance().setOpenActivityAfterShowInterAds(true)
 
-        // App resume par App-Open ad ni jagya e Welcome Screen batavvi che,
-        // etle resume open-ad disable rakhiye ane WelcomeManager init kariye.
-        AppOpenManager.getInstance().disableAppResume()
-        AppResumeWelcomeManager.init(this)
+            // SplashActivity પર App Resume Open Ad બિલકુલ બંધ રાખો
+            AppOpenManager.getInstance().disableAppResumeWithActivity(SplashActivity::class.java)
+            AppOpenManager.getInstance().disableAppResume()
+            AppResumeWelcomeManager.init(this)
+        } catch (e: Exception) {
+            Log.e(STARTUP_TAG, "initAds Error: ${e.message}")
+        }
     }
-
-
-
 }

@@ -143,7 +143,9 @@ class MainActivity : Base__Activity<ActivityMainBinding>() {
 
         AdsManager.loadInterAddPlaylist(this)
         binding.viewPager.setAdapter(MyViewPagerAdapter(this))
-        binding.viewPager.setOffscreenPageLimit(3)
+//        binding.viewPager.setOffscreenPageLimit(3)
+        binding.viewPager.offscreenPageLimit = 1
+
 
         checkIntent(getIntent())
 
