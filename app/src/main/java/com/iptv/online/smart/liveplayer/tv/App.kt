@@ -145,6 +145,8 @@ class App : AdsMultiDexApplication() {
             AppOpenManager.getInstance().disableAppResumeWithActivity(SplashActivity::class.java)
             AppOpenManager.getInstance().disableAppResume()
             AppResumeWelcomeManager.init(this)
+
+
         } catch (e: Exception) {
             Log.e(STARTUP_TAG, "initAds Error: ${e.message}")
         }

@@ -219,7 +219,21 @@ class LanguageActivity : Base__Activity<ActivityLanguageBinding>(),
         Log.d(AD_LOG, "STEP 2 | [$TAG_LANG_CLICK] preload chalu (100ms delay)")
         binding.root.postDelayed({
             if (!isFinishing && !isDestroyed) {
-                AdsManager.loadNativeLanguageClick(this@LanguageActivity, screenCount)
+                if (!AdsManager.wasRequested(TAG_LANG)) {
+                    Log.d(AD_LOG, "STEP 2b | splash e [$TAG_LANG] mangyu nahotu -> ahi mangyu")
+                    AdsManager.loadNativeLanguage(this@LanguageActivity, screenCount)
+                }
+
+                if (!AdsManager.wasRequested(TAG_LANG_CLICK)) {
+                    AdsManager.loadNativeLanguageClick(this@LanguageActivity, screenCount)
+                }
+
+                // Base jevu: onboarding-1 no native pan ahi J, ek j var.
+                // wasRequested vaparie jethi activity recreate thay topan fari na jay.
+                val onboardingTag = AdsManager.onboarding1Tag(isIntroFlowDone())
+                if (!AdsManager.wasRequested(onboardingTag)) {
+                    AdsManager.loadNativeOnboarding1(this@LanguageActivity, isIntroFlowDone())
+                }
             }
         }, 100)
     }
@@ -302,10 +316,7 @@ class LanguageActivity : Base__Activity<ActivityLanguageBinding>(),
 
             if (config.isNeedToShowADs && isAdEnabled) {
                 // Reviewer: ahiya koi navo load NA karvo (duplicate request atke).
-                // Load fakt be jagya e thay chhe: native -> Splash nu
-                // preloadLanguageAdInApp(), click -> aa screen no 100ms valo ek j call.
-                // Ad kyarey na aave (request j na thayo hoy ke pending rahi jay) to niche
-                // no timeout shimmer band kari de chhe - navo request kar_ya vagar.
+
                 startShimmerTimeout(tag)
 
                 AdsManager.getAdLive(tag).observe(this@LanguageActivity) { state ->
@@ -437,6 +448,7 @@ class LanguageActivity : Base__Activity<ActivityLanguageBinding>(),
 
             } else {
                 // iptv2 jevu: is_intro_page true -> onboarding, nahi to skip -> ActivityNotice.
+                SplashActivity.markLanguageDone(this)
                 val intent = if (RemoteConfigdata(this).isIntroPage)
                     Intent(this, IntroActivity::class.java)
                 else
@@ -519,11 +531,7 @@ class LanguageActivity : Base__Activity<ActivityLanguageBinding>(),
                 "STEP 3 | language click: ${languageModel_?.s_lan_name} " +
                         "(alreadySwapped=$isClickAdPhase)"
             )
-            if (!isOnboardingAdRequested) {
-                isOnboardingAdRequested = true
-                // pehla LanguageOptionalActivity ma hatu -> have pehla click par.
-                AdsManager.loadNativeOnboarding1(this, isIntroFlowDone())
-            }
+
             // swap na thai shakyo hoy (net nathi) to bija click par fari try thay.
             if (!isClickAdPhase && loadLanguageClickAd()) {
                 isClickAdPhase = true

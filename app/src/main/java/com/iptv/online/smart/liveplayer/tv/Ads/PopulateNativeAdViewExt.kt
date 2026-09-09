@@ -10,15 +10,7 @@ import com.ads.module.ads.wrapper.ApNativeAd
 import com.facebook.shimmer.ShimmerFrameLayout
 import com.google.android.gms.ads.nativead.NativeAdView
 
-/**
- * iptv2 jevu: stock ERain-Studio:2.0 (remote) ma built-in ERainAd.populateNativeAdView
- * method nathi (juna local :ads module ma hatu). Etle ahiya e j signature nu extension
- * banaviye chhie -> app na `ERainAd.getInstance().populateNativeAdView(...)` calls kaam kare.
- *
- * Kaam: native ad layout inflate -> shimmer chhupavo -> Admob thi populate -> frAds ma mukho.
- * CTA button ni height caller (fragment) pote state.ctaHeight thi set kare chhe, etle ahiya
- * alag height logic ni jarur nathi.
- */
+
 fun ERainAd.populateNativeAdView(
     activity: Activity,
     apNativeAd: ApNativeAd,

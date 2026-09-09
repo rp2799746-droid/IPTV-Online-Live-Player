@@ -33,25 +33,10 @@ object AdsManager {
     fun getAdLive(tag: String): LiveData<NativeAdUiState> =
         adLiveMap.getOrPut(tag) { MutableLiveData() }
 
-    // ---- Native ad preload ne thoda-thoda karine mokalvano (stagger) ----
-    //
-    // Screen khulte j 7 native ad EK SAATHE load thata hata. AdMob dareek native ad
-    // mate WebView ubhu kare chhe, ane ek saathe ghana WebView banave to Chromium ni
-    // andar native lock contention thay -> main thread atke -> ANR.
-    // (Play Console ma "Native method - J.N.OOZ / J.N.JJ / J.N.VZ" + "Native lock
-    //  contention" vala rows aa j chhe.)
-    //
-    // Badhi ad load to thay j chhe - bas ek saathe nahi, vaari-fari ne.
-
     private val preloadHandler = Handler(Looper.getMainLooper())
 
-    /** Ek preload request: kaya id ni ad, kaya layout ma, kaya tag thi. */
     data class AdSpec(val adId: String, val layoutId: Int, val tag: String)
 
-    /**
-     * [specs] ne [gapMs] na antare ek pachi ek load kare chhe.
-     * Activity vachche band thai gai hoy to baaki ni skip thai jaay chhe.
-     */
     fun preloadStaggered(activity: Activity, specs: List<AdSpec>, gapMs: Long = 250L) {
         specs.forEachIndexed { index, spec ->
             preloadHandler.postDelayed({
@@ -63,10 +48,16 @@ object AdsManager {
     }
 
     private val currentAds = mutableMapOf<String, ApNativeAd?>()
+    private val requestedTags = mutableSetOf<String>()
+    fun wasRequested(tag: String) = tag in requestedTags
+    fun onboarding1Tag(isDone: Boolean) =
+        if (isDone) "native_onboarding_2_1" else "native_onboarding_1_1"
+
     fun loadAd(context: Activity, adId: String, layoutId: Int, adTag: String, shouldDisplay: Boolean = true,
     ) {
         if (RemoteConfigdata(context).isNeedToShowADs && context.isInternetAvailable() && shouldDisplay) {
             Log.d("AdManager123", "🔄 Loading ad for tag=$adTag, id=$adId")
+            requestedTags += adTag
             ERainAd.getInstance().loadNativeAdResultCallback(
                 context, adId, layoutId, object : AdCallback() {
                     override fun onNativeAdLoaded(nativeAd: ApNativeAd) {
@@ -137,7 +128,7 @@ object AdsManager {
         // id + isEnable JSON (AdRemoteConfig) mathi.
         val cfg = if (isDone) AdRemoteConfig.getInstance().native_onboarding_2_1
         else AdRemoteConfig.getInstance().native_onboarding_1_1
-        val tag = if (isDone) "native_onboarding_2_1" else "native_onboarding_1_1"
+        val tag = onboarding1Tag(isDone)
         loadAd(activity, cfg.id, R.layout.layout_native_ad_large, tag, cfg.isEnable)
     }
 
@@ -197,9 +188,6 @@ object AdsManager {
         }
     }
 
-    // inter_onboarding ne 30s gap VAGAR j batavo -> splash na inter no 30s count ene block
-    // na kare. Interval temporary 0 kari, show kari, pachho restore -> bija inter (back/home/
-    // click) no 30s gap jem no tem rahe.
     private fun showInterIgnoreGap(activity: Activity, ad: ApInterstitialAd, onAction: () -> Unit) {
         val cfg = ERainAd.getInstance().adConfig
         val orig = cfg.intervalInterstitialAd

@@ -123,15 +123,10 @@ class IntroFragment4 : BaseFragment<FragmentIntro4Binding>(), LazyShowAds {
 
 
                             if (tag == "native_onboarding_1_4") {
-                                // Ad thi thodu j uper - sdp vapriye chhe etle badha
-                                // device par sarkhu rahe ane ad ne touch na thay.
                                 setNextRowBottomMarginPx(
                                     resources.getDimensionPixelSize(com.intuit.sdp.R.dimen._2sdp)
                                 )
-                                // Dots image 60sdp unchi chhe etle row unchi thati hati ane
-                                // button ni niche khali jagya dekhati hati. Dots ni height
-                                // button jetli (35sdp) kari do - banne center ma ek line ma
-                                // rahe ane aakhi row ad ni adine aavi jay.
+
                                 binding.dotsIndicator1.layoutParams?.let { lp ->
                                     lp.height = resources.getDimensionPixelSize(com.intuit.sdp.R.dimen._35sdp)
                                     binding.dotsIndicator1.layoutParams = lp

@@ -73,7 +73,26 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
 
     companion object {
         var screenCount = 1
+        private const val KEY_LANG_DONE = "lang_flow_done"
+        private const val KEY_OLD_COUNT = "lang_screen_count"
+        fun isLanguageDone(context: Context): Boolean {
+            val sp = context.getSharedPreferences(context.packageName, 0)
+            if (sp.contains(KEY_LANG_DONE)) return sp.getBoolean(KEY_LANG_DONE, false)
+
+            // Juno user: lang_screen_count set hato etle e puru kari chukyo che.
+            val done = sp.getInt(KEY_OLD_COUNT, 0) > 0
+            sp.edit().putBoolean(KEY_LANG_DONE, done).apply()
+            return done
+        }
+
+        /** Fakt Done dabave tyare j bolavvu. */
+        fun markLanguageDone(context: Context) {
+            context.getSharedPreferences(context.packageName, 0)
+                .edit().putBoolean(KEY_LANG_DONE, true).apply()
+        }
     }
+
+
 
     override fun setViewBinding() = ActivitySplashBinding.inflate(layoutInflater)
 
@@ -413,11 +432,13 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
             } else {
                 AdRemoteConfig.getInstance().inter_splash
             }
+            if (isGoingToLanguageScreen()) prepareLanguageAdState()
+
+
 
             if (splashInterConfig.isEnable) {
-                // Timeout 30000 ms thi ghatadi ne 15000 ms karyo jethi App ANR na aave
                 ERainAd.getInstance().loadSplashInterstitialAds(
-                    this, splashInterConfig.id, 15000, 4000, object : AdCallback() {
+                    this, splashInterConfig.id, 30000 , 5000, object : AdCallback() {
                         override fun onAdLoaded() {
                             super.onAdLoaded()
                             if (isGoingToLanguageScreen()) {
@@ -432,10 +453,19 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
 
                         override fun onAdFailedToLoad(i: LoadAdError?) {
                             super.onAdFailedToLoad(i)
+                            // Inter fail thayu topan Language ne to native joie j.
+                            // langPreloaded guard duplicate atkave chhe.
+                            if (isGoingToLanguageScreen()) {
+                                preloadLanguageAdInApp()
+                            }
                             goNextScreen()
                         }
                     })
             } else {
+                // Splash inter band chhe -> tya pan native to joie.
+                if (isGoingToLanguageScreen()) {
+                    preloadLanguageAdInApp()
+                }
                 goNextScreen()
             }
         } else {
@@ -522,7 +552,7 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
         }
     }
 
-    private fun preloadLanguageAdInApp() {
+/*    private fun preloadLanguageAdInApp() {
         if (langPreloaded) return
         langPreloaded = true
 
@@ -538,8 +568,18 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
                 }
             }
         }
+    }*/
+    /** Ads flow shuru thay e pehla j state nakki kari lo - pachi thread badalvo nathi. */
+    private fun prepareLanguageAdState() {
+        // Ahi kai lakhvanu nathi - Done dabave tyare j badlay.
+        screenCount = if (isLanguageDone(this)) 2 else 1
     }
-
+    /** Main thread par j, ek j var. */
+    private fun preloadLanguageAdInApp() {
+        if (langPreloaded) return
+        langPreloaded = true
+        AdsManager.loadNativeLanguage(this, screenCount)
+    }
     private fun setConfigData(config: FirebaseRemoteConfig) {
         lifecycleScope.launch(Dispatchers.IO) {
             val adRemoteJson = if (BuildConfig.DEBUG) config.getString("ad_rem_dup")
