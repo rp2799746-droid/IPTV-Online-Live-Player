@@ -54,13 +54,6 @@ public class Preference {
         editor.apply();
     }
 
-    public static int getInt(Context context, String key) {
-        return getInt(context, key, -1);
-    }
-
-    public static long getLong(Context context, String key) {
-        return getLong(context, key, 1234567890L);
-    }
 
     public static int getInt(Context context, String key, int defaultValue) {
         SharedPreferences settings = context.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE);

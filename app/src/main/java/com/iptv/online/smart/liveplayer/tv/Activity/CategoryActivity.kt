@@ -40,7 +40,6 @@ class CategoryActivity : Base__Activity<ActivityCategoryBinding>() {
     }
 
     public override fun bindObjects() {
-        // Intent માંથી ડેટા મેળવો
 
         configScript = RemoteConfigdata(this@CategoryActivity)
 
@@ -105,7 +104,7 @@ class CategoryActivity : Base__Activity<ActivityCategoryBinding>() {
                                 } else {
                                     Log.e("AdManager123", "CTA Button not found in layout for tag: $tag")
                                 }
-                                //
+
 
 
 
@@ -134,7 +133,7 @@ class CategoryActivity : Base__Activity<ActivityCategoryBinding>() {
     }
 
     public override fun bindListener() {
-        // Back બટન ક્લિક
+
         binding.back.setOnClickListener({ v -> onBackPressed() })
         binding.etSearchChannel.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -158,9 +157,7 @@ class CategoryActivity : Base__Activity<ActivityCategoryBinding>() {
         loadGroups()
     }
 
-    // Playlist ni badhi channel DB mathi vanchi ne group count kariye chhe.
-    // Ae kaam IO thread par. Cache hoy to list TARAT dekhay ane fresh data
-    // aave etle update thai jaay - main thread kyare y block na thay (ANR).
+
     private fun loadGroups() {
         val dao = AppDatabase.getInstance(this).historyDao()
         val pName = playlistName
@@ -169,8 +166,7 @@ class CategoryActivity : Base__Activity<ActivityCategoryBinding>() {
         DbCache.getGroups(cacheKey)?.let { showGroups(it) }
 
         lifecycleScope.launch(Dispatchers.IO) {
-            // SQLite pote GROUP BY + COUNT + sort kari aape chhe (jo pehla aakhi
-            // channel list memory ma laavi ne Kotlin ma ganta hata - e bov dhimu hatu).
+
             val tempList: List<ChannelGroup?> = dao.getGroupCounts(pName) ?: emptyList()
             DbCache.putGroups(cacheKey, tempList)
 
@@ -185,7 +181,6 @@ class CategoryActivity : Base__Activity<ActivityCategoryBinding>() {
             return
         }
 
-        // જો ડેટા મળે તો જૂનું લોજિક
         binding.rvCategories.setVisibility(View.VISIBLE)
         binding.layoutNoData.setVisibility(View.GONE)
 

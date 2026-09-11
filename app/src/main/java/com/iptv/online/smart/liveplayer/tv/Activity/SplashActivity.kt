@@ -73,25 +73,18 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
 
     companion object {
         var screenCount = 1
+
         private const val KEY_LANG_DONE = "lang_flow_done"
-        private const val KEY_OLD_COUNT = "lang_screen_count"
-        fun isLanguageDone(context: Context): Boolean {
-            val sp = context.getSharedPreferences(context.packageName, 0)
-            if (sp.contains(KEY_LANG_DONE)) return sp.getBoolean(KEY_LANG_DONE, false)
 
-            // Juno user: lang_screen_count set hato etle e puru kari chukyo che.
-            val done = sp.getInt(KEY_OLD_COUNT, 0) > 0
-            sp.edit().putBoolean(KEY_LANG_DONE, done).apply()
-            return done
-        }
+        fun isLanguageDone(context: Context): Boolean =
+            context.getSharedPreferences(context.packageName, 0)
+                .getBoolean(KEY_LANG_DONE, false)
 
-        /** Fakt Done dabave tyare j bolavvu. */
         fun markLanguageDone(context: Context) {
             context.getSharedPreferences(context.packageName, 0)
                 .edit().putBoolean(KEY_LANG_DONE, true).apply()
         }
     }
-
 
 
     override fun setViewBinding() = ActivitySplashBinding.inflate(layoutInflater)
@@ -103,7 +96,6 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
         binding.btnSettings.isSelected = true
         appUpdate_Manager = AppUpdateManagerFactory.create(this)
 
-        // Shortcut setup background ma post karo jethi splash UI launch na rokay
         lifecycleScope.launch(Dispatchers.Default) {
             manageAppShortcuts()
         }
@@ -453,19 +445,10 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
 
                         override fun onAdFailedToLoad(i: LoadAdError?) {
                             super.onAdFailedToLoad(i)
-                            // Inter fail thayu topan Language ne to native joie j.
-                            // langPreloaded guard duplicate atkave chhe.
-                            if (isGoingToLanguageScreen()) {
-                                preloadLanguageAdInApp()
-                            }
                             goNextScreen()
                         }
                     })
             } else {
-                // Splash inter band chhe -> tya pan native to joie.
-                if (isGoingToLanguageScreen()) {
-                    preloadLanguageAdInApp()
-                }
                 goNextScreen()
             }
         } else {
@@ -490,7 +473,6 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
         if (hasNavigated) return
         hasNavigated = true
 
-        // Debug mode ma j print karo, production ma IPC/CPU time bachavo
         if (BuildConfig.DEBUG) {
             printHashKey()
         }
@@ -508,6 +490,7 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
                 } else {
                     Intent(this, LanguageActivity::class.java).apply {
                         putExtra("isFromSplash", true)
+                        putExtra("screen_count", screenCount)
                     }
                 }
             }
@@ -552,29 +535,10 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
         }
     }
 
-/*    private fun preloadLanguageAdInApp() {
-        if (langPreloaded) return
-        langPreloaded = true
 
-        lifecycleScope.launch(Dispatchers.IO) {
-            val sp = getSharedPreferences(packageName, 0)
-            val prevLangCount = sp.getInt("lang_screen_count", 0)
-            screenCount = if (prevLangCount == 0) 1 else 2
-            sp.edit().putInt("lang_screen_count", screenCount).apply()
-
-            withContext(Dispatchers.Main) {
-                if (!isFinishing && !isDestroyed) {
-                    AdsManager.loadNativeLanguage(this@SplashActivity, screenCount)
-                }
-            }
-        }
-    }*/
-    /** Ads flow shuru thay e pehla j state nakki kari lo - pachi thread badalvo nathi. */
     private fun prepareLanguageAdState() {
-        // Ahi kai lakhvanu nathi - Done dabave tyare j badlay.
         screenCount = if (isLanguageDone(this)) 2 else 1
     }
-    /** Main thread par j, ek j var. */
     private fun preloadLanguageAdInApp() {
         if (langPreloaded) return
         langPreloaded = true
@@ -585,7 +549,7 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
             val adRemoteJson = if (BuildConfig.DEBUG) config.getString("ad_rem_dup")
             else config.getString("ad_remote_config")
 
-            // Heavy JSON Parsing in Background Thread
+
             AdRemoteConfig.initialize(this@SplashActivity, adRemoteJson)
 
             withContext(Dispatchers.Main) {

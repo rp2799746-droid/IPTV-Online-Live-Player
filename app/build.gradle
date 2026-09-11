@@ -58,7 +58,6 @@ android {
 }
 
 dependencies {
-    // java.time desugaring (AppLovin java.time.Duration crash fix) -> jup 2️⃣ crash
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.4'
     implementation libs.androidx.core.ktx
     implementation libs.androidx.appcompat

@@ -161,29 +161,14 @@ class MainActivity : Base__Activity<ActivityMainBinding>() {
         }
 
 
-        //preload
-        //
-        // Pehla aa 7 e 7 native ad EK SAATHE load thati hati. AdMob dareek native ad
-        // mate WebView ubhu kare chhe, ane 7 WebView ek saathe banave to Chromium ni
-        // andar lock contention thay -> main thread atke -> ANR (Play Console ma
-        // "Native method - J.N.OOZ / J.N.JJ" ane "Native lock contention" vala rows).
-        //
-        // Have preloadStaggered() e badhi ne 250 ms na antare ek pachi ek moklе chhe.
-        // Badhi ad load to thay j chhe - bas ek saathe nahi.
-        //
-        // Kram = user ne je pehla dekhay e pehla: Home -> Playlist -> Channel -> ...
+
         val preloads = mutableListOf<AdsManager.AdSpec>()
 
         fun queue(cfg: AdUnitConfig, layoutId: Int, tag: String) {
             if (cfg.isEnable) preloads.add(AdsManager.AdSpec(cfg.id, layoutId, tag))
         }
 
-        // native_home fakt IntroFragment4 (chhelli onboarding screen) ma preload thay chhe.
-        // Pan uninstall-flow, widget shortcut, purchased user - aa badha ma Intro chalti
-        // j nathi, etle "native_home_2005" ni koi e load j nathi kari hoti. LiveData ni
-        // value null rahe -> observer kyare y fire na thay -> Home par shimmer kayam
-        // farya kare. Ahi safety-net: haju sudhi load na thai hoy to J load kariye
-        // (Intro e pehla thi load kari hoy to fari nathi karta).
+
         if (AdsManager.getAdLive("native_home_2005").value == null) {
             queue(AdRemoteConfig.getInstance().native_home, R.layout.layout_native_ad_medium, "native_home_2005")
         }

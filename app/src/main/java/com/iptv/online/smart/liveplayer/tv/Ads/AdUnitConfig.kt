@@ -3,10 +3,7 @@ package com.iptv.online.smart.liveplayer.tv.adsutils
 import androidx.annotation.Keep
 import com.google.gson.annotations.SerializedName
 
-/**
- * iptv2 jevu ad-unit config (JSON mathi). Gson thi parse thay chhe.
- * JSON key `enable_ua_check` -> field `enableUaCheck`.
- */
+
 @Keep
 data class AdUnitConfig(
     @SerializedName("id") val id: String = "",

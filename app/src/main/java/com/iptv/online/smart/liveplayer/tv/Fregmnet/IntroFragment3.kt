@@ -1,7 +1,6 @@
 package com.iptv.online.smart.liveplayer.tv.activities.forIntro
 
-import android.os.Bundle
-import androidx.fragment.app.Fragment
+
 import com.iptv.online.smart.liveplayer.tv.Fregmnet.BaseFragment
 import com.iptv.online.smart.liveplayer.tv.databinding.FragmentIntro3Binding
 import com.iptv.online.smart.liveplayer.tv.utils.triggerClick
@@ -38,7 +37,6 @@ class IntroFragment3 : BaseFragment<FragmentIntro3Binding>() {
         binding.btnNext.triggerClick {
             (activity as? IntroActivity)?.getNextFragment()
         }
-        // Lambo translated text single line ma marquee (scroll) thava mate.
         binding.tvNext.isSelected = true
     }
 

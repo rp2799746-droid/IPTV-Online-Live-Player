@@ -152,7 +152,6 @@ class ChannelFragment : Fragment() {
 
     private fun registerNetworkCallback() {
         try {
-            // Fragment detach hoy to crash na thay — safe nullable context.
             val ctx = context ?: return
             val connectivityManager =
                 ctx.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -201,7 +200,6 @@ class ChannelFragment : Fragment() {
     }
 
     private fun initRemoteConfig() {
-        // Fragment detach hoy to kaઈ na karo — niche requireActivity()/dialog crash na thay.
         if (!isAdded) return
         if (!this.isNetworkAvailable) {
             showNoInternetDialog()
@@ -237,8 +235,7 @@ class ChannelFragment : Fragment() {
 
     val isNetworkAvailable: Boolean
         get() {
-            // Fragment detach thai gayu hoy (dialog button no async click pachi user niki
-            // gayo) to requireContext() crash kare che. Etle safe nullable context vaprie.
+
             val ctx = context ?: return false
             val connectivityManager =
                 ctx.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
@@ -259,7 +256,6 @@ class ChannelFragment : Fragment() {
 
         view.findViewById<View?>(R.id.btn_settings)
             .setOnClickListener(View.OnClickListener { v: View? ->
-                // Fragment detach thai gayu hoy to kaઈ na karo — crash na thay.
                 if (!isAdded) return@OnClickListener
                 if (this.isNetworkAvailable) {
                     noInternetDialog!!.dismiss()
@@ -310,14 +306,13 @@ class ChannelFragment : Fragment() {
                     val uniqueId = "$row|$CLOUD_PLAYLIST_NAME"
                     current.id = uniqueId
 
-                    // --- અહીં સુધારો છે ---
+
                     val existing = db.historyDao().getChannelById(uniqueId)
                     if (existing != null) {
                         current.isFavorite = existing.isFavorite
-                        // જો જૂની હિસ્ટ્રી હોય તો તે ટાઈમ પાછો સેટ કરો
                         current.historyTimestamp = existing.historyTimestamp
                     } else {
-                        // જો નવી ચેનલ હોય તો 0 સેટ કરો
+
                         current.historyTimestamp = 0
                     }
 
@@ -345,8 +340,7 @@ class ChannelFragment : Fragment() {
 
     private fun updateGroups() {
         lifecycleScope.launch(Dispatchers.IO) {
-            // SQLite pote GROUP BY + COUNT + sort kari aape chhe (jo pehla aakhi
-            // channel list memory ma laavi ne Kotlin ma ganta hata - e bov dhimu hatu).
+
             val tempList: List<ChannelGroup> = db.historyDao().getGroupCounts(CLOUD_PLAYLIST_NAME) ?: emptyList()
 
             if (tempList.isNotEmpty()) {
@@ -373,16 +367,13 @@ class ChannelFragment : Fragment() {
 
     override fun onDestroy() {
         super.onDestroy()
-        // Open dialog band karo — window leak / BadToken atkave.
         noInternetDialog?.dismiss()
         noInternetDialog = null
         if (networkCallback != null) {
-            // onDestroy vakhtе context null hoy shake — requireContext() na vaprie.
             val connectivityManager =
                 context?.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
             try {
-                // Callback register j na thyu hoy (register fail) ke pehla unregister thai
-                // gayu hoy to "NetworkCallback was not registered" crash aave — safe try-catch.
+
                 connectivityManager?.unregisterNetworkCallback(networkCallback!!)
             } catch (e: IllegalArgumentException) {
                 e.printStackTrace()

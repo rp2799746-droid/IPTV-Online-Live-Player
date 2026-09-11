@@ -24,12 +24,8 @@ public class Channel  implements Parcelable {
     private String channelDrmKey;
     private String playlistName;
     private boolean isFavorite;
-    // Channel.java માં
     private String playlistUrl;
-    private long historyTimestamp;
-
-    // Constructor
-    public Channel() {
+    private long historyTimestamp;public Channel() {
     }
 
     public String getPlaylistUrl() { return playlistUrl; }
@@ -84,7 +80,7 @@ public class Channel  implements Parcelable {
         channelDrmType = in.readString();
         channelDrmKey = in.readString();
         playlistName = in.readString();
-        playlistUrl = in.readString(); // આ ઉમેરો
+        playlistUrl = in.readString();
         isFavorite = in.readByte() != 0;
         historyTimestamp = in.readLong();
     }
@@ -99,7 +95,7 @@ public class Channel  implements Parcelable {
         dest.writeString(channelDrmType);
         dest.writeString(channelDrmKey);
         dest.writeString(playlistName);
-        dest.writeString(playlistUrl); // આ ઉમેરો
+        dest.writeString(playlistUrl);
         dest.writeByte((byte) (isFavorite ? 1 : 0));
         dest.writeLong(historyTimestamp);
 

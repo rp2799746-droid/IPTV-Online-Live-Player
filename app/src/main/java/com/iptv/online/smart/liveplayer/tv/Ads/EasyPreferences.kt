@@ -20,9 +20,7 @@ object EasyPreferences {
         editor.apply()
     }
 
-    /**
-     * puts a key value pair in shared prefs if doesn't exists, otherwise updates value on given [key]
-     */
+
     operator fun SharedPreferences.set(
         key: String,
         value: Any?
@@ -37,11 +35,7 @@ object EasyPreferences {
         }
     }
 
-    /**
-     * finds value on given key.
-     * [T] is the type of value
-     * @param defaultValue optional default value - will take null for strings, false for bool and -1 for numeric values if [defaultValue] is not specified
-     */
+
     inline operator fun <reified T : Any> SharedPreferences.get(
         key: String,
         defaultValue: T? = null

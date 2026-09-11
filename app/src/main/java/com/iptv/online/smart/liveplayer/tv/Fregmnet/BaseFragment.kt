@@ -31,8 +31,7 @@ abstract class BaseFragment<actBinding : ViewBinding> : Fragment() {
         if (activity != null)
             mActivity = activity as FragmentActivity
 
-        // Har bind step ne alag try-catch ma -> ek (dr. bindObjects nu ad logic) fail thay
-        // to pan baki chale. Khas bindListener (Next button wiring) hammesha chale -> Next dead na thay.
+
         try { bindObjects() } catch (e: Exception) { android.util.Log.e(TAG, "bindObjects failed", e) }
         try { bindListener() } catch (e: Exception) { android.util.Log.e(TAG, "bindListener failed", e) }
         try { bindMethod() } catch (e: Exception) { android.util.Log.e(TAG, "bindMethod failed", e) }

@@ -125,22 +125,21 @@ class MirrorStepsActivity : Base__Activity<ActivityMirrorStepsBinding>() {
     }
 
     override fun bindListener() {
-        // બેક બટન
+
         binding.toolbar.back.setOnClickListener { onBackPressed() }
 
-        // સ્માર્ટ ટીવી ટેબ સિલેક્શન
+
         binding.tvSmartTVTab.setOnClickListener {
             isSmartTV = true
             updateTabUI(true)
         }
 
-        // ડાયરેક્ટ ટેબ સિલેક્શન
         binding.tvDirectTab.setOnClickListener {
             isSmartTV = false
             updateTabUI(false)
         }
 
-        // મિરરિંગ સ્ટાર્ટ બટન
+
         binding.btnStartMirroring.setOnClickListener {
             if (isSmartTV) {
                 Toast.makeText(this, getString(R.string.connecting_to_smart_tv), Toast.LENGTH_SHORT)
@@ -156,7 +155,7 @@ class MirrorStepsActivity : Base__Activity<ActivityMirrorStepsBinding>() {
             }
         }
 
-        // સાઉન્ડ સ્વીચ લોજિક
+
         binding.switchSound.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
                 unmuteSound()
@@ -169,7 +168,7 @@ class MirrorStepsActivity : Base__Activity<ActivityMirrorStepsBinding>() {
     }
 
     override fun bindMethod() {
-        // શરૂઆતમાં સ્માર્ટ ટીવી ટેબ એક્ટિવ રાખો
+
         updateTabUI(true)
     }
 

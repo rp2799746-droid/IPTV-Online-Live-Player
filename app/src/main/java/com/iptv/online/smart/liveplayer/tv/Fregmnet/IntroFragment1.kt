@@ -35,9 +35,7 @@ class IntroFragment1 : BaseFragment<FragmentIntro1Binding>() {
 
     @SuppressLint("SuspiciousIndentation")
     override fun bindObjects() {
-        // Next button SAUTHI PEHLA wire karo -> niche ad code (nativeAds / full-ad) exception
-        // aape to pan Next button hammesha kaam kare (bindListener skip thay to pan chale).
-        binding.btnNext.triggerClick { (activity as? IntroActivity)?.getNextFragment() }
+           binding.btnNext.triggerClick { (activity as? IntroActivity)?.getNextFragment() }
         binding.btnNext1.triggerClick { (activity as? IntroActivity)?.getNextFragment() }
 
         nativeAds()
@@ -70,7 +68,6 @@ class IntroFragment1 : BaseFragment<FragmentIntro1Binding>() {
     }
 
     override fun bindListener() {
-        // Banne rows na button wire karo - kyo row dekhay chhe e isDone par aadharit chhe.
         binding.btnNext.triggerClick { (activity as? IntroActivity)?.getNextFragment() }
         binding.btnNext1.triggerClick { (activity as? IntroActivity)?.getNextFragment() }
         binding.tvNext.isSelected = true
@@ -88,7 +85,6 @@ class IntroFragment1 : BaseFragment<FragmentIntro1Binding>() {
         val cfg = if (requireActivity().isIntroFlowDone())
             AdRemoteConfig.getInstance().native_onboarding_2_1
         else AdRemoteConfig.getInstance().native_onboarding_1_1
-        // enableUaCheck config (JSON) mathi -> JSON pramane UA gate. false hoy to disable ma pan dekhay.
         if (!(ERainAd.getInstance().getShouldDisplayNativeOnboardingNormal1(cfg.enableUaCheck) == true)) {
             binding.adShimmer.root.gone
             binding.frAds.gone
@@ -114,15 +110,11 @@ class IntroFragment1 : BaseFragment<FragmentIntro1Binding>() {
 
 
                         if (tag == "native_onboarding_1_1") {
-                            // Ad thi thodu j uper - sdp vapriye chhe etle badha
-                            // device par sarkhu rahe ane ad ne touch na thay.
+
                             setNextRowBottomMarginPx(
                                 resources.getDimensionPixelSize(com.intuit.sdp.R.dimen._2sdp)
                             )
-                            // Dots image 60sdp unchi chhe etle row unchi thati hati ane
-                            // button ni niche khali jagya dekhati hati. Dots ni height
-                            // button jetli (35sdp) kari do - banne center ma ek line ma
-                            // rahe ane aakhi row ad ni adine aavi jay.
+
                             binding.dotsIndicator1.layoutParams?.let { lp ->
                                 lp.height = resources.getDimensionPixelSize(com.intuit.sdp.R.dimen._35sdp)
                                 binding.dotsIndicator1.layoutParams = lp
@@ -136,9 +128,7 @@ class IntroFragment1 : BaseFragment<FragmentIntro1Binding>() {
                             binding.adShimmer.root
                         )
 
-                        // Intro screen 1 ma Next button ad ni ekdum close aave e mate
-                        // card no TOP margin 0 karo - ad potey jya chhe tya j rahe chhe.
-                        // Layout share thay chhe etle ahiya code ma j.
+
                         if (tag == "native_onboarding_1_1") {
                             binding.frAds.findViewById<View>(R.id.ad_card)?.let { card ->
                                 (card.layoutParams as? ViewGroup.MarginLayoutParams)?.let { lp ->
@@ -183,7 +173,6 @@ class IntroFragment1 : BaseFragment<FragmentIntro1Binding>() {
                                 )
                                 Log.d("AdManager123", "[$tag] fallback reload triggered")
                             } else {
-                                // Fallback pachi pan na aavyu -> hide.
                                 binding.adShimmer.root.gone
                                 binding.frAds.gone
                             }

@@ -46,14 +46,9 @@ class IntroActivity : Base__Activity<ActivityIntroBinding>() {
         AdsManager.loadInterOnboarding(this)
         val isDone = isIntroFlowDone()
 
-        // iptv2 jevu: fullscreen native gate canShowFullScreenAd() thi -> isEnable false
-        // hoy to na dekhay, ane enableUaCheck XOR organic switch pramane show/hide.
         val fullCfg =
             if (isDone) AdRemoteConfig.getInstance().native_onboarding_fullscreen_2_2
             else AdRemoteConfig.getInstance().native_onboarding_fullscreen_1_2
-
-
-
         fragments = arrayListOf<Fragment>().apply {
             add(IntroFragment1()) // Index 0
             add(IntroFragment2())
@@ -61,7 +56,6 @@ class IntroActivity : Base__Activity<ActivityIntroBinding>() {
 
                 add(IntroFragmentFullAd())
             }
-
             add(IntroFragment3())
             add(IntroFragment4())
         }
@@ -114,10 +108,7 @@ class IntroActivity : Base__Activity<ActivityIntroBinding>() {
                     flags = (Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
                 }
             else
-//                Intent(this, MainActivity::class.java).apply {
-//                    putExtra("isFromIntro", true)
-//                    flags = (Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-//                }
+
                 Intent(this, ActivityNotice::class.java).apply {
                     putExtra("isFromIntro", true)
                     flags = (Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)

@@ -49,8 +49,6 @@ class SettingsActivity : Base__Activity<ActivitySettingsBinding>() {
 
 
         binding.cardLanguage.setOnClickListener({ v ->
-            // Language ni badhi screen ek j activity ma -> settingss = true flag thi
-            // LanguageActivity settings-mode ma khule chhe (ad nahi, Done + back).
             val intent = Intent(this, LanguageActivity::class.java)
             intent.putExtra("settingss", true)
             startActivity(intent)
@@ -74,7 +72,7 @@ class SettingsActivity : Base__Activity<ActivitySettingsBinding>() {
     }
 
     public override fun bindMethod() {
-        // વધારાની મેથડ્સ
+
     }
 
     public override fun onBackPressed() {
@@ -303,7 +301,6 @@ class SettingsActivity : Base__Activity<ActivitySettingsBinding>() {
         val pref = getSharedPreferences(getPackageName(), MODE_PRIVATE)
         val newLang: String = pref.getString("selected_language_code", "en")!!
 
-        // જો ભાષા બદલાઈ હોય, તો recreate કરો જેથી BaseActivity નું attachBaseContext ફરીથી રન થાય
         if (currentLang != newLang) {
             currentLang = newLang
             recreate()

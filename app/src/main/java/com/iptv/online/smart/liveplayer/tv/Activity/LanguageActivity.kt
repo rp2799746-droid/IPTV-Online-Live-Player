@@ -33,20 +33,6 @@ import com.itg.devconfig.utils.setOnAdminAdToggleListener
 import java.util.Locale
 
 
-/**
- * Demo jevu: language na BADHA case ek j activity ma.
- *
- * Splash flow (settingss = false):
- *  - Screen kholta -> "native_lang_tag" ad observe thay chhe.
- *  - User language par click kare -> e J screen par observer swap thai ne
- *    "native_lang_click_tag" ad batave chhe ane Done button dekhay chhe.
- *
- * Settings flow (settingss = true):
- *  - Back + Done visible, koi native ad nahi, back e inter_back batave chhe.
- *
- * (pehla aa be case LanguageOptionalActivity ane LanguageChangeActivity ma alag
- *  hata -> have alag activity nathi.)
- */
 class LanguageActivity : Base__Activity<ActivityLanguageBinding>(),
     LanguageAdapter.OnClickItemListener {
     private var languageAdapterNew: LanguageAdapter? = null
@@ -57,17 +43,12 @@ class LanguageActivity : Base__Activity<ActivityLanguageBinding>(),
     private var sp_editor: SharedPreferences.Editor? = null
     private var configScript: RemoteConfigdata? = null
 
-    // Click-ad no swap thai gayo -> fari na karvo (duplicate observer na thay).
     private var isClickAdPhase = false
 
-    // Onboarding native no preload fakt pehla click par ek j var.
-    private var isOnboardingAdRequested = false
     private val doneHandler = Handler(Looper.getMainLooper())
 
-    // Ad na kaam mate alag handler - doneHandler na callback sathe bhelsel na thay.
     private val adHandler = Handler(Looper.getMainLooper())
 
-    // Settings mathi aavya hoy tya J back par inter_back joie -> Base e preload kare chhe.
     override val needBackInterAd: Boolean
         get() = intent.getBooleanExtra("settingss", false)
 
@@ -75,10 +56,10 @@ class LanguageActivity : Base__Activity<ActivityLanguageBinding>(),
         private const val TAG_LANG = "native_lang_tag"
         private const val TAG_LANG_CLICK = "native_lang_click_tag"
 
-        // Language screen na ad flow no logcat tag - logcat ma "LangAd" filter karo.
+
         private const val AD_LOG = "LangAd"
 
-        // Aatla time ma ad na aave to shimmer band (navo request NAHI).
+
         private const val SHIMMER_TIMEOUT_MS = 10_000L
     }
 
@@ -87,6 +68,9 @@ class LanguageActivity : Base__Activity<ActivityLanguageBinding>(),
     }
 
     override fun bindObjects() {
+        if (intent.hasExtra("screen_count")) {
+            screenCount = intent.getIntExtra("screen_count", 1)
+        }
 
         sp = getSharedPreferences(getPackageName(), 0)
         sp_editor = sp!!.edit()
@@ -114,14 +98,12 @@ class LanguageActivity : Base__Activity<ActivityLanguageBinding>(),
             binding.gradinttext.invalidate()
         }
 
-        // iptv2 jevu dev-settings dialog: title 10-click e khule, toggle pachi splash restart.
         val restartSplash = {
             val i = Intent(this, SplashActivity::class.java)
             i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
             startActivity(i)
             finish()
         }
-        // iptv2 jevu: fakt title (textheader) par.
         binding.textheader.setOnAdminAdToggleListener { restartSplash() }
 
         configScript = RemoteConfigdata(this@LanguageActivity)
@@ -140,13 +122,8 @@ class LanguageActivity : Base__Activity<ActivityLanguageBinding>(),
             binding.back.visibility = View.GONE
             binding.textheader.text = getString(R.string.choose_your_language)
             binding.done.visibility = View.GONE
-            // Ad-review (native_language_1_click): Done button ma fakt ✓ icon rakhvu,
-            // "Done" text kadhi nakhvu. Settings screen par text pehla jevu j rahe chhe.
             binding.gradinttext.visibility = View.GONE
 
-            // screenCount Splash ma J nakki thay chhe (pehli vaar _1, pachi hammesha _2) ane
-            // companion dwara ahiya aave chhe. Ahiya FARI compute NA karvu -> lang ad ane
-            // click ad banne same variant vaapre. Consistent.
             loadLanguageAd()
 
 
@@ -164,8 +141,6 @@ class LanguageActivity : Base__Activity<ActivityLanguageBinding>(),
 
     }
 
-    // Ad-review: native ad ni bilkul uper vertical-swipe hint (fakt screen 1 par).
-    // User language list na chhelle pahonche etle hint jato rahe chhe.
     private fun setupSwipeHint() {
         if (screenCount != 1) return
 
@@ -181,7 +156,6 @@ class LanguageActivity : Base__Activity<ActivityLanguageBinding>(),
             }
         })
 
-        // List etli nani hoy ke scroll j na thay -> hint ni jarur nathi.
         binding.recyclerView.post {
             if (!binding.recyclerView.canScrollVertically(1)) hideSwipeHint()
         }
@@ -193,9 +167,6 @@ class LanguageActivity : Base__Activity<ActivityLanguageBinding>(),
         binding.swipeHint.visibility = View.GONE
     }
 
-    // Ad na aave to shimmer kayam ferato rahe - dakhla tarike inter_splash load J na thayo
-    // hoy to native ad no preload j nathi thayo, ane LiveData khali rahe etle observer
-    // kyarey chalto nathi. Aa timeout FAKT UI band kare chhe, NAVO ad request nathi karto.
     private fun startShimmerTimeout(tag: String) {
         adHandler.removeCallbacksAndMessages(null)
         adHandler.postDelayed({
@@ -214,36 +185,17 @@ class LanguageActivity : Base__Activity<ActivityLanguageBinding>(),
 
         startAdFlow(TAG_LANG)
 
-        // Reviewer: click-ad ne screen enter thatan EK J VAR, ~100ms delay sathe preload karo.
-        // (Fail thay to language select vakhte FARI load nathi karvano -> retry kadhi nakhyo.)
+
         Log.d(AD_LOG, "STEP 2 | [$TAG_LANG_CLICK] preload chalu (100ms delay)")
         binding.root.postDelayed({
             if (!isFinishing && !isDestroyed) {
-                if (!AdsManager.wasRequested(TAG_LANG)) {
-                    Log.d(AD_LOG, "STEP 2b | splash e [$TAG_LANG] mangyu nahotu -> ahi mangyu")
-                    AdsManager.loadNativeLanguage(this@LanguageActivity, screenCount)
-                }
-
-                if (!AdsManager.wasRequested(TAG_LANG_CLICK)) {
-                    AdsManager.loadNativeLanguageClick(this@LanguageActivity, screenCount)
-                }
-
-                // Base jevu: onboarding-1 no native pan ahi J, ek j var.
-                // wasRequested vaparie jethi activity recreate thay topan fari na jay.
-                val onboardingTag = AdsManager.onboarding1Tag(isIntroFlowDone())
-                if (!AdsManager.wasRequested(onboardingTag)) {
-                    AdsManager.loadNativeOnboarding1(this@LanguageActivity, isIntroFlowDone())
-                }
+                AdsManager.loadNativeLanguageClick(this@LanguageActivity, screenCount)
+                AdsManager.loadNativeOnboarding1(this@LanguageActivity, isIntroFlowDone())
             }
         }, 100)
     }
 
-    // Language click pachi E J screen par click-ad batavo:
-    // juno (lang) observer band -> juno ad view kadho -> shimmer -> click-ad observe.
-    //
-    // Return: swap kharekhar thayo ke nahi. Click-ad load J na thavano hoy (config off ke
-    // net nathi) tya swap NA karvo -> nahi to juno dekhato lang ad jato rahe ane screen par
-    // kayamnu shimmer rahi jaay (loadAd tyare koi state post karto nathi).
+
     private fun loadLanguageClickAd(): Boolean {
         val cfg = AdRemoteConfig.getInstance()
         val isClickAdEnabled = if (screenCount == 1) cfg.native_language_1_click.isEnable
@@ -271,10 +223,6 @@ class LanguageActivity : Base__Activity<ActivityLanguageBinding>(),
         return true
     }
 
-    // Shimmer ne current ad variant JEVU J banave (nanu-motu nahi, EXACT match):
-    //  screenCount==1 -> small ad  : media 80dp,  media topMargin 6dp,  CTA topMargin 8dp,  card side 0.
-    //  screenCount==2 -> layout_native_ad_large : media 130dp, media topMargin 8dp, CTA topMargin 16dp, card 8dp.
-    // Aa mate shimmer-ad ni height sarkhi -> loading pachi koi jump/khali space nahi.
     private fun adjustLangShimmerHeight() {
         val d = resources.displayMetrics.density
         val large = screenCount != 1
@@ -301,10 +249,9 @@ class LanguageActivity : Base__Activity<ActivityLanguageBinding>(),
     }
 
 
-
     private fun startAdFlow(tag: String) {
         configScript?.let { config ->
-            // Enable have JSON (AdRemoteConfig) mathi aave chhe.
+
             val ad = AdRemoteConfig.getInstance()
             val isAdEnabled = if (tag == TAG_LANG) {
                 if (screenCount == 1) ad.native_language_1.isEnable else ad.native_language_2.isEnable
@@ -315,69 +262,63 @@ class LanguageActivity : Base__Activity<ActivityLanguageBinding>(),
             }
 
             if (config.isNeedToShowADs && isAdEnabled) {
-                // Reviewer: ahiya koi navo load NA karvo (duplicate request atke).
+
 
                 startShimmerTimeout(tag)
 
                 AdsManager.getAdLive(tag).observe(this@LanguageActivity) { state ->
 
-                        if (state is NativeAdUiState.Success) {
-                            Log.d(
-                                AD_LOG,
-                                "SHOW  | [$tag] ad screen par mukyo (id=${state.adsID})"
-                            )
-                            binding.adShimmer.root.visibility = View.GONE
-                            binding.frAds.visibility = View.VISIBLE
+                    if (state is NativeAdUiState.Success) {
+                        Log.d(
+                            AD_LOG,
+                            "SHOW  | [$tag] ad screen par mukyo (id=${state.adsID})"
+                        )
+                        binding.adShimmer.root.visibility = View.GONE
+                        binding.frAds.visibility = View.VISIBLE
 
-                            ERainAd.getInstance().populateNativeAdView(
-                                this@LanguageActivity,
-                                state.ad,
-                                binding.frAds,
-                                binding.adShimmer.root
-                            )
+                        ERainAd.getInstance().populateNativeAdView(
+                            this@LanguageActivity,
+                            state.ad,
+                            binding.frAds,
+                            binding.adShimmer.root
+                        )
 //// Height cta
-                            val remoteHeightDp = state.ctaHeight
-                            val adBtn = binding.frAds.findViewById<View>(R.id.ad_call_to_action)
-                            if (adBtn != null) {
-                                val density = resources.displayMetrics.density
-                                val heightInPx = (remoteHeightDp * density).toInt()
+                        val remoteHeightDp = state.ctaHeight
+                        val adBtn = binding.frAds.findViewById<View>(R.id.ad_call_to_action)
+                        if (adBtn != null) {
+                            val density = resources.displayMetrics.density
+                            val heightInPx = (remoteHeightDp * density).toInt()
 
-                                val params = adBtn.layoutParams
-                                params?.let {
-                                    it.height = heightInPx
-                                    adBtn.layoutParams = it
-                                    adBtn.requestLayout()
-                                    Log.d(
-                                        "AdManager123",
-                                        "Height set to: $heightInPx px for tag: $tag"
-                                    )
-                                }
-                                // CTA gradient (#2663FF -> #7BD5F5) have layout XML ma J chhe:
-                                // layout_native_ad_lang_1 ane layout_native_ad_lang_click
-                                // (banne fakt screen 1 vaapre chhe) -> bg_btn_native_cta_review.
-                            } else {
-                                Log.e(
+                            val params = adBtn.layoutParams
+                            params?.let {
+                                it.height = heightInPx
+                                adBtn.layoutParams = it
+                                adBtn.requestLayout()
+                                Log.d(
                                     "AdManager123",
-                                    "CTA Button not found in layout for tag: $tag"
+                                    "Height set to: $heightInPx px for tag: $tag"
                                 )
                             }
-                            //
 
-
-                        } else if (state is NativeAdUiState.Loading) {
-                            if (binding.frAds.visibility != View.VISIBLE) {
-                                binding.adShimmer.root.visibility = View.VISIBLE
-                            }
-                        } else if (state == null || state is NativeAdUiState.Failed || state is NativeAdUiState.Empty) {
-                            if (binding.frAds.visibility != View.VISIBLE) {
-                                // Reviewer: koi pan tag fail thay to FARI load NAHI karvanu
-                                // (native ke click, banne) -> duplicate request atke chhe.
-                                // Bas ad slot band kari daie.
-                                Log.d(AD_LOG, "[$tag] fail -> ad slot band (retry nahi)")
-                                binding.adShimmer.root.visibility = View.GONE
-                                binding.frAds.visibility = View.GONE
-                            }
+                        } else {
+                            Log.e(
+                                "AdManager123",
+                                "CTA Button not found in layout for tag: $tag"
+                            )
                         }
+
+
+                    } else if (state is NativeAdUiState.Loading) {
+                        if (binding.frAds.visibility != View.VISIBLE) {
+                            binding.adShimmer.root.visibility = View.VISIBLE
+                        }
+                    } else if (state == null || state is NativeAdUiState.Failed || state is NativeAdUiState.Empty) {
+                        if (binding.frAds.visibility != View.VISIBLE) {
+                            Log.d(AD_LOG, "[$tag] fail -> ad slot band (retry nahi)")
+                            binding.adShimmer.root.visibility = View.GONE
+                            binding.frAds.visibility = View.GONE
+                        }
+                    }
                 }
             } else {
                 binding.adShimmer.root.visibility = View.GONE
@@ -389,7 +330,6 @@ class LanguageActivity : Base__Activity<ActivityLanguageBinding>(),
     public override fun bindListener() {
         binding.back.setOnClickListener({ v -> onBackPressed() })
 
-        // iptv2 jevu dev-settings dialog: title 10-click e khule, toggle pachi splash restart.
         val restartSplash = {
             val i = Intent(this, SplashActivity::class.java)
             i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
@@ -436,10 +376,7 @@ class LanguageActivity : Base__Activity<ActivityLanguageBinding>(),
 
             if (isFromSettings) {
 
-                // Settings mathi language badlyu - aakho task fresh banavie jethi
-                // MainActivity pan navi language ma recreate thay. startActivities thi
-                // Main (niche) + Settings (uper) stack banave -> user Settings par land
-                // thay ane back kare tya Main navi language ma male.
+
                 val mainIntent = Intent(this, MainActivity::class.java)
                     .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
                 val settingsIntent = Intent(this, SettingsActivity::class.java)
@@ -447,7 +384,7 @@ class LanguageActivity : Base__Activity<ActivityLanguageBinding>(),
                 finish()
 
             } else {
-                // iptv2 jevu: is_intro_page true -> onboarding, nahi to skip -> ActivityNotice.
+
                 SplashActivity.markLanguageDone(this)
                 val intent = if (RemoteConfigdata(this).isIntroPage)
                     Intent(this, IntroActivity::class.java)
@@ -522,17 +459,14 @@ class LanguageActivity : Base__Activity<ActivityLanguageBinding>(),
         sp_editor!!.putBoolean("is_lang_btn_visible", true).apply()
 
         if (isFromSettings) {
-            // ===== Settings flow: pehla jevu j single screen (Done batavo) =====
-            binding.done.visibility = View.VISIBLE
+                      binding.done.visibility = View.VISIBLE
         } else {
-            // ===== Splash flow: same screen par click-ad par switch (demo jevu) =====
             Log.d(
                 AD_LOG,
                 "STEP 3 | language click: ${languageModel_?.s_lan_name} " +
                         "(alreadySwapped=$isClickAdPhase)"
             )
 
-            // swap na thai shakyo hoy (net nathi) to bija click par fari try thay.
             if (!isClickAdPhase && loadLanguageClickAd()) {
                 isClickAdPhase = true
             }
@@ -540,7 +474,6 @@ class LanguageActivity : Base__Activity<ActivityLanguageBinding>(),
         }
     }
 
-    // Config pramane Done ne turat ke thodi var pachi batave.
     private fun showDoneButton() {
         if (configScript?.delayButtonDoneLanguage == true) {
             binding.done.visibility = View.INVISIBLE
@@ -561,10 +494,8 @@ class LanguageActivity : Base__Activity<ActivityLanguageBinding>(),
 
     override fun onBackPressed() {
         if (getIntent().getBooleanExtra("settingss", false)) {
-            // Settings flow: Base nu default -> inter_back batavi ne Settings par pacha.
             super.onBackPressed()
         } else {
-            // Splash flow: app band.
             finishAffinity()
         }
     }

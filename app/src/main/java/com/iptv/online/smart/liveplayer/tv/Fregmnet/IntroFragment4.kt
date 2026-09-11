@@ -34,9 +34,7 @@ class IntroFragment4 : BaseFragment<FragmentIntro4Binding>(), LazyShowAds {
     override fun setViewBinding() = FragmentIntro4Binding.inflate(layoutInflater)
 
     override fun bindObjects() {
-        // Next button SAUTHI PEHLA wire karo (btnNext + btnNext1 banne) -> je visible hoy e
-        // wired rahe, ane niche ad code throw thay to pan Next hammesha kaam kare.
-        binding.btnNext.triggerClick { (activity as? IntroActivity)?.getNextFragment() }
+           binding.btnNext.triggerClick { (activity as? IntroActivity)?.getNextFragment() }
         binding.btnNext1.triggerClick { (activity as? IntroActivity)?.getNextFragment() }
 
         val isDone = requireActivity().isIntroFlowDone()
@@ -68,7 +66,6 @@ class IntroFragment4 : BaseFragment<FragmentIntro4Binding>(), LazyShowAds {
         binding.btnNext.triggerClick { (activity as? IntroActivity)?.getNextFragment()
             binding.btnNext1.triggerClick { (activity as? IntroActivity)?.getNextFragment() }
         }
-        // Lambo translated text single line ma marquee (scroll) thava mate.
         binding.tvNext.isSelected = true
         binding.tvNext1.isSelected = true
     }
@@ -166,9 +163,7 @@ class IntroFragment4 : BaseFragment<FragmentIntro4Binding>(), LazyShowAds {
                                         "Height set to: $heightInPx px for tag: $tag"
                                     )
                                 }
-                                // Ad-review: native_onboarding_1_4 nu CTA gradient
-                                // #2663FF -> #7BD5F5. layout_native_ad_large bija unit
-                                // pan vaapre chhe etle XML ma nahi, ahiya J lagavie.
+
                                 if (tag == "native_onboarding_1_4") {
                                     adBtn.backgroundTintList = null
                                     adBtn.setBackgroundResource(R.drawable.bg_btn_native_cta_review)
@@ -179,14 +174,13 @@ class IntroFragment4 : BaseFragment<FragmentIntro4Binding>(), LazyShowAds {
                                     "CTA Button not found in layout for tag: $tag"
                                 )
                             }
-                            //
+
 
                         } else if (state is NativeAdUiState.Loading) {
                             if (binding.frAds.visibility != View.VISIBLE) {
                                 binding.adShimmer.root.visible
                             }
                         } else if (state == null || state is NativeAdUiState.Failed || state is NativeAdUiState.Empty) {
-                            // Ad ready nathi -> 90%+ show rate mate ek j var jate FRESH load (fallback).
                             if (binding.frAds.visibility != View.VISIBLE) {
                                 if (retriedTags.add(tag)) {
                                     binding.adShimmer.root.visible

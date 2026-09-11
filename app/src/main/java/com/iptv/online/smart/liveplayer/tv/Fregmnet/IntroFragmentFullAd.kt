@@ -59,11 +59,10 @@ class IntroFragmentFullAd : BaseFragment<FragmentIntroFullAdBinding>(), LazyShow
         val currentConfig = configScript ?: return
 
         if (currentConfig.isNeedToShowADs) {
-            // iptv2 jevu: fullscreen native mate JSON enable_ua_check + organic (XOR) gate.
+
             val fullCfg = if (currentActivity.isIntroFlowDone())
                 AdRemoteConfig.getInstance().native_onboarding_fullscreen_2_2
             else AdRemoteConfig.getInstance().native_onboarding_fullscreen_1_2
-            // Pure JSON: canShowFullScreenAd() pote isEnable + enable_ua_check + organic check kare chhe.
             if (fullCfg.canShowFullScreenAd()) {
                 val handledAds = mutableSetOf<String>()
                 val retriedTags = mutableSetOf<String>()
@@ -88,19 +87,14 @@ class IntroFragmentFullAd : BaseFragment<FragmentIntroFullAdBinding>(), LazyShow
                                 binding.frAds,
                                 binding.adShimmer.root
                             )
-                            // iptv2 jevu: show_full_native_close_btn true hoy to j close (X) button
-                            // 3 sec pachi batavo -> banne full_1 ane full_2 mate (pehla fakt full_2
-                            // ne j batavtu, full_1 trap thato e pan fix). false hoy to close na batavo.
+
                             if (currentConfig.isFullNativeCloseBtn) {
                                 lifecycleScope.launchWhenStarted {
-                                    delay(1000)   // iptv2 jevu: 1 sec pachi close button
+                                    delay(1000)
                                     binding.ivCloseAd.visible
                                 }
                             }
-                           /* lifecycleScope.launchWhenStarted {
-                                delay(3000)
-                                binding.ivCloseAd.visible
-                            }*/
+
                             //// Height cta
                             val remoteHeightDp = state.ctaHeight
                             val adBtn = binding.frAds.findViewById<View>(R.id.ad_call_to_action)
@@ -146,7 +140,6 @@ class IntroFragmentFullAd : BaseFragment<FragmentIntroFullAdBinding>(), LazyShow
                                 binding.ivCloseAd.gone
                             }
                         } else if (state == null || state is NativeAdUiState.Failed || state is NativeAdUiState.Empty) {
-                            // Ad ready nathi -> 90%+ show rate mate ek j var jate FRESH load (fallback).
                             if (retriedTags.add(tag)) {
                                 binding.adShimmer.root.visible
                                 binding.frAds.gone
@@ -158,7 +151,6 @@ class IntroFragmentFullAd : BaseFragment<FragmentIntroFullAdBinding>(), LazyShow
                                 )
                                 Log.d("AdManager123", "[$tag] fallback reload triggered")
                             } else {
-                                // Fallback pachi pan na aavyu -> hide + close batavo jethi user aagal jai sake.
                                 binding.adShimmer.root.gone
                                 binding.frAds.gone
                                 binding.ivCloseAd.visible

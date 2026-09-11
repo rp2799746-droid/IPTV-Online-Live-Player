@@ -55,7 +55,6 @@ class FileSelectActivity : Base__Activity<ActivityFileSelectBinding>() {
     }
 
     override fun bindListener() {
-        // Back બટન
         binding.back.setOnClickListener { onBackPressed() }
 
         binding.btnFile.setOnClickListener {
@@ -221,10 +220,7 @@ class FileSelectActivity : Base__Activity<ActivityFileSelectBinding>() {
 
     }
 
-    // Pehla aakhi channel list (hajaro rows) memory ma laavi ne loop marto hato -
-    // e main thread par bov var lagadto. Have SQLite ne j puchhi laie chhie, je
-    // pehli match male tya j atki jaay chhe.
-    private fun isPlaylistAlreadyExist(name: String, url: String): Boolean {
+     private fun isPlaylistAlreadyExist(name: String, url: String): Boolean {
         return AppDatabase.getInstance(this).historyDao().playlistExists(name, url)
     }
 
@@ -273,9 +269,6 @@ class FileSelectActivity : Base__Activity<ActivityFileSelectBinding>() {
         var result: String? = null
         if (uri.scheme == "content") {
             try {
-                // Aમુક file-picker media URI (content://media/...) query karva
-                // READ_EXTERNAL_STORAGE permission mange che; na hoy to SecurityException
-                // aave. Etle safe try-catch — fail thay to niche URI path thi naam lai le.
                 contentResolver.query(uri, null, null, null, null)?.use { cursor ->
                     if (cursor.moveToFirst()) {
                         val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)

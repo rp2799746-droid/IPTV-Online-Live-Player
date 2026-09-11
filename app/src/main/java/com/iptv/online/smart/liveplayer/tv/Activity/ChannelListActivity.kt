@@ -132,9 +132,7 @@ class ChannelListActivity : Base__Activity<ActivityChannelListBinding>() {
         loadChannels()
     }
 
-    // Group ni channel list moti hoy shake, etle DB read IO thread par.
-    // Cache hoy to list TARAT dekhay ane fresh data aave etle update thai jaay.
-    private fun loadChannels() {
+     private fun loadChannels() {
         val dao = AppDatabase.getInstance(this).historyDao()
         val playlist = pName ?: ""
         val group = gName ?: ""

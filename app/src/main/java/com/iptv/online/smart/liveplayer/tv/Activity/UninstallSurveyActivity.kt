@@ -19,9 +19,7 @@ import com.iptv.online.smart.liveplayer.tv.utils.visible
 
 class UninstallSurveyActivity : Base__Activity<UninstallSurveyBinding>() {
 
-    private val remoteData: RemoteConfigdata by lazy {
-        RemoteConfigdata(this)
-    }
+
     private var configScript: RemoteConfigdata? = null
 
 

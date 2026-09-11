@@ -150,7 +150,7 @@ class PlayerActivity : Base__Activity<ActivityPlayerBinding>() {
         })
     }
 
-    // ✅ ANR FIX: લૂપ અને ડેટાબેઝ ક્વેરી બેકગ્રાઉન્ડ થ્રેડમાં
+
     private fun setupUpNextList() {
         upNextAdapter = ChannelAdapter(this, channelList)
         upNextAdapter?.setOnChannelClickListener { position ->
@@ -166,7 +166,7 @@ class PlayerActivity : Base__Activity<ActivityPlayerBinding>() {
         binding.rvUpNext.adapter = upNextAdapter
         binding.rvUpNext.scrollToPosition(currentPosition)
 
-        // બેકગ્રાઉન્ડમાં ફેવરિટ સ્ટેટસ ચેક કરો
+
         lifecycleScope.launch(Dispatchers.IO) {
             val db = AppDatabase.getInstance(applicationContext).historyDao()
             channelList?.forEach { channel ->
@@ -202,14 +202,13 @@ class PlayerActivity : Base__Activity<ActivityPlayerBinding>() {
         binding.tvPlayerChannelName.text = channel.channelName
         binding.tvPlaylistInfo.text = "${getString(R.string.playing)} ${position + 1} ${getString(R.string.of)} ${list.size}"
 
-        // ✅ ANR FIX: DB Call in Background
         lifecycleScope.launch(Dispatchers.IO) {
             val primaryKey = channel.channelUrl + "|" + channel.playlistName
             val dbData = AppDatabase.getInstance(applicationContext).historyDao().getChannelById(primaryKey)
             val favStatus = (dbData != null && dbData.isFavorite)
             channel.isFavorite = favStatus
 
-            // History માં સેવ કરો
+
             channel.historyTimestamp = System.currentTimeMillis()
             AppDatabase.getInstance(applicationContext).historyDao().insertHistory(channel)
             DbCache.invalidate()
@@ -348,7 +347,6 @@ class PlayerActivity : Base__Activity<ActivityPlayerBinding>() {
         player?.pause()
     }
 
-    // ✅ ANR FIX: Safe ExoPlayer release
     override fun onDestroy() {
         super.onDestroy()
         countdownHandler.removeCallbacksAndMessages(null)

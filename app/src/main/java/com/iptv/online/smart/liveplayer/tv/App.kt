@@ -40,7 +40,6 @@ class App : AdsMultiDexApplication() {
         @SuppressLint("StaticFieldLeak")
         var app: App? = null
         var onRemoteFetched: ((FirebaseRemoteConfig?) -> Unit)? = null
-        var isNeedToStopOPenAds = false
         const val STARTUP_TAG = "AppStartup"
     }
 
@@ -66,14 +65,13 @@ class App : AdsMultiDexApplication() {
         super.onCreate()
         app = this
 
-        // 1. JSON Ad Config પેહલા sync લોડ કરો જેથી AdUnitId null ના રહે અને Crash ના થાય
         try {
             AdRemoteConfig.initialize(this)
         } catch (e: Exception) {
             Log.e(STARTUP_TAG, "AdRemoteConfig init error: ${e.message}")
         }
 
-        // 2. ViewPump font init
+
         try {
             ViewPump.init(
                 ViewPump.builder()
@@ -90,10 +88,10 @@ class App : AdsMultiDexApplication() {
             Log.e(STARTUP_TAG, "ViewPump init error: ${e.message}")
         }
 
-        // 3. Ads Module Configuration (Splash Resume Ad Disable)
+
         initAds()
 
-        // 4. ભારે SDKs (Firebase, OneSignal, DevConfig) બેકગ્રાઉન્ડ થ્રેડમાં
+
         appScope.launch {
             try {
                 FirebaseApp.initializeApp(this@App)
@@ -110,7 +108,7 @@ class App : AdsMultiDexApplication() {
             try {
                 DevConfig.init(
                     context = this@App,
-                    nkhStudioVersion = "2.0",
+                    nkhStudioVersion = "2.1",
                     playServicesAdsVersion = "24.7.0",
                     gdprModuleVersion = "2.0.2"
                 )
@@ -122,26 +120,23 @@ class App : AdsMultiDexApplication() {
 
     private fun initAds() {
         try {
-            val environment =
-                if (BuildConfig.DEBUG) ERainAdConfig.ENVIRONMENT_DEVELOP else ERainAdConfig.ENVIRONMENT_PRODUCTION
+            val environment = if (BuildConfig.DEBUG) ERainAdConfig.ENVIRONMENT_DEVELOP else ERainAdConfig.ENVIRONMENT_PRODUCTION
             mERainAdConfig = ERainAdConfig(this, environment)
 
             mERainAdConfig.adjustConfig = AdjustConfig(true, resources.getString(R.string.adjust_token))
             mERainAdConfig.facebookClientToken = resources.getString(R.string.facebook_client_token)
             mERainAdConfig.adjustTokenTiktok = resources.getString(R.string.tiktok_token)
 
-            // Safe Ad ID Check - ક્યારેય null નહીં જાય
             val resumeId = AdRemoteConfig.getInstance()?.inter_welcome_back?.id ?: ""
             mERainAdConfig.idAdResume = if (resumeId.isNotEmpty()) resumeId else "ca-app-pub-3940256099942544/9257395921" // Fallback Test ID if blank
 
-            mERainAdConfig.intervalInterstitialAd = 30
+            mERainAdConfig.intervalInterstitialAd = 35
 
             ERainAd.getInstance().init(this, mERainAdConfig)
 
             Admob.getInstance().setDisableAdResumeWhenClickAds(true)
             Admob.getInstance().setOpenActivityAfterShowInterAds(true)
 
-            // SplashActivity પર App Resume Open Ad બિલકુલ બંધ રાખો
             AppOpenManager.getInstance().disableAppResumeWithActivity(SplashActivity::class.java)
             AppOpenManager.getInstance().disableAppResume()
             AppResumeWelcomeManager.init(this)

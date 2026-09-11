@@ -173,7 +173,7 @@ class PlaylistFragment : Fragment() {
 
                     AdsManager.getAdLive(tag).observe(viewLifecycleOwner) { state ->
                             if (state is NativeAdUiState.Success && !handledAds.contains(tag)) {
-                                handledAds.add(tag) // mark as handled
+                                handledAds.add(tag)
                                 Log.d(
                                     "AdManager121113",
                                     "[$tag] Success,🚀 showing ad is [${state.adsID}]"
@@ -211,8 +211,7 @@ class PlaylistFragment : Fragment() {
                                 binding?.frAds?.visible
 
                             } else if (state == null || state is NativeAdUiState.Failed || state is NativeAdUiState.Empty) {
-                                // No-fill / preload fail (real id ma sambhave) ->
-                                // 90%+ show rate mate ahiya ek j var jate FRESH load karo (fallback).
+
                                 if (retriedTags.add(tag)) {
                                     binding?.adShimmer?.root?.visible
                                     binding?.frAds?.visible
@@ -243,9 +242,7 @@ class PlaylistFragment : Fragment() {
         }
     }
 
-    // allHistory1 badhi j channel return kare chhe (M3U ma hajaro hoy shake), etle
-    // DB read ane counting IO thread par. Cache hoy to list TARAT dekhay chhe ane
-    // background nu fresh data aave etle update thai jaay chhe.
+
     private fun updatePlaylists() {
         val context = context ?: return
         val dao = AppDatabase.getInstance(context).historyDao()
@@ -253,8 +250,7 @@ class PlaylistFragment : Fragment() {
         DbCache.getPlaylists()?.let { showPlaylists(it) }
 
         viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
-            // SQLite pote GROUP BY + COUNT + sort kari aape chhe (jo pehla badhi j
-            // channel - hajaro rows - memory ma laavi ne Kotlin ma ganta hata).
+
             val tempList: List<PlaylistGroup?> = dao.playlistCounts ?: emptyList()
             DbCache.putPlaylists(tempList)
 

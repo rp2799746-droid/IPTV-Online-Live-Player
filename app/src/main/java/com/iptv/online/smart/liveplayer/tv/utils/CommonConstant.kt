@@ -10,9 +10,7 @@ import android.os.Bundle
 import android.view.HapticFeedbackConstants
 import android.view.View
 
-const val THEME_DAY = "Light"
-const val THEME_NIGHT = "Dark"
-const val THEME_SYSTEM = "System_default"
+
 
 fun View.triggerClick(onClick: (View?) -> Unit) {
     setOnClickListener {

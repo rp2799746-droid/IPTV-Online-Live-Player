@@ -61,8 +61,7 @@ class HistoryFragment : Fragment() {
     }
 
 
-  // Cache ma data hoy to TARAT batavi daie, ane saathe background ma
-  // DB mathi fresh data vanchi ne update kari daie (main thread block na thay).
+
   private fun loadHistory() {
       val dao = AppDatabase.getInstance(requireContext()).historyDao()
 

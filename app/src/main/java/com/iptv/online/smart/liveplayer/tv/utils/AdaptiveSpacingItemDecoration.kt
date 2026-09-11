@@ -18,7 +18,6 @@ class AdaptiveSpacingItemDecoration(
         parent: RecyclerView,
         state: RecyclerView.State
     ) {
-        // Separate layout type
         when (val layoutManager = parent.layoutManager) {
             is GridLayoutManager -> {
                 makeGridSpacing(
@@ -33,10 +32,6 @@ class AdaptiveSpacingItemDecoration(
 
             is LinearLayoutManager -> {
                 val linearOrientation = layoutManager.orientation
-
-                // Flag whether item positioning is reversed (more like flipped) or not. So, if normally item is
-                // written from left to right (horizontally), then it will be right to left (whatever item index is)
-                // and if item is written from top to bottom (vertically), then it will be from bottom to top.
                 val isReversed = layoutManager.reverseLayout xor layoutManager.stackFromEnd
 
                 makeLinearSpacing(
@@ -48,7 +43,7 @@ class AdaptiveSpacingItemDecoration(
                 )
             }
 
-            is StaggeredGridLayoutManager -> { // Equals to GridLayoutManager but isn't the same on function level
+            is StaggeredGridLayoutManager -> {
                 makeGridSpacing(
                     outRect,
                     parent.getChildAdapterPosition(view),
@@ -68,11 +63,9 @@ class AdaptiveSpacingItemDecoration(
         @RecyclerView.Orientation orientation: Int,
         isReversed: Boolean
     ) {
-        // Basic item positioning
         val isLastPosition = position == (itemCount - 1)
         val isFirstPosition = position == 0
 
-        // Saved size
         val sizeBasedOnEdge = if (edgeEnabled) size else NO_SPACING
         val sizeBasedOnFirstPosition = if (isFirstPosition) sizeBasedOnEdge else size
         val sizeBasedOnLastPosition = if (isLastPosition) sizeBasedOnEdge else NO_SPACING
@@ -106,25 +99,21 @@ class AdaptiveSpacingItemDecoration(
         spanCount: Int,
         isReversed: Boolean
     ) {
-        // Basic item positioning
         val isLastPosition = position == (itemCount - 1)
         val sizeBasedOnEdge = if (edgeEnabled) size else NO_SPACING
         val sizeBasedOnLastPosition = if (isLastPosition) sizeBasedOnEdge else size
 
-        // Opposite of spanCount (find layout depth)
         val subsideCount = if (itemCount % spanCount == 0) {
             itemCount / spanCount
         } else {
             (itemCount / spanCount) + 1
         }
 
-        // Grid position. Imagine all items ordered in x/y axis
         val xAxis =
             if (orientation == RecyclerView.HORIZONTAL) position / spanCount else position % spanCount
         val yAxis =
             if (orientation == RecyclerView.HORIZONTAL) position % spanCount else position / spanCount
 
-        // Conditions in row and column
         val isFirstColumn = xAxis == 0
         val isFirstRow = yAxis == 0
         val isLastColumn =
@@ -132,14 +121,13 @@ class AdaptiveSpacingItemDecoration(
         val isLastRow =
             if (orientation == RecyclerView.HORIZONTAL) yAxis == spanCount - 1 else yAxis == subsideCount - 1
 
-        // Saved size
         val sizeBasedOnFirstColumn = if (isFirstColumn) sizeBasedOnEdge else NO_SPACING
         val sizeBasedOnLastColumn = if (!isLastColumn) sizeBasedOnLastPosition else sizeBasedOnEdge
         val sizeBasedOnFirstRow = if (isFirstRow) sizeBasedOnEdge else NO_SPACING
         val sizeBasedOnLastRow = if (!isLastRow) size else sizeBasedOnEdge
 
         when (orientation) {
-            RecyclerView.HORIZONTAL -> { // Row fixed. Number of rows is spanCount
+            RecyclerView.HORIZONTAL -> {
                 with(outRect) {
                     left = if (isReversed) sizeBasedOnLastColumn else sizeBasedOnFirstColumn
                     top =
@@ -153,7 +141,7 @@ class AdaptiveSpacingItemDecoration(
                 }
             }
 
-            RecyclerView.VERTICAL -> { // Column fixed. Number of columns is spanCount
+            RecyclerView.VERTICAL -> {
                 with(outRect) {
                     left =
                         if (edgeEnabled) size * (spanCount - xAxis) / (spanCount) else size * xAxis / spanCount

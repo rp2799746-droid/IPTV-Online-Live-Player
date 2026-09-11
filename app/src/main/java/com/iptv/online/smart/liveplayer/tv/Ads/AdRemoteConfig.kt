@@ -6,13 +6,7 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.iptv.online.smart.liveplayer.tv.BuildConfig
 
-/**
- * iptv2 jevu JSON-driven ad config (Gson - aa project ma Moshi nathi).
- *  - Firebase remote config (ad_remote_config / ad_rem_dup) mathi JSON aave to e vapre,
- *    nahi to bundled asset (release=ad_config.json, debug=ad_config_debug.json).
- *  - App.onCreate() ma initialize(context) (asset), pachi SplashActivity ma
- *    initialize(context, firebaseJson) call thay chhe.
- */
+
 class AdRemoteConfig private constructor(
     val ads: Map<String, AdUnitConfig>
 ) {
@@ -70,12 +64,10 @@ class AdRemoteConfig private constructor(
         @Volatile
         private var instance: AdRemoteConfig? = null
 
-        /** Init nathi thayu to pan crash na thay - empty config return kare. */
         fun getInstance(): AdRemoteConfig = instance ?: AdRemoteConfig(emptyMap())
 
         fun isInitialized(): Boolean = instance != null
 
-        /** Asset mathi (App.onCreate ma pehli var). */
         fun initialize(context: Context) {
             synchronized(this) {
                 val fileName = if (BuildConfig.DEBUG) DEBUG_FILE else RELEASE_FILE
@@ -83,7 +75,6 @@ class AdRemoteConfig private constructor(
             }
         }
 
-        /** Firebase-fetched JSON thi (SplashActivity ma). Blank/fail thay to asset fallback. */
         fun initialize(context: Context, json: String?) {
             synchronized(this) {
                 val fileName = if (BuildConfig.DEBUG) DEBUG_FILE else RELEASE_FILE

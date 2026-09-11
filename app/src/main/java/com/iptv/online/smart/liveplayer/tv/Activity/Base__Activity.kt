@@ -37,17 +37,12 @@ abstract class Base__Activity<actBinding : ViewBinding> : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        // BadParcelableException fix: recreate vakhtे saved fragment-state khota
-        // classloader thi read thay ne "ClassNotFoundException unmarshalling
-        // FragmentManagerState" crash aave. App no classLoader set karie etle
-        // nested Parcelable barabar read thay.
+
         savedInstanceState?.classLoader = classLoader
         super.onCreate(savedInstanceState)
 
         val windowInsetsController =
             WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView())
-
-
         windowInsetsController.hide(WindowInsetsCompat.Type.navigationBars())
         windowInsetsController.setSystemBarsBehavior(
             WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE

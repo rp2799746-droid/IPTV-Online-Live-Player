@@ -2,6 +2,7 @@ package com.iptv.online.smart.liveplayer.tv.Activity
 
 import android.util.Log
 import androidx.activity.OnBackPressedCallback
+import com.iptv.online.smart.liveplayer.tv.Ads.AdsManager
 import com.iptv.online.smart.liveplayer.tv.adsutils.RemoteConfigdata
 import com.iptv.online.smart.liveplayer.tv.databinding.ActivityWelcomeScreenBinding
 
@@ -19,12 +20,10 @@ class WelcomeScreenActivity : Base__Activity<ActivityWelcomeScreenBinding>() {
 
         RemoteConfigdata(this@WelcomeScreenActivity).also { configScript = it }
 
-        // Marquee scroll chalu karva mate view selected rakhvi pade
         binding.txtWelcome.isSelected = true
 //        binding.txtDesc.isSelected = true
 
-        // Welcome-back interstitial ad taiyar rakhiye (btnNext par batavvano che)
-        WelcomeBackAdsManager.preload(this)
+        AdsManager.loadInterWelcomeBack(this)
 
     }
     override fun bindListener() {
@@ -37,10 +36,10 @@ class WelcomeScreenActivity : Base__Activity<ActivityWelcomeScreenBinding>() {
 
         binding.btnNext.setOnClickListener {
             Log.d(LOG, "WelcomeScreen -> btnNext click, show welcome-back inter")
-            // Safe coding: show Welcome Back Interstitial ad
-            WelcomeBackAdsManager.showInterWelcomeBack(activity = this) {
+
+            AdsManager.showInterWelcomeBack(activity = this) {
                 Log.d(LOG, "WelcomeScreen -> inter done, finish()")
-                // Safe check before finishing
+
                 if (!isFinishing && !isDestroyed) {
                     finish()
                 }

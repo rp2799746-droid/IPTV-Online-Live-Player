@@ -10,6 +10,7 @@ import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import androidx.lifecycle.ProcessLifecycleOwner
 import com.ads.module.admob.AppOpenManager
+import com.ads.module.ads.ERainAd
 import com.ads.module.funtion.AdmobHelper.isPurchased
 import com.iptv.online.smart.liveplayer.tv.Activity.IntroActivity
 import com.iptv.online.smart.liveplayer.tv.Activity.LanguageActivity
@@ -25,7 +26,6 @@ object AppResumeWelcomeManager : LifecycleObserver, Application.ActivityLifecycl
     private const val TAG = "WelcomeFlow"
     private var currentActivity: Activity? = null
 
-    // App pehli var (cold start) khule tyare welcome screen na batavo — e resume nથી.
     private var isColdStart = true
 
     fun init(app: Application) {
@@ -48,8 +48,7 @@ object AppResumeWelcomeManager : LifecycleObserver, Application.ActivityLifecycl
             return
         }
 
-        // AppOpen jem j: fakt Splash par skip.
-        // WelcomeScreen par pan skip karvu j pade (nahitar infinite loop thay).
+
         if (activity is SplashActivity ||
             activity is WelcomeScreenActivity ||
             activity is LanguageActivity ||
@@ -64,24 +63,35 @@ object AppResumeWelcomeManager : LifecycleObserver, Application.ActivityLifecycl
             return
         }
 
-        // SDK j taiyar nathi -> batavvanu kai chhe nahi.
+
         if (!AppOpenManager.getInstance().isInitialized) {
             Log.d(TAG, "sdk not initialized -> skip welcome")
             return
         }
 
-        // Ads kadhi nakhi che evo user.
+
         if (isPurchased(activity)) {
             Log.d(TAG, "purchased -> skip welcome")
             return
         }
         val config = RemoteConfigdata(activity)
-        Log.d(TAG, "flags -> isNeedToShowADs=${config.isNeedToShowADs}, interwelcomeback=${config.interwelcomeback}")
-        if (!config.isNeedToShowADs || !AdRemoteConfig.getInstance().inter_welcome_back.isEnable) {
-            Log.d(TAG, "welcome back disabled by remote config -> skip")
+        val unit = AdRemoteConfig.getInstance().inter_welcome_back
+
+// Base SDK nu eligibility check - organic/UA user pramane SDK nakki kare chhe.
+        val isEligible = ERainAd.getInstance()
+            .getShouldDisplayInterWelcomeBack(unit.enableUaCheck) == true
+
+        Log.d(
+            TAG,
+            "flags -> isNeedToShowADs=${config.isNeedToShowADs}, " +
+                    "interwelcomeback=${config.interwelcomeback}, " +
+                    "unitEnable=${unit.isEnable}, sdkEligible=$isEligible"
+        )
+
+        if (!config.isNeedToShowADs || !config.interwelcomeback || !unit.isEnable || !isEligible) {
+            Log.d(TAG, "welcome back disabled -> skip")
             return
         }
-        // Ad par click karine bahar gayo hato? To e resume nathi - Welcome na kholo.
         if (AppOpenManager.getInstance().isDisableAdResumeByClickAction) {
             AppOpenManager.getInstance().isDisableAdResumeByClickAction = false
             Log.d(TAG, "back from ad click -> skip welcome")
@@ -90,7 +100,6 @@ object AppResumeWelcomeManager : LifecycleObserver, Application.ActivityLifecycl
 
         Log.d(TAG, "Opening WelcomeScreen over ${activity.javaClass.simpleName}")
         val intent = Intent(activity, WelcomeScreenActivity::class.java)
-        // Tarat j (animation vagar) kholo, jethi niche ni screen na dekhay
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
         activity.startActivity(intent)
         activity.overridePendingTransition(0, 0)

@@ -33,19 +33,15 @@ class Historychannel(private val context: Context, private val channelList: Muta
     private val channelListFull: MutableList<Channel> = ArrayList(channelList)
     private var listener: OnChannelClickListener? = null
 
-    // Remote Config ઇનિશિયલાઈઝેશન
     private val configScript = RemoteConfigdata(context as Activity)
 
-    // એડ બતાવવી કે નહીં તેની કન્ડિશન (Remote Config માંથી)
     private val isAdEnabled: Boolean = configScript.isNeedToShowADs && configScript.nativehistory2005
 
     interface OnChannelClickListener {
         fun onChannelClick(position: Int)
     }
 
-    fun setOnChannelClickListener(listener: OnChannelClickListener?) {
-        this.listener = listener
-    }
+
 
     override fun getItemViewType(position: Int): Int {
         if (isAdEnabled && (position + 1) % (AD_INTERVAL + 1) == 0) {
@@ -165,8 +161,6 @@ class Historychannel(private val context: Context, private val channelList: Muta
                 Log.e("AdManager123", "❌ CTA Button not found in adHolder layout")
             }
 
-//
-
         } else if (state is NativeAdUiState.Loading) {
             adHolder.itemView.visibility = View.VISIBLE
             adHolder.adShimmer.visibility = View.VISIBLE
@@ -199,20 +193,6 @@ class Historychannel(private val context: Context, private val channelList: Muta
         }
     }
 
-    fun filter(query: String) {
-        channelList.clear()
-        if (query.isEmpty()) {
-            channelList.addAll(channelListFull)
-        } else {
-            val pattern = query.lowercase(Locale.getDefault()).trim()
-            for (item in channelListFull) {
-                if (item.getChannelName().lowercase(Locale.getDefault()).contains(pattern)) {
-                    channelList.add(item)
-                }
-            }
-        }
-        notifyDataSetChanged()
-    }
 
     fun updateList(newList: MutableList<Channel>) {
         this.channelList.clear()

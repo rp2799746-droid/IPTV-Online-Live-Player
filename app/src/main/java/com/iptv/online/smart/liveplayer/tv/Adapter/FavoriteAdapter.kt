@@ -98,7 +98,6 @@ class FavoriteAdapter(private val context: Context, incomingList: MutableList<Ch
                     ERainAd.getInstance().populateNativeAdView(
                         context as Activity, state.ad, adHolder.frAds, adHolder.adShimmer as ShimmerFrameLayout
                     )
-                    //height cta
                     val remoteHeightDp = state.ctaHeight
 
                     val adBtn = adHolder.frAds.findViewById<View>(R.id.ad_call_to_action)
@@ -118,10 +117,9 @@ class FavoriteAdapter(private val context: Context, incomingList: MutableList<Ch
                         Log.e("AdManager123", "❌ CTA Button not found in adHolder layout")
                     }
 
-//
+
 
                 }
-                // Loading અને null બંને કેસમાં શિમર ચલાવો
                 is NativeAdUiState.Loading, null -> {
                     adHolder.frAds.visibility = View.GONE
                     adHolder.adShimmer.visibility = View.VISIBLE
@@ -130,7 +128,6 @@ class FavoriteAdapter(private val context: Context, incomingList: MutableList<Ch
                     }
                 }
                 else -> {
-                    // Failed કે Empty હોય તો જ છુપાવો
                     adHolder.itemView.visibility = View.GONE
                     updateHeight(adHolder.itemView, false)
                 }
@@ -150,7 +147,6 @@ class FavoriteAdapter(private val context: Context, incomingList: MutableList<Ch
             .into(holder.ivLogo)
 
         holder.ivFav.setOnClickListener {
-            // ફેવરિટ રિમૂવ લોજિક
             val cPos = holder.bindingAdapterPosition
             val idx = if (isAdEnabled) cPos - (cPos / (AD_INTERVAL + 1)) else cPos
 

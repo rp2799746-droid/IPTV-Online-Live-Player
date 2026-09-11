@@ -65,12 +65,10 @@ class FavoriteFragment : Fragment() {
 
         rvFav!!.setLayoutManager(LinearLayoutManager(getContext()))
 
-        // onResume ma pan aa j load thay chhe, etle ahi bijivar call nathi karvi.
         return view
     }
 
-// Cache ma data hoy to TARAT batavi daie, ane saathe background ma DB mathi
-// fresh data vanchi ne update kari daie (main thread block na thay - ANR).
+
 private fun loadFavoriteChannels() {
     val dao = AppDatabase.getInstance(requireContext()).historyDao()
 

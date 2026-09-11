@@ -25,8 +25,6 @@ public class FirebaseMessageReceiver extends FirebaseMessagingService {
     public void onMessageReceived(RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
 
-        // Try-catch: notification build/post ma koi exception aave to e propagate na thay
-        // (FCM delivery fail -> system nu CannotDeliverBroadcastException aatakva madad kare).
         try {
             if (remoteMessage.getData().size() > 0) {
                 String link = remoteMessage.getData().get("link");
@@ -47,7 +45,6 @@ public class FirebaseMessageReceiver extends FirebaseMessagingService {
         NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         if (notificationManager == null) return;
 
-        // Android 13+ : POST_NOTIFICATIONS permission na hoy to notify skip karo
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
                     != PackageManager.PERMISSION_GRANTED) {
