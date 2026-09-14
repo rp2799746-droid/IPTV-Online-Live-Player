@@ -17,6 +17,7 @@ import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.LoadAdError
 import com.iptv.online.smart.liveplayer.tv.R
 import com.iptv.online.smart.liveplayer.tv.adsutils.AdRemoteConfig
+import com.iptv.online.smart.liveplayer.tv.adsutils.AdUnitConfig
 import com.iptv.online.smart.liveplayer.tv.adsutils.NativeAdUiState
 import com.iptv.online.smart.liveplayer.tv.adsutils.RemoteConfigdata
 import com.iptv.online.smart.liveplayer.tv.adsutils.isInternetAvailable
@@ -51,8 +52,60 @@ object AdsManager {
 
     private val currentAds = mutableMapOf<String, ApNativeAd?>()
 
-    fun onboarding1Tag(isDone: Boolean) =
-        if (isDone) "native_onboarding_2_1" else "native_onboarding_1_1"
+    // Base flow channels.  Startup/onboarding screens observe these directly;
+    // the tag-based state below remains only for unrelated legacy IPTV screens.
+    val nativeLanguageAdLive = MutableLiveData<ApNativeAd?>()
+    val nativeLanguageClickAdLive = MutableLiveData<ApNativeAd?>()
+    val nativeOnboarding1AdLive = MutableLiveData<ApNativeAd?>()
+    val nativeOnboarding4AdLive = MutableLiveData<ApNativeAd?>()
+    val nativeOnboardingFullAdLive = MutableLiveData<ApNativeAd?>()
+
+    /** Clears a prior process-static Language native without issuing a load. */
+    fun clearNativeLanguage() {
+        nativeLanguageAdLive.postValue(null)
+    }
+
+    fun onboarding1Tag(isFirst: Boolean) =
+        if (isFirst) "native_onboarding_1_1" else "native_onboarding_2_1"
+
+    /**
+     * Single base-style native gate.  Every skipped or failed request emits
+     * null so the owner cannot be left waiting on a stale shimmer/state.
+     */
+    private fun loadNativeInternal(
+        activity: Activity,
+        config: AdUnitConfig,
+        layoutRes: Int,
+        liveData: MutableLiveData<ApNativeAd?>,
+        shouldDisplay: Boolean? = true,
+    ) {
+        if (!RemoteConfigdata(activity).isNeedToShowADs
+            || !config.isEnable
+            || isPurchased(activity)
+            || !activity.isInternetAvailable()
+            || shouldDisplay != true
+        ) {
+            liveData.postValue(null)
+            return
+        }
+
+        ERainAd.getInstance().loadNativeAdResultCallback(
+            activity,
+            config.id,
+            layoutRes,
+            object : AdCallback() {
+                override fun onNativeAdLoaded(nativeAd: ApNativeAd) {
+                    super.onNativeAdLoaded(nativeAd)
+                    liveData.postValue(nativeAd)
+                }
+
+                override fun onAdFailedToLoad(adError: LoadAdError?) {
+                    super.onAdFailedToLoad(adError)
+                    liveData.postValue(null)
+                }
+            }
+        )
+    }
 
     fun loadAd(context: Activity, adId: String, layoutId: Int, adTag: String, shouldDisplay: Boolean = true,
     ) {
@@ -102,30 +155,62 @@ object AdsManager {
         }
     }
 
-    fun loadNativeLanguage(activity: Activity, screenCount: Int) {
-        val cfg = if (screenCount == 1) AdRemoteConfig.getInstance().native_language_1
+    fun loadNativeLanguage(activity: Activity, isFirst: Boolean, layoutRes: Int) {
+        val config = if (isFirst) AdRemoteConfig.getInstance().native_language_1
         else AdRemoteConfig.getInstance().native_language_2
-               val layoutRes = if (screenCount == 1) R.layout.layout_native_ad_lang_1
-        else R.layout.layout_native_ad_large
-        loadAd(activity, cfg.id, layoutRes, "native_lang_tag", cfg.isEnable)
+        loadNativeInternal(activity, config, layoutRes, nativeLanguageAdLive)
     }
 
-    fun loadNativeLanguageClick(activity: Activity, screenCount: Int) {
-        val cfg = if (screenCount == 1) AdRemoteConfig.getInstance().native_language_1_click
+    fun loadNativeLanguageClick(activity: Activity, isFirst: Boolean, layoutRes: Int) {
+        val config = if (isFirst) AdRemoteConfig.getInstance().native_language_1_click
         else AdRemoteConfig.getInstance().native_language_2_click
-
-
-        val layoutRes = if (screenCount == 1) R.layout.layout_native_ad_lang_click
-        else R.layout.layout_native_ad_lang_click_2
-
-        loadAd(activity, cfg.id, layoutRes, "native_lang_click_tag", cfg.isEnable)
+        loadNativeInternal(activity, config, layoutRes, nativeLanguageClickAdLive)
     }
 
-    fun loadNativeOnboarding1(activity: Activity, isDone: Boolean) {
-        val cfg = if (isDone) AdRemoteConfig.getInstance().native_onboarding_2_1
-        else AdRemoteConfig.getInstance().native_onboarding_1_1
-        val tag = onboarding1Tag(isDone)
-        loadAd(activity, cfg.id, R.layout.layout_native_ad_large, tag, cfg.isEnable)
+    fun loadNativeOnboarding1(activity: Activity, isFirst: Boolean, layoutRes: Int) {
+        val config = if (isFirst) AdRemoteConfig.getInstance().native_onboarding_1_1
+        else AdRemoteConfig.getInstance().native_onboarding_2_1
+        loadNativeInternal(
+            activity,
+            config,
+            layoutRes,
+            nativeOnboarding1AdLive,
+            ERainAd.getInstance().getShouldDisplayNativeOnboardingNormal1(config.enableUaCheck)
+        )
+    }
+
+    fun loadNativeOnboarding4(activity: Activity, isFirst: Boolean, layoutRes: Int) {
+        val config = if (isFirst) AdRemoteConfig.getInstance().native_onboarding_1_4
+        else AdRemoteConfig.getInstance().native_onboarding_2_4
+        loadNativeInternal(
+            activity,
+            config,
+            layoutRes,
+            nativeOnboarding4AdLive,
+            ERainAd.getInstance().getShouldDisplayNativeOnboardingNormal2(config.enableUaCheck)
+        )
+    }
+
+    fun loadNativeOnboardingFull(activity: Activity, isFirst: Boolean, layoutRes: Int) {
+        val config = if (isFirst) AdRemoteConfig.getInstance().native_onboarding_fullscreen_1_2
+        else AdRemoteConfig.getInstance().native_onboarding_fullscreen_2_2
+        loadNativeInternal(
+            activity,
+            config,
+            layoutRes,
+            nativeOnboardingFullAdLive,
+            ERainAd.getInstance().getShouldDisplayNativeOnboardingFull1(config.enableUaCheck)
+        )
+    }
+
+    fun shouldIncludeOnboardingFull(activity: Activity, isFirst: Boolean): Boolean {
+        val config = if (isFirst) AdRemoteConfig.getInstance().native_onboarding_fullscreen_1_2
+        else AdRemoteConfig.getInstance().native_onboarding_fullscreen_2_2
+        return RemoteConfigdata(activity).isNeedToShowADs
+            && config.isEnable
+            && !isPurchased(activity)
+            && activity.isInternetAvailable()
+            && ERainAd.getInstance().getShouldDisplayNativeOnboardingFull1(config.enableUaCheck) == true
     }
 
     private fun updateAdState(tagName: String, state: NativeAdUiState) {
@@ -162,7 +247,10 @@ object AdsManager {
         val cfg = AdRemoteConfig.getInstance().inter_onboarding
         if (!config.isNeedToShowADs
             || !cfg.isEnable
-            || (!ignoreLimit && !(ERainAd.getInstance().getShouldDisplayInterOnboarding(true) == true))
+            || isPurchased(activity)
+            || !activity.isInternetAvailable()
+            || (!ignoreLimit && ERainAd.getInstance()
+                .getShouldDisplayInterOnboarding(cfg.enableUaCheck) != true)
         ) {
             interOnboarding = null
             return
@@ -176,25 +264,21 @@ object AdsManager {
         if (interstitial != null
             && interstitial.isReady
             && RemoteConfigdata(activity).isNeedToShowADs
-            && (ignoreLimit || ERainAd.getInstance().getShouldDisplayInterOnboarding(true) == true)
+            && !isPurchased(activity)
+            && activity.isInternetAvailable()
+            && (ignoreLimit || ERainAd.getInstance()
+                .getShouldDisplayInterOnboarding(AdRemoteConfig.getInstance().inter_onboarding.enableUaCheck) == true)
         ) {
-            showInterIgnoreGap(activity, interstitial, onAction)
+            ERainAd.getInstance().forceShowInterstitial(activity, interstitial, object : AdCallback() {
+                override fun onNextAction() {
+                    super.onNextAction()
+                    interOnboarding = null
+                    onAction()
+                }
+            }, true)
         } else {
             onAction()
         }
-    }
-
-    private fun showInterIgnoreGap(activity: Activity, ad: ApInterstitialAd, onAction: () -> Unit) {
-        val cfg = ERainAd.getInstance().adConfig
-        val orig = cfg.intervalInterstitialAd
-        cfg.intervalInterstitialAd = 0
-        ERainAd.getInstance().forceShowInterstitial(activity, ad, object : AdCallback() {
-            override fun onNextAction() {
-                super.onNextAction()
-                onAction()
-            }
-        }, true)
-        cfg.intervalInterstitialAd = orig
     }
 
     private var interWelcomeBack: ApInterstitialAd? = null

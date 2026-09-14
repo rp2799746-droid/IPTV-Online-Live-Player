@@ -15,6 +15,9 @@ import com.google.firebase.FirebaseApp
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.remoteConfig
 import com.google.firebase.remoteconfig.remoteConfigSettings
+import com.google.android.gms.ads.MobileAds
+import com.iptv.online.smart.liveplayer.tv.Activity.IntroActivity
+import com.iptv.online.smart.liveplayer.tv.Activity.LanguageActivity
 import com.iptv.online.smart.liveplayer.tv.Activity.SplashActivity
 import com.iptv.online.smart.liveplayer.tv.BuildConfig
 import com.iptv.online.smart.liveplayer.tv.R
@@ -26,15 +29,9 @@ import dagger.hilt.android.HiltAndroidApp
 import io.github.inflationx.calligraphy3.CalligraphyConfig
 import io.github.inflationx.calligraphy3.CalligraphyInterceptor
 import io.github.inflationx.viewpump.ViewPump
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.launch
 
 @HiltAndroidApp
 class App : AdsMultiDexApplication() {
-
-    private val appScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     companion object {
         @SuppressLint("StaticFieldLeak")
@@ -50,13 +47,9 @@ class App : AdsMultiDexApplication() {
         }
         remoteConfig.setConfigSettingsAsync(configSettings)
 
-        remoteConfig.fetchAndActivate().addOnCompleteListener(mActivity) { _ ->
+        remoteConfig.fetchAndActivate().addOnCompleteListener(mActivity) { task ->
             if (!mActivity.isFinishing && !mActivity.isDestroyed) {
-                onRemoteFetched?.invoke(remoteConfig)
-            }
-        }.addOnFailureListener(mActivity) {
-            if (!mActivity.isFinishing && !mActivity.isDestroyed) {
-                onRemoteFetched?.invoke(null)
+                onRemoteFetched?.invoke(if (task.isSuccessful) remoteConfig else null)
             }
         }
     }
@@ -64,6 +57,25 @@ class App : AdsMultiDexApplication() {
     override fun onCreate() {
         super.onCreate()
         app = this
+
+        MobileAds.initialize(this) {}
+
+        try {
+            DevConfig.init(
+                context = this,
+                nkhStudioVersion = BuildConfig.ERAIN_STUDIO_VERSION,
+                playServicesAdsVersion = BuildConfig.PLAY_SERVICES_ADS_VERSION,
+                gdprModuleVersion = BuildConfig.GDPR_MODULE_VERSION
+            )
+        } catch (e: Exception) {
+            Log.e(STARTUP_TAG, "DevConfig init error: ${e.message}")
+        }
+
+        try {
+            FirebaseApp.initializeApp(this)
+        } catch (e: Exception) {
+            Log.e(STARTUP_TAG, "FirebaseApp init error: ${e.message}")
+        }
 
         try {
             AdRemoteConfig.initialize(this)
@@ -91,30 +103,10 @@ class App : AdsMultiDexApplication() {
 
         initAds()
 
-
-        appScope.launch {
-            try {
-                FirebaseApp.initializeApp(this@App)
-            } catch (e: Exception) {
-                Log.e(STARTUP_TAG, "FirebaseApp init error: ${e.message}")
-            }
-
-            try {
-                OneSignal.initWithContext(this@App, "9971a8a0-4bb3-48ae-bac0-30af3026640d")
-            } catch (e: Exception) {
-                Log.e(STARTUP_TAG, "OneSignal init error: ${e.message}")
-            }
-
-            try {
-                DevConfig.init(
-                    context = this@App,
-                    nkhStudioVersion = "2.1",
-                    playServicesAdsVersion = "24.7.0",
-                    gdprModuleVersion = "2.0.2"
-                )
-            } catch (e: Exception) {
-                Log.e(STARTUP_TAG, "DevConfig init error: ${e.message}")
-            }
+        try {
+            OneSignal.initWithContext(this, "9971a8a0-4bb3-48ae-bac0-30af3026640d")
+        } catch (e: Exception) {
+            Log.e(STARTUP_TAG, "OneSignal init error: ${e.message}")
         }
     }
 
@@ -127,8 +119,7 @@ class App : AdsMultiDexApplication() {
             mERainAdConfig.facebookClientToken = resources.getString(R.string.facebook_client_token)
             mERainAdConfig.adjustTokenTiktok = resources.getString(R.string.tiktok_token)
 
-            val resumeId = AdRemoteConfig.getInstance()?.inter_welcome_back?.id ?: ""
-            mERainAdConfig.idAdResume = if (resumeId.isNotEmpty()) resumeId else "ca-app-pub-3940256099942544/9257395921" // Fallback Test ID if blank
+            mERainAdConfig.idAdResume = ""
 
             mERainAdConfig.intervalInterstitialAd = 35
 
@@ -138,12 +129,25 @@ class App : AdsMultiDexApplication() {
             Admob.getInstance().setOpenActivityAfterShowInterAds(true)
 
             AppOpenManager.getInstance().disableAppResumeWithActivity(SplashActivity::class.java)
+            AppOpenManager.getInstance().disableAppResumeWithActivity(LanguageActivity::class.java)
+            AppOpenManager.getInstance().disableAppResumeWithActivity(IntroActivity::class.java)
             AppOpenManager.getInstance().disableAppResume()
             AppResumeWelcomeManager.init(this)
 
 
         } catch (e: Exception) {
             Log.e(STARTUP_TAG, "initAds Error: ${e.message}")
+        }
+    }
+
+    /** Called after Splash has applied the ad configuration selected by Firebase. */
+    fun configureAppResume() {
+        val config = AdRemoteConfig.getInstance().open_resume
+        if (config.isEnable && config.id.isNotBlank()) {
+            AppOpenManager.getInstance().setAppResumeAdId(config.id)
+            AppOpenManager.getInstance().enableAppResume()
+        } else {
+            AppOpenManager.getInstance().disableAppResume()
         }
     }
 }

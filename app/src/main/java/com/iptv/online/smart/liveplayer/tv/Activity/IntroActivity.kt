@@ -5,9 +5,6 @@ import android.util.Log
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
-import com.ads.module.ads.ERainAd
-import com.ads.module.ads.wrapper.ApInterstitialAd
-import com.ads.module.funtion.AdCallback
 import com.ads.module.funtion.AdmobHelper
 import com.iptv.online.smart.liveplayer.tv.R
 import com.iptv.online.smart.liveplayer.tv.activities.forIntro.IntroFragment1
@@ -15,11 +12,8 @@ import com.iptv.online.smart.liveplayer.tv.activities.forIntro.IntroFragment2
 import com.iptv.online.smart.liveplayer.tv.activities.forIntro.IntroFragment3
 import com.iptv.online.smart.liveplayer.tv.activities.forIntro.IntroFragment4
 import com.iptv.online.smart.liveplayer.tv.adsutils.AdRemoteConfig
-import com.iptv.online.smart.liveplayer.tv.adsutils.canShowFullScreenAd
 import com.iptv.online.smart.liveplayer.tv.Ads.AdsManager
 import com.iptv.online.smart.liveplayer.tv.adsutils.LazyShowAds
-import com.iptv.online.smart.liveplayer.tv.adsutils.RemoteConfigdata
-import com.iptv.online.smart.liveplayer.tv.adsutils.isInternetAvailable
 import com.iptv.online.smart.liveplayer.tv.databinding.ActivityIntroBinding
 import com.iptv.online.smart.liveplayer.tv.Fregmnet.IntroFragmentFullAd
 //import com.iptv.online.smart.liveplayer.tv.adsutils.getShouldDisplayNativeOnboardingFull2
@@ -37,23 +31,16 @@ class IntroActivity : Base__Activity<ActivityIntroBinding>() {
 
     var fragments = emptyList<Fragment>()
 
-    private val configScript: RemoteConfigdata by lazy {
-        RemoteConfigdata(this)
-    }
+    var isFirstOnboarding = true
+        private set
 
 
     override fun bindObjects() {
-        AdsManager.loadInterOnboarding(this)
-        val isDone = isIntroFlowDone()
-
-        val fullCfg =
-            if (isDone) AdRemoteConfig.getInstance().native_onboarding_fullscreen_2_2
-            else AdRemoteConfig.getInstance().native_onboarding_fullscreen_1_2
+        isFirstOnboarding = !isIntroFlowDone()
         fragments = arrayListOf<Fragment>().apply {
             add(IntroFragment1()) // Index 0
             add(IntroFragment2())
-            if (fullCfg.canShowFullScreenAd() && isInternetAvailable() && configScript.isNeedToShowADs) {
-
+            if (AdsManager.shouldIncludeOnboardingFull(this@IntroActivity, isFirstOnboarding)) {
                 add(IntroFragmentFullAd())
             }
             add(IntroFragment3())
@@ -61,6 +48,34 @@ class IntroActivity : Base__Activity<ActivityIntroBinding>() {
         }
 
         binding.pagerIntro.offscreenPageLimit = 5
+
+        // Match the base preloading point.  The IPTV-only native_home preload
+        // stays here so fragments remain render-only.
+        binding.root.postDelayed({
+            if (!isFinishing && !isDestroyed) {
+                AdsManager.loadNativeOnboarding4(
+                    this,
+                    isFirstOnboarding,
+                    R.layout.layout_native_ad_large
+                )
+                AdsManager.loadNativeOnboardingFull(
+                    this,
+                    isFirstOnboarding,
+                    R.layout.layout_native_ad_full
+                )
+                AdsManager.loadInterOnboarding(this)
+
+                val nativeHome = AdRemoteConfig.getInstance().native_home
+                if (nativeHome.isEnable) {
+                    AdsManager.loadAd(
+                        this,
+                        nativeHome.id,
+                        R.layout.layout_native_ad_medium,
+                        "native_home_2005"
+                    )
+                }
+            }
+        }, 100L)
     }
 
 

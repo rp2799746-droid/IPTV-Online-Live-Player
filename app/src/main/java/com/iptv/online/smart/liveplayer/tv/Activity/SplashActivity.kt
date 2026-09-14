@@ -16,6 +16,8 @@ import android.net.Network
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.CountDownTimer
+import android.os.SystemClock
 import android.provider.Settings
 import android.util.Base64
 import android.util.Log
@@ -41,6 +43,7 @@ import com.iptv.online.smart.liveplayer.tv.adsutils.EasyPreferences
 import com.iptv.online.smart.liveplayer.tv.adsutils.EasyPreferences.set
 import com.iptv.online.smart.liveplayer.tv.Ads.AdsManager
 import com.iptv.online.smart.liveplayer.tv.BuildConfig
+import com.iptv.online.smart.liveplayer.tv.adsutils.LanguageAdVariant
 import com.iptv.online.smart.liveplayer.tv.adsutils.RemoteConfigdata
 import com.iptv.online.smart.liveplayer.tv.databinding.ActivitySplashBinding
 import com.iptv.online.smart.liveplayer.tv.utils.gone
@@ -66,15 +69,18 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
     private var pendingProceed: (() -> Unit)? = null
     private var hasNavigated = false
     private var langPreloaded = false
+    private var remoteConfigTimer: CountDownTimer? = null
+    private var remoteConfigStartedAt = 0L
+    private var remoteConfigHandled = false
 
     private fun runWhenResumed(action: () -> Unit) {
         if (splashResumed) action() else pendingProceed = action
     }
 
     companion object {
-        var screenCount = 1
-
         private const val KEY_LANG_DONE = "lang_flow_done"
+        private const val REMOTE_CONFIG_TIMEOUT_MS = 6_500L
+        private const val MIN_SPLASH_DURATION_MS = 5_000L
 
         fun isLanguageDone(context: Context): Boolean =
             context.getSharedPreferences(context.packageName, 0)
@@ -207,6 +213,8 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
     }
 
     override fun onDestroy() {
+        remoteConfigTimer?.cancel()
+        App.onRemoteFetched = null
         super.onDestroy()
         try {
             if (networkCallback != null) {
@@ -371,19 +379,46 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
     }
 
     private fun loadingRemoteConfig() {
-        App.app?.initFirebaseConfigs(this)
-        App.onRemoteFetched = { firebaseConfig ->
-            if (!isFlowStarted) {
-                firebaseConfig?.let { config ->
-                    setConfigData(config)
-                    check_AppUpdate()
-                } ?: run {
-                    if (isPurchased(this)) {
-                        remoteData.isNeedToShowADs = false
-                    }
-                    goNextScreen()
-                }
+        if (remoteConfigHandled || isFlowStarted || remoteConfigTimer != null) return
+
+        remoteConfigStartedAt = SystemClock.elapsedRealtime()
+        remoteConfigTimer = object : CountDownTimer(REMOTE_CONFIG_TIMEOUT_MS, 100L) {
+            override fun onTick(millisUntilFinished: Long) = Unit
+
+            override fun onFinish() {
+                completeRemoteConfig(null)
             }
+        }.start()
+
+        App.onRemoteFetched = { firebaseConfig ->
+            // Mirror the base flow: a successful response honours the splash
+            // minimum; a failed/empty response falls through at the timeout.
+            if (firebaseConfig != null) {
+                val elapsed = SystemClock.elapsedRealtime() - remoteConfigStartedAt
+                binding.root.postDelayed(
+                    { completeRemoteConfig(firebaseConfig) },
+                    (MIN_SPLASH_DURATION_MS - elapsed).coerceAtLeast(0L)
+                )
+            }
+        }
+        App.app?.initFirebaseConfigs(this)
+    }
+
+    private fun completeRemoteConfig(firebaseConfig: FirebaseRemoteConfig?) {
+        if (remoteConfigHandled || isFlowStarted || isFinishing || isDestroyed) return
+        remoteConfigHandled = true
+        remoteConfigTimer?.cancel()
+        remoteConfigTimer = null
+
+        if (firebaseConfig != null) {
+            setConfigData(firebaseConfig)
+            check_AppUpdate()
+        } else {
+            if (isPurchased(this)) {
+                remoteData.isNeedToShowADs = false
+            }
+            App.app?.configureAppResume()
+            runWhenResumed { loadInfinityFlow() }
         }
     }
 
@@ -424,7 +459,14 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
             } else {
                 AdRemoteConfig.getInstance().inter_splash
             }
-            if (isGoingToLanguageScreen()) prepareLanguageAdState()
+            if (isGoingToLanguageScreen()) {
+                prepareLanguageAdState()
+                // A failed/disabled Splash inter must not reuse a previous
+                // process-static native or leave Language's observer pending.
+                // This publishes state only; the sole normal-native request
+                // remains inside the onAdLoaded callback below.
+                AdsManager.clearNativeLanguage()
+            }
 
 
 
@@ -490,7 +532,10 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
                 } else {
                     Intent(this, LanguageActivity::class.java).apply {
                         putExtra("isFromSplash", true)
-                        putExtra("screen_count", screenCount)
+                        putExtra(
+                            LanguageAdVariant.EXTRA,
+                            LanguageAdVariant.intentValue(prepareLanguageAdState())
+                        )
                     }
                 }
             }
@@ -536,13 +581,19 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
     }
 
 
-    private fun prepareLanguageAdState() {
-        screenCount = if (isLanguageDone(this)) 2 else 1
+    private fun prepareLanguageAdState(): LanguageAdVariant {
+        return LanguageAdVariant.fromLanguageCompleted(isLanguageDone(this))
     }
     private fun preloadLanguageAdInApp() {
         if (langPreloaded) return
         langPreloaded = true
-        AdsManager.loadNativeLanguage(this, screenCount)
+        val variant = prepareLanguageAdState()
+        AdsManager.loadNativeLanguage(
+            this,
+            variant == LanguageAdVariant.FIRST,
+            if (variant == LanguageAdVariant.FIRST) R.layout.layout_native_ad_lang_1
+            else R.layout.layout_native_ad_large
+        )
     }
     private fun setConfigData(config: FirebaseRemoteConfig) {
         lifecycleScope.launch(Dispatchers.IO) {
@@ -580,7 +631,7 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
                     remoteData.isNeedToShowADs = false
                 }
 
-                AppOpenManager.getInstance().disableAppResume()
+                App.app?.configureAppResume()
                 runWhenResumed { loadInfinityFlow() }
             }
         }
