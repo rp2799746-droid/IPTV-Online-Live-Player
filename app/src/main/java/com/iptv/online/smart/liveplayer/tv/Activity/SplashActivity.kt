@@ -548,10 +548,7 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
         lifecycleScope.launch(Dispatchers.IO) {
             val adRemoteJson = if (BuildConfig.DEBUG) config.getString("ad_rem_dup")
             else config.getString("ad_remote_config")
-
-
             AdRemoteConfig.initialize(this@SplashActivity, adRemoteJson)
-
             withContext(Dispatchers.Main) {
                 remoteData.delayButtonDoneLanguage = config.getBoolean("delay_button_done_language")
                 remoteData.privacyLink = config.getString("privacy_policy")

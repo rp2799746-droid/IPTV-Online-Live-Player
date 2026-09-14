@@ -174,9 +174,9 @@ class RemoteConfigdata(
     var nativehome2005: Boolean
         get() = Preference.getBoolean(context, "native_home_2005", true)
         set(value) = Preference.setBoolean(context, "native_home_2005", value)
-    var nativechannel2005: Boolean
-        get() = Preference.getBoolean(context, "native_channel_2005", true)
-        set(value) = Preference.setBoolean(context, "native_channel_2005", value)
+    var nativechannel1409: Boolean
+        get() = Preference.getBoolean(context, "native_channel_1409", true)
+        set(value) = Preference.setBoolean(context, "native_channel_1409", value)
     var nativefavorite2005: Boolean
         get() = Preference.getBoolean(context, "native_favorite_2005", true)
         set(value) = Preference.setBoolean(context, "native_favorite_2005", value)

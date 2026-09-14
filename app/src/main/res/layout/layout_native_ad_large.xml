@@ -4,16 +4,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:padding="8dp"
     tools:ignore="HardcodedText,SpUsage">
 
     <androidx.cardview.widget.CardView
         android:id="@+id/ad_card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp"
         app:cardBackgroundColor="#EDEDED"
         app:cardCornerRadius="20dp"
-        app:cardElevation="5dp">
+        app:cardElevation="0dp"
+  >
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -35,16 +36,15 @@
 
             <TextView
                 android:id="@+id/ad_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="17dp"
+                android:layout_height="17dp"
                 android:layout_marginStart="@dimen/_10sdp"
                 android:layout_marginTop="@dimen/_10sdp"
-                android:background="@drawable/bg_ad_icon"
-                android:paddingHorizontal="5dp"
-                android:paddingVertical="2dp"
+                android:background="#2D7BFF"
+             android:gravity="center"
                 android:text="Ad"
-                android:textColor="#ffffff"
-                android:textSize="11dp"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_8sdp"
                 app:layout_constraintStart_toEndOf="@id/ad_app_icon"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -56,6 +56,8 @@
                 android:layout_marginEnd="8dp"
                 android:textColor="@color/black"
                 android:textSize="15dp"
+                android:maxLines="2"
+                android:ellipsize="end"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="@id/ad_icon"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -90,7 +92,6 @@
                 app:layout_constraintTop_toBottomOf="@id/ad_advertiser"
                 tools:text="ad body" />
 
-            <!-- GPS na ad_native_big jevu ratio: media height 130dp, margin 8dp -->
             <com.google.android.gms.ads.nativead.MediaView
                 android:id="@+id/ad_media"
                 android:layout_width="0dp"

@@ -65,10 +65,10 @@ class CategoryActivity : Base__Activity<ActivityCategoryBinding>() {
     private fun nativeAds() {
         configScript?.let {
             if (it.isNeedToShowADs) {
-                if (configScript!!.nativechannel2005) {
+                if (configScript!!.nativechannel1409) {
 
                     val handledAds = mutableSetOf<String>()
-                    val tag = "native_channel_2005"
+                    val tag = "native_channel_1409"
 
                     AdsManager.getAdLive(tag).observe(this@CategoryActivity) { state ->
                             if (state is NativeAdUiState.Success && !handledAds.contains(tag)) {

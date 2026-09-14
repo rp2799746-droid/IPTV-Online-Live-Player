@@ -24,14 +24,13 @@
 
         <TextView
             android:id="@+id/ad_attribution"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@color/white"
-            android:paddingHorizontal="4dp"
-            android:paddingVertical="2dp"
+            android:layout_width="17dp"
+            android:layout_height="17dp"
+            android:background="#2D7BFF"
+            android:gravity="center"
             android:text="Ad"
-            android:textColor="#555555"
-            android:textSize="12sp"
+            android:textColor="@color/white"
+            android:textSize="@dimen/_8sdp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 

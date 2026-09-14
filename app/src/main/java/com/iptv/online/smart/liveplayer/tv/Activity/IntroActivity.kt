@@ -50,7 +50,7 @@ class IntroActivity : Base__Activity<ActivityIntroBinding>() {
             if (isDone) AdRemoteConfig.getInstance().native_onboarding_fullscreen_2_2
             else AdRemoteConfig.getInstance().native_onboarding_fullscreen_1_2
         fragments = arrayListOf<Fragment>().apply {
-            add(IntroFragment1()) // Index 0
+            add(IntroFragment1())
             add(IntroFragment2())
             if (fullCfg.canShowFullScreenAd() && isInternetAvailable() && configScript.isNeedToShowADs) {
 
@@ -123,13 +123,9 @@ class IntroActivity : Base__Activity<ActivityIntroBinding>() {
     }
 
     private fun updateButtonStyles(index: Int) {
-
-
         if (index > 0) {
-            val adapter = binding.pagerIntro.adapter as FragmentStateAdapter
             fragments.getOrNull(index)?.let { fragment ->
                 if (fragment is LazyShowAds  && fragment.isAdded) {
-                    Log.d("AdManager123", "Calling showAds for fragment at index: $index")
                     fragment.showAds()
                 }
             }

@@ -174,7 +174,7 @@ class MainActivity : Base__Activity<ActivityMainBinding>() {
         }
 
         queue(AdRemoteConfig.getInstance().native_playlist, R.layout.layout_native_ad_large, "native_playlist")
-        queue(AdRemoteConfig.getInstance().native_channel, R.layout.layout_native_ad_medium_channel, "native_channel_2005")
+        queue(AdRemoteConfig.getInstance().native_channel, R.layout.layout_native_ad_medium_channel, "native_channel_1409")
         queue(AdRemoteConfig.getInstance().native_channellist, R.layout.layout_native_ad_large, "native_channel_list")
         queue(AdRemoteConfig.getInstance().native_favorite, R.layout.layout_native_ad_small, "native_favorite_2005")
         queue(AdRemoteConfig.getInstance().native_history, R.layout.layout_native_ad_small, "native_history_2005")

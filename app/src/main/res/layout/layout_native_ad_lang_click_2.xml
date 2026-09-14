@@ -1,23 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-    Language CLICK ad - SCREEN 2 nu design.
-    Juno look: card no margin, corner radius, elevation
-    ane button na margins + rounded corner.
--->
 <com.google.android.gms.ads.nativead.NativeAdView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:padding="8dp"
     tools:ignore="HardcodedText,SpUsage">
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp"
         app:cardBackgroundColor="#EDEDED"
         app:cardCornerRadius="20dp"
-        app:cardElevation="5dp">
+        app:cardElevation="0dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -39,16 +34,15 @@
 
             <TextView
                 android:id="@+id/ad_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="17dp"
+                android:layout_height="17dp"
                 android:layout_marginStart="@dimen/_10sdp"
                 android:layout_marginTop="@dimen/_10sdp"
-                android:background="@drawable/bg_ad_icon"
-                android:paddingHorizontal="5dp"
-                android:paddingVertical="2dp"
+                android:background="#2D7BFF"
                 android:text="Ad"
-                android:textColor="#ffffff"
-                android:textSize="11dp"
+                android:gravity="center"
+                android:textSize="@dimen/_8sdp"
+                android:textColor="@color/white"
                 app:layout_constraintStart_toEndOf="@id/ad_app_icon"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -60,6 +54,8 @@
                 android:layout_marginEnd="8dp"
                 android:textColor="@color/black"
                 android:textSize="15dp"
+                android:maxLines="2"
+                android:ellipsize="end"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="@id/ad_icon"
                 app:layout_constraintEnd_toEndOf="parent"

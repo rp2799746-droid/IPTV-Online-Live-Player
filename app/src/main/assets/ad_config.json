@@ -20,7 +20,7 @@
   "inter_back":              { "id": "ca-app-pub-2864154863223892/9581539835", "isEnable": true, "enable_ua_check": false },
   "banner_collapsible_home": { "id": "ca-app-pub-2864154863223892/7785873321", "isEnable": true, "enable_ua_check": false },
   "native_home":             { "id": "ca-app-pub-2864154863223892/1230304300", "isEnable": true, "colorCTA": "default", "heightCTA": 40, "positionCTA": "BOTTOM", "components": ["icon_headline","body","media","cta"], "enable_ua_check": false },
-  "native_channel":          { "id": "ca-app-pub-2864154863223892/6291059299", "isEnable": true, "colorCTA": "default", "heightCTA": 40, "positionCTA": "BOTTOM", "components": ["icon_headline","body","media","cta"], "enable_ua_check": false },
+  "native_channel":          { "id": "ca-app-pub-2864154863223892/1829729555", "isEnable": true, "colorCTA": "default", "heightCTA": 40, "positionCTA": "BOTTOM", "components": ["icon_headline","body","media","cta"], "enable_ua_check": false },
   "native_favorite":         { "id": "ca-app-pub-2864154863223892/2207132600", "isEnable": true, "colorCTA": "default", "heightCTA": 40, "positionCTA": "BOTTOM", "components": ["icon_headline","body","media","cta"], "enable_ua_check": false },
   "native_history":          { "id": "ca-app-pub-2864154863223892/3124628450", "isEnable": true, "colorCTA": "default", "heightCTA": 40, "positionCTA": "BOTTOM", "components": ["icon_headline","body","media","cta"], "enable_ua_check": false },
 
