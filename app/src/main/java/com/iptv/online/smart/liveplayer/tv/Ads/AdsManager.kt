@@ -153,50 +153,6 @@ object AdsManager {
         }
     }
 
-
-
-    private var interOnboarding: ApInterstitialAd? = null
-
-    fun loadInterOnboarding(activity: Activity, ignoreLimit: Boolean = false) {
-        val config = RemoteConfigdata(activity)
-        val cfg = AdRemoteConfig.getInstance().inter_onboarding
-        if (!config.isNeedToShowADs
-            || !cfg.isEnable
-            || (!ignoreLimit && !(ERainAd.getInstance().getShouldDisplayInterOnboarding(true) == true))
-        ) {
-            interOnboarding = null
-            return
-        }
-        interOnboarding = ERainAd.getInstance()
-            .getInterstitialAds(activity, cfg.id, object : AdCallback() {})
-    }
-
-    fun showInterOnboarding(activity: Activity, ignoreLimit: Boolean = false, onAction: () -> Unit) {
-        val interstitial = interOnboarding
-        if (interstitial != null
-            && interstitial.isReady
-            && RemoteConfigdata(activity).isNeedToShowADs
-            && (ignoreLimit || ERainAd.getInstance().getShouldDisplayInterOnboarding(true) == true)
-        ) {
-            showInterIgnoreGap(activity, interstitial, onAction)
-        } else {
-            onAction()
-        }
-    }
-
-    private fun showInterIgnoreGap(activity: Activity, ad: ApInterstitialAd, onAction: () -> Unit) {
-        val cfg = ERainAd.getInstance().adConfig
-        val orig = cfg.intervalInterstitialAd
-        cfg.intervalInterstitialAd = 0
-        ERainAd.getInstance().forceShowInterstitial(activity, ad, object : AdCallback() {
-            override fun onNextAction() {
-                super.onNextAction()
-                onAction()
-            }
-        }, true)
-        cfg.intervalInterstitialAd = orig
-    }
-
     private var interWelcomeBack: ApInterstitialAd? = null
 
     fun loadInterWelcomeBack(activity: Activity, ignoreLimit: Boolean = false) {

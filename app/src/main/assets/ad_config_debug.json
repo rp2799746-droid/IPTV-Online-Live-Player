@@ -155,11 +155,6 @@
     ],
     "enable_ua_check": false
   },
-  "inter_onboarding": {
-    "id": "/21775744923/example/interstitial",
-    "isEnable": true,
-    "enable_ua_check": false
-  },
   "inter_home": {
     "id": "/21775744923/example/interstitial",
     "isEnable": true,

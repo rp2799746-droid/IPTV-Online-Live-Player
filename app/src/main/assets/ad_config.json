@@ -14,7 +14,6 @@
   "native_onboarding_2_4":   { "id": "ca-app-pub-2864154863223892/4496734116", "isEnable": true, "colorCTA": "default", "heightCTA": 40, "positionCTA": "BOTTOM", "components": ["icon_headline","body","media","cta"], "enable_ua_check": false },
   "native_onboarding_fullscreen_1_2": { "id": "ca-app-pub-2864154863223892/3295963974", "isEnable": true, "colorCTA": "default", "heightCTA": 40, "positionCTA": "BOTTOM", "components": ["icon_headline","body","media","cta"], "enable_ua_check": false },
   "native_onboarding_fullscreen_2_2": { "id": "ca-app-pub-2864154863223892/8603500089", "isEnable": true, "colorCTA": "default", "heightCTA": 40, "positionCTA": "BOTTOM", "components": ["icon_headline","body","media","cta"], "enable_ua_check": false },
-  "inter_onboarding":        { "id": "ca-app-pub-2864154863223892/5730555625", "isEnable": true, "enable_ua_check": false },
 
   "inter_home":              { "id": "ca-app-pub-2864154863223892/4118686863", "isEnable": true, "enable_ua_check": false },
   "inter_back":              { "id": "ca-app-pub-2864154863223892/9581539835", "isEnable": true, "enable_ua_check": false },

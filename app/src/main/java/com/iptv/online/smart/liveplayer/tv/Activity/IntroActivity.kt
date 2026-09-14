@@ -1,6 +1,7 @@
 package com.iptv.online.smart.liveplayer.tv.Activity
 
 import android.content.Intent
+import android.os.Build
 import android.util.Log
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
@@ -22,6 +23,7 @@ import com.iptv.online.smart.liveplayer.tv.adsutils.RemoteConfigdata
 import com.iptv.online.smart.liveplayer.tv.adsutils.isInternetAvailable
 import com.iptv.online.smart.liveplayer.tv.databinding.ActivityIntroBinding
 import com.iptv.online.smart.liveplayer.tv.Fregmnet.IntroFragmentFullAd
+import com.iptv.online.smart.liveplayer.tv.utils.AppShortcuts
 //import com.iptv.online.smart.liveplayer.tv.adsutils.getShouldDisplayNativeOnboardingFull2
 import com.iptv.online.smart.liveplayer.tv.utils.Preference
 
@@ -43,7 +45,7 @@ class IntroActivity : Base__Activity<ActivityIntroBinding>() {
 
 
     override fun bindObjects() {
-        AdsManager.loadInterOnboarding(this)
+        applyUninstallWidgetShortcutsFromRemoteConfig()
         val isDone = isIntroFlowDone()
 
         val fullCfg =
@@ -62,7 +64,12 @@ class IntroActivity : Base__Activity<ActivityIntroBinding>() {
 
         binding.pagerIntro.offscreenPageLimit = 5
     }
-
+    private fun applyUninstallWidgetShortcutsFromRemoteConfig() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N_MR1) return
+        if (ERainAd.getInstance().getShouldDisplayWidgetUninstall(true) == true) {
+            AppShortcuts.initShortCut(this@IntroActivity)
+        }
+    }
 
     fun getNextFragment() {
         if (binding.pagerIntro.currentItem == fragments.size - 1) {
@@ -74,9 +81,8 @@ class IntroActivity : Base__Activity<ActivityIntroBinding>() {
 
     private fun callNext() {
         setIntroFlowDone()
-        AdsManager.showInterOnboarding(this) {
             redirectToNextActivity()
-        }
+
     }
 
     override fun bindListener() {

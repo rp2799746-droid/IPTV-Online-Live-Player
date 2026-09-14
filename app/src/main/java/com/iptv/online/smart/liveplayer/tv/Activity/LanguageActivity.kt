@@ -480,7 +480,7 @@ class LanguageActivity : Base__Activity<ActivityLanguageBinding>(),
             doneHandler.removeCallbacksAndMessages(null)
             doneHandler.postDelayed({
                 binding.done.visibility = View.VISIBLE
-            }, configScript?.timeDelayLanguageDone ?: 1200L)
+            }, configScript?.timeDelayLanguageDone ?: 2000L)
         } else {
             binding.done.visibility = View.VISIBLE
         }

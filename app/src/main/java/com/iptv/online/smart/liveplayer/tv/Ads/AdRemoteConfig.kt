@@ -31,7 +31,6 @@ class AdRemoteConfig private constructor(
     val native_onboarding_2_4 get() = unit("native_onboarding_2_4")
     val native_onboarding_fullscreen_1_2 get() = unit("native_onboarding_fullscreen_1_2")
     val native_onboarding_fullscreen_2_2 get() = unit("native_onboarding_fullscreen_2_2")
-    val inter_onboarding get() = unit("inter_onboarding")
 
     // ---- Home ----
     val inter_home get() = unit("inter_home")

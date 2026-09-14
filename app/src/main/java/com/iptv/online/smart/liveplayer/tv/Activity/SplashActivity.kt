@@ -16,6 +16,7 @@ import android.net.Network
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.provider.Settings
 import android.util.Base64
 import android.util.Log
@@ -33,7 +34,9 @@ import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.UpdateAvailability
 import com.google.android.ump.ConsentInformation
 import com.google.android.ump.FormError
+import com.google.firebase.Firebase
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
+import com.google.firebase.remoteconfig.remoteConfig
 import com.iptv.online.smart.liveplayer.tv.App
 import com.iptv.online.smart.liveplayer.tv.R
 import com.iptv.online.smart.liveplayer.tv.adsutils.AdRemoteConfig
@@ -43,6 +46,7 @@ import com.iptv.online.smart.liveplayer.tv.Ads.AdsManager
 import com.iptv.online.smart.liveplayer.tv.BuildConfig
 import com.iptv.online.smart.liveplayer.tv.adsutils.RemoteConfigdata
 import com.iptv.online.smart.liveplayer.tv.databinding.ActivitySplashBinding
+import com.iptv.online.smart.liveplayer.tv.utils.AppConstants
 import com.iptv.online.smart.liveplayer.tv.utils.gone
 import com.iptv.online.smart.liveplayer.tv.utils.visible
 import com.itg.iaumodule.IAdConsentCallBack
@@ -59,14 +63,14 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
     private var canPersonalized = true
     private var appUpdate_Manager: AppUpdateManager? = null
     val UPDATE_REQUEST_CODE: Int = 123
-    private var noInternetDialog: Dialog? = null
     private var networkCallback: ConnectivityManager.NetworkCallback? = null
 
     private var splashResumed = false
     private var pendingProceed: (() -> Unit)? = null
     private var hasNavigated = false
     private var langPreloaded = false
-
+    private var getConfigSuccess = false
+    private var configTimerStarted = false
     private fun runWhenResumed(action: () -> Unit) {
         if (splashResumed) action() else pendingProceed = action
     }
@@ -96,115 +100,29 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
         binding.btnSettings.isSelected = true
         appUpdate_Manager = AppUpdateManagerFactory.create(this)
 
-        lifecycleScope.launch(Dispatchers.Default) {
-            manageAppShortcuts()
-        }
+
     }
 
     override fun bindObjects() {
         handleIncomingLink(intent)
         prefs = EasyPreferences.defaultPrefs(this)
 
-        if (!prefs!!.getBoolean("KEY_IS_USER_GLOBAL", false) && !prefs!!.getBoolean("KEY_CONFIRM_CONSENT", false)) {
-            checkNeedToLoadConsent()
+        if (!prefs!!.getBoolean("KEY_IS_USER_GLOBAL", false)
+            && !prefs!!.getBoolean("KEY_CONFIRM_CONSENT", false)
+            && isNetworkAvailable(this)
+        ) {            checkNeedToLoadConsent()
         } else {
             startAppFlow()
         }
     }
 
     private fun startAppFlow() {
-        if (!isNetworkAvailable(this@SplashActivity)) {
-            Internet_Connection_Status(this@SplashActivity)
-            registerNetworkCallback()
-        } else {
-            loadingRemoteConfig()
-        }
+        loadingRemoteConfig()
     }
 
-    private fun manageAppShortcuts() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
-            try {
-                val shortcutManager = getSystemService(ShortcutManager::class.java)
-                val shouldShowShortcuts = ERainAd.getInstance().getShouldDisplayWidgetUninstall(true) == true
 
-                if (shouldShowShortcuts) {
-                    val shortcutList = mutableListOf<ShortcutInfo>()
 
-                    val streamtv = ShortcutInfo.Builder(this, "stream_id")
-                        .setShortLabel(getString(R.string.stream_your_tv))
-                        .setIcon(Icon.createWithResource(this, R.drawable.stream_tv))
-                        .setIntent(Intent(this, MainActivity::class.java).apply {
-                            action = Intent.ACTION_VIEW
-                            putExtra("widget_flow", "flow_iptv")
-                            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_NO_ANIMATION
-                        })
-                        .build()
 
-                    val mirrorShortcut = ShortcutInfo.Builder(this, "mirror_id")
-                        .setShortLabel(getString(R.string.iptv_smart))
-                        .setIcon(Icon.createWithResource(this, R.drawable.iptv_wid))
-                        .setIntent(Intent(this, MainActivity::class.java).apply {
-                            action = Intent.ACTION_VIEW
-                            putExtra("ACTION_TYPE", "OPEN_IPTV")
-                            putExtra("widget_flow", "flow_mirror")
-                            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_NO_ANIMATION
-                        })
-                        .build()
-
-                    val castShortcut = ShortcutInfo.Builder(this, "cast_id")
-                        .setShortLabel(getString(R.string.cast_to_tv))
-                        .setIcon(Icon.createWithResource(this, R.drawable.cast_wiget))
-                        .setIntent(Intent(this, MirrorStepsActivity::class.java).apply {
-                            action = Intent.ACTION_VIEW
-                            putExtra("widget_flow", "flow_tv")
-                        })
-                        .build()
-
-                    val uninstallShortcut = ShortcutInfo.Builder(this, "uninstall_id")
-                        .setShortLabel(getString(R.string.uninstall))
-                        .setIcon(Icon.createWithResource(this, R.drawable.uninstall_wid))
-                        .setIntent(Intent(this, SplashActivity::class.java).apply {
-                            action = Intent.ACTION_VIEW
-                            putExtra("widget_flow", "flow_uninstall")
-                        })
-                        .build()
-
-                    shortcutList.add(streamtv)
-                    shortcutList.add(mirrorShortcut)
-                    shortcutList.add(castShortcut)
-                    shortcutList.add(uninstallShortcut)
-
-                    shortcutManager.dynamicShortcuts = shortcutList
-                } else {
-                    shortcutManager.removeAllDynamicShortcuts()
-                }
-            } catch (e: Exception) {
-                Log.e(TAG, "manageAppShortcuts error: ${e.message}")
-            }
-        }
-    }
-
-    private fun registerNetworkCallback() {
-        try {
-            val connectivityManager = getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                networkCallback = object : ConnectivityManager.NetworkCallback() {
-                    override fun onAvailable(network: Network) {
-                        super.onAvailable(network)
-                        runOnUiThread {
-                            if (noInternetDialog != null && noInternetDialog!!.isShowing) {
-                                noInternetDialog!!.dismiss()
-                                loadingRemoteConfig()
-                            }
-                        }
-                    }
-                }
-                connectivityManager.registerDefaultNetworkCallback(networkCallback!!)
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
 
     override fun onDestroy() {
         super.onDestroy()
@@ -293,12 +211,7 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
             }, 1000)
         }
 
-        if (isNetworkAvailable(this)) {
-            if (noInternetDialog != null && noInternetDialog!!.isShowing) {
-                noInternetDialog!!.dismiss()
-                loadingRemoteConfig()
-            }
-        }
+
     }
 
     fun isNetworkAvailable(context: Context): Boolean {
@@ -312,31 +225,8 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
         return false
     }
 
-    fun Internet_Connection_Status(activity: Activity?) {
-        showNoInternetBottomSheet()
-    }
 
-    private fun showNoInternetBottomSheet() {
-        if (noInternetDialog != null && noInternetDialog!!.isShowing) return
 
-        noInternetDialog = Dialog(this, R.style.CustomDialog)
-        val view = layoutInflater.inflate(R.layout.dialog_no_internet, null)
-        noInternetDialog!!.setContentView(view)
-        noInternetDialog!!.setCancelable(false)
-
-        view.findViewById<View?>(R.id.btn_settings)?.setOnClickListener {
-            if (isNetworkAvailable(this@SplashActivity)) {
-                noInternetDialog!!.dismiss()
-                loadingRemoteConfig()
-            } else {
-                startActivity(Intent(Settings.ACTION_SETTINGS))
-            }
-        }
-
-        if (!isFinishing && !isDestroyed) {
-            noInternetDialog!!.show()
-        }
-    }
 
     private fun checkNeedToLoadConsent() {
         loadAndShowConsent(true, object : IAdConsentCallBack {
@@ -371,22 +261,35 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
     }
 
     private fun loadingRemoteConfig() {
+        if (configTimerStarted) return
+        configTimerStarted = true
+
         App.app?.initFirebaseConfigs(this)
-        App.onRemoteFetched = { firebaseConfig ->
-            if (!isFlowStarted) {
-                firebaseConfig?.let { config ->
-                    setConfigData(config)
-                    check_AppUpdate()
-                } ?: run {
-                    if (isPurchased(this)) {
-                        remoteData.isNeedToShowADs = false
-                    }
-                    goNextScreen()
+
+        App.onRemoteFetched = { _ ->
+            getConfigSuccess = true
+        }
+
+        object : CountDownTimer(AppConstants.DEFAULT_TIME_SPLASH, 100) {
+            override fun onTick(millisUntilFinished: Long) {
+                if (getConfigSuccess && millisUntilFinished < AppConstants.DEFAULT_LIMIT_TIME_SPLASH) {
+                    checkRemoteConfigResult()
+                    cancel()
                 }
             }
-        }
+
+            override fun onFinish() {
+                if (!getConfigSuccess) {
+                    checkRemoteConfigResult()
+                }
+            }
+        }.start()
     }
 
+    private fun checkRemoteConfigResult() {
+        setConfigData(Firebase.remoteConfig)
+        check_AppUpdate()
+    }
     private fun loadInfinityFlow() {
         if (isFlowStarted) return
         isFlowStarted = true
@@ -428,7 +331,7 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
 
 
 
-            if (splashInterConfig.isEnable) {
+            if (splashInterConfig.isEnable && isNetworkAvailable(this@SplashActivity)) {
                 ERainAd.getInstance().loadSplashInterstitialAds(
                     this, splashInterConfig.id, 30000 , 5000, object : AdCallback() {
                         override fun onAdLoaded() {
@@ -550,7 +453,10 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
             else config.getString("ad_remote_config")
             AdRemoteConfig.initialize(this@SplashActivity, adRemoteJson)
             withContext(Dispatchers.Main) {
-                remoteData.delayButtonDoneLanguage = config.getBoolean("delay_button_done_language")
+                val delayDoneValue = config.getValue("delay_button_done_language")
+                if (delayDoneValue.source == FirebaseRemoteConfig.VALUE_SOURCE_REMOTE) {
+                    remoteData.delayButtonDoneLanguage = delayDoneValue.asBoolean()
+                }
                 remoteData.privacyLink = config.getString("privacy_policy")
                 remoteData.height_button_cta = config.getString("height_button_cta")
 
