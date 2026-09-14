@@ -36,7 +36,7 @@ class IntroFragmentFullAd : BaseFragment<FragmentIntroFullAdBinding>(), LazyShow
         if (isObserving) return
         isObserving = true
         val isFirst = (activity as? IntroActivity)?.isFirstOnboarding ?: true
-        AdsManager.nativeOnboardingFullAdLive.observe(viewLifecycleOwner) { ad ->
+        AdsManager.nativeAdOnBoardingFullLive.observe(viewLifecycleOwner) { ad ->
             renderNative(ad, isFirst)
         }
     }

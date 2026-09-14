@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
+import com.ads.module.ads.ERainAd
 import com.ads.module.funtion.AdmobHelper
 import com.iptv.online.smart.liveplayer.tv.R
 import com.iptv.online.smart.liveplayer.tv.activities.forIntro.IntroFragment1
@@ -14,6 +15,7 @@ import com.iptv.online.smart.liveplayer.tv.activities.forIntro.IntroFragment4
 import com.iptv.online.smart.liveplayer.tv.adsutils.AdRemoteConfig
 import com.iptv.online.smart.liveplayer.tv.Ads.AdsManager
 import com.iptv.online.smart.liveplayer.tv.adsutils.LazyShowAds
+import com.iptv.online.smart.liveplayer.tv.adsutils.isInternetAvailable
 import com.iptv.online.smart.liveplayer.tv.databinding.ActivityIntroBinding
 import com.iptv.online.smart.liveplayer.tv.Fregmnet.IntroFragmentFullAd
 //import com.iptv.online.smart.liveplayer.tv.adsutils.getShouldDisplayNativeOnboardingFull2
@@ -37,10 +39,18 @@ class IntroActivity : Base__Activity<ActivityIntroBinding>() {
 
     override fun bindObjects() {
         isFirstOnboarding = !isIntroFlowDone()
+        val fullConfig = if (isFirstOnboarding) {
+            AdRemoteConfig.getInstance().native_onboarding_fullscreen_1_2
+        } else {
+            AdRemoteConfig.getInstance().native_onboarding_fullscreen_2_2
+        }
         fragments = arrayListOf<Fragment>().apply {
             add(IntroFragment1()) // Index 0
             add(IntroFragment2())
-            if (AdsManager.shouldIncludeOnboardingFull(this@IntroActivity, isFirstOnboarding)) {
+            if (isInternetAvailable()
+                && ERainAd.getInstance()
+                    .getShouldDisplayNativeOnboardingFull1(fullConfig.enableUaCheck) == true
+            ) {
                 add(IntroFragmentFullAd())
             }
             add(IntroFragment3())

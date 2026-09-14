@@ -58,7 +58,10 @@ object AdsManager {
     val nativeLanguageClickAdLive = MutableLiveData<ApNativeAd?>()
     val nativeOnboarding1AdLive = MutableLiveData<ApNativeAd?>()
     val nativeOnboarding4AdLive = MutableLiveData<ApNativeAd?>()
-    val nativeOnboardingFullAdLive = MutableLiveData<ApNativeAd?>()
+    val nativeAdOnBoardingFullLive = MutableLiveData<ApNativeAd?>()
+    private val adConfigMap = mutableMapOf<ApNativeAd, AdUnitConfig>()
+
+    fun getAdConfig(ad: ApNativeAd): AdUnitConfig? = adConfigMap[ad]
 
     /** Clears a prior process-static Language native without issuing a load. */
     fun clearNativeLanguage() {
@@ -77,13 +80,13 @@ object AdsManager {
         config: AdUnitConfig,
         layoutRes: Int,
         liveData: MutableLiveData<ApNativeAd?>,
-        shouldDisplay: Boolean? = true,
+        shouldDisplay: Boolean = true,
     ) {
         if (!RemoteConfigdata(activity).isNeedToShowADs
             || !config.isEnable
             || isPurchased(activity)
             || !activity.isInternetAvailable()
-            || shouldDisplay != true
+            || !shouldDisplay
         ) {
             liveData.postValue(null)
             return
@@ -96,6 +99,7 @@ object AdsManager {
             object : AdCallback() {
                 override fun onNativeAdLoaded(nativeAd: ApNativeAd) {
                     super.onNativeAdLoaded(nativeAd)
+                    adConfigMap[nativeAd] = config
                     liveData.postValue(nativeAd)
                 }
 
@@ -156,61 +160,50 @@ object AdsManager {
     }
 
     fun loadNativeLanguage(activity: Activity, isFirst: Boolean, layoutRes: Int) {
-        val config = if (isFirst) AdRemoteConfig.getInstance().native_language_1
-        else AdRemoteConfig.getInstance().native_language_2
+        val config =
+            if (isFirst) AdRemoteConfig.getInstance().native_language_1 else AdRemoteConfig.getInstance().native_language_2
         loadNativeInternal(activity, config, layoutRes, nativeLanguageAdLive)
     }
 
     fun loadNativeLanguageClick(activity: Activity, isFirst: Boolean, layoutRes: Int) {
-        val config = if (isFirst) AdRemoteConfig.getInstance().native_language_1_click
-        else AdRemoteConfig.getInstance().native_language_2_click
+        val config =
+            if (isFirst) AdRemoteConfig.getInstance().native_language_1_click else AdRemoteConfig.getInstance().native_language_2_click
         loadNativeInternal(activity, config, layoutRes, nativeLanguageClickAdLive)
     }
 
     fun loadNativeOnboarding1(activity: Activity, isFirst: Boolean, layoutRes: Int) {
-        val config = if (isFirst) AdRemoteConfig.getInstance().native_onboarding_1_1
-        else AdRemoteConfig.getInstance().native_onboarding_2_1
+        val config =
+            if (isFirst) AdRemoteConfig.getInstance().native_onboarding_1_1 else AdRemoteConfig.getInstance().native_onboarding_2_1
         loadNativeInternal(
             activity,
             config,
             layoutRes,
-            nativeOnboarding1AdLive,
-            ERainAd.getInstance().getShouldDisplayNativeOnboardingNormal1(config.enableUaCheck)
+            nativeOnboarding1AdLive
         )
     }
 
     fun loadNativeOnboarding4(activity: Activity, isFirst: Boolean, layoutRes: Int) {
-        val config = if (isFirst) AdRemoteConfig.getInstance().native_onboarding_1_4
-        else AdRemoteConfig.getInstance().native_onboarding_2_4
+        val config =
+            if (isFirst) AdRemoteConfig.getInstance().native_onboarding_1_4 else AdRemoteConfig.getInstance().native_onboarding_2_4
         loadNativeInternal(
             activity,
             config,
             layoutRes,
             nativeOnboarding4AdLive,
-            ERainAd.getInstance().getShouldDisplayNativeOnboardingNormal2(config.enableUaCheck)
+            ERainAd.getInstance().getShouldDisplayNativeOnboardingNormal2(config.enableUaCheck) == true
         )
     }
 
     fun loadNativeOnboardingFull(activity: Activity, isFirst: Boolean, layoutRes: Int) {
-        val config = if (isFirst) AdRemoteConfig.getInstance().native_onboarding_fullscreen_1_2
-        else AdRemoteConfig.getInstance().native_onboarding_fullscreen_2_2
+        val config =
+            if (isFirst) AdRemoteConfig.getInstance().native_onboarding_fullscreen_1_2 else AdRemoteConfig.getInstance().native_onboarding_fullscreen_2_2
         loadNativeInternal(
             activity,
             config,
             layoutRes,
-            nativeOnboardingFullAdLive,
-            ERainAd.getInstance().getShouldDisplayNativeOnboardingFull1(config.enableUaCheck)
+            nativeAdOnBoardingFullLive,
+            ERainAd.getInstance().getShouldDisplayNativeOnboardingFull1(config.enableUaCheck) == true
         )
-    }
-
-    fun shouldIncludeOnboardingFull(activity: Activity, isFirst: Boolean): Boolean {
-        val config = if (isFirst) AdRemoteConfig.getInstance().native_onboarding_fullscreen_1_2
-        else AdRemoteConfig.getInstance().native_onboarding_fullscreen_2_2
-        return RemoteConfigdata(activity).isNeedToShowADs
-            && config.isEnable
-            && !isPurchased(activity)
-            && activity.isInternetAvailable()
-            && ERainAd.getInstance().getShouldDisplayNativeOnboardingFull1(config.enableUaCheck) == true
     }
 
     private fun updateAdState(tagName: String, state: NativeAdUiState) {
