@@ -47,13 +47,13 @@ class IntroActivity : Base__Activity<ActivityIntroBinding>() {
         fragments = arrayListOf<Fragment>().apply {
             add(IntroFragment1()) // Index 0
             add(IntroFragment2())
+            add(IntroFragment3())
             if (isInternetAvailable()
                 && ERainAd.getInstance()
                     .getShouldDisplayNativeOnboardingFull1(fullConfig.enableUaCheck) == true
             ) {
                 add(IntroFragmentFullAd())
             }
-            add(IntroFragment3())
             add(IntroFragment4())
         }
 
@@ -74,18 +74,21 @@ class IntroActivity : Base__Activity<ActivityIntroBinding>() {
                     R.layout.layout_native_ad_full
                 )
                 AdsManager.loadInterOnboarding(this)
-
-                val nativeHome = AdRemoteConfig.getInstance().native_home
-                if (nativeHome.isEnable) {
-                    AdsManager.loadAd(
-                        this,
-                        nativeHome.id,
-                        R.layout.layout_native_ad_medium,
-                        "native_home_2005"
-                    )
-                }
+                preloadAppSpecificAds()
             }
         }, 100L)
+    }
+
+    private fun preloadAppSpecificAds() {
+        val nativeHome = AdRemoteConfig.getInstance().native_home
+        if (nativeHome.isEnable) {
+            AdsManager.loadAd(
+                this,
+                nativeHome.id,
+                R.layout.layout_native_ad_medium,
+                "native_home_2005"
+            )
+        }
     }
 
 
@@ -151,7 +154,6 @@ class IntroActivity : Base__Activity<ActivityIntroBinding>() {
 
 
         if (index > 0) {
-            val adapter = binding.pagerIntro.adapter as FragmentStateAdapter
             fragments.getOrNull(index)?.let { fragment ->
                 if (fragment is LazyShowAds  && fragment.isAdded) {
                     Log.d("AdManager123", "Calling showAds for fragment at index: $index")

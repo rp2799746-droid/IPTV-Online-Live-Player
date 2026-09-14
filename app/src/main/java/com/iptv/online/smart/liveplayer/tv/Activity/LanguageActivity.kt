@@ -23,6 +23,8 @@ import com.iptv.online.smart.liveplayer.tv.ReadFile.BOOKER_Manager
 import com.iptv.online.smart.liveplayer.tv.ReadFile.PreferenceManager
 import com.iptv.online.smart.liveplayer.tv.adsutils.LanguageAdVariant
 import com.iptv.online.smart.liveplayer.tv.adsutils.RemoteConfigdata
+import com.iptv.online.smart.liveplayer.tv.adsutils.RemoteConfigUtils
+import com.iptv.online.smart.liveplayer.tv.app.AppConstants.DEFAULT_TIME_DELAY_SHOW_LANGUAGE_DONE_BUTTON
 import com.iptv.online.smart.liveplayer.tv.adsutils.populateNativeAdView
 import com.iptv.online.smart.liveplayer.tv.databinding.ActivityLanguageBinding
 import com.iptv.online.smart.liveplayer.tv.utils.isIntroFlowDone
@@ -41,6 +43,8 @@ class LanguageActivity : Base__Activity<ActivityLanguageBinding>(),
     private var isClickAdPhase = false
     private val doneHandler = Handler(Looper.getMainLooper())
     private var languageVariant = LanguageAdVariant.FIRST
+    private var shouldDelayDoneButton = true
+    private var timeDelayDoneButton = DEFAULT_TIME_DELAY_SHOW_LANGUAGE_DONE_BUTTON
 
     private val isFirstLanguage: Boolean
         get() = languageVariant == LanguageAdVariant.FIRST
@@ -71,6 +75,8 @@ class LanguageActivity : Base__Activity<ActivityLanguageBinding>(),
     }
 
     override fun bindObjects() {
+        shouldDelayDoneButton = RemoteConfigUtils.shouldDelayLanguageDoneButton()
+        timeDelayDoneButton = RemoteConfigUtils.getTimeDelayButtonDoneLanguage()
         sp = getSharedPreferences(getPackageName(), 0)
         sp_editor = sp!!.edit()
         val colors = intArrayOf(
@@ -120,10 +126,6 @@ class LanguageActivity : Base__Activity<ActivityLanguageBinding>(),
             binding.textheader.text = getString(R.string.choose_your_language)
             binding.done.visibility = View.GONE
             binding.gradinttext.visibility = View.GONE
-
-            loadLanguageAd()
-
-
         }
 
 
@@ -134,7 +136,10 @@ class LanguageActivity : Base__Activity<ActivityLanguageBinding>(),
         loadSavedLanguage()
         setAdapter()
 
-        if (!isFromSettings) setupSwipeHint()
+        if (!isFromSettings) {
+            setupSwipeHint()
+            initAds()
+        }
 
     }
 
@@ -164,9 +169,8 @@ class LanguageActivity : Base__Activity<ActivityLanguageBinding>(),
         binding.swipeHint.visibility = View.GONE
     }
 
-    private fun loadLanguageAd() {
+    private fun initAds() {
         adjustLangShimmerHeight()
-        observeLanguageAd()
         binding.root.postDelayed({
             if (!isFinishing && !isDestroyed) {
                 AdsManager.loadNativeLanguageClick(
@@ -183,14 +187,18 @@ class LanguageActivity : Base__Activity<ActivityLanguageBinding>(),
         }, 100)
     }
 
-    private fun observeLanguageAd() {
+    override fun bindObserver() {
+        if (!intent.getBooleanExtra("settingss", false)) listenLanguageAd()
+    }
+
+    private fun listenLanguageAd() {
         AdsManager.nativeLanguageClickAdLive.removeObservers(this)
         AdsManager.nativeLanguageAdLive.observe(this) { ad ->
             renderLanguageAd(ad)
         }
     }
 
-    private fun observeLanguageClickAd() {
+    private fun listenLanguageClickAd() {
         AdsManager.nativeLanguageAdLive.removeObservers(this)
         AdsManager.nativeLanguageClickAdLive.observe(this) { ad ->
             renderLanguageAd(ad)
@@ -389,20 +397,19 @@ class LanguageActivity : Base__Activity<ActivityLanguageBinding>(),
                 adjustLangShimmerHeight()
                 // The shimmer remains while the preloaded click native resolves.
                 binding.adShimmer.root.visibility = View.VISIBLE
-                observeLanguageClickAd()
+                listenLanguageClickAd()
             }
             showDoneButton()
         }
     }
 
     private fun showDoneButton() {
-        val remoteConfig = RemoteConfigdata(this)
-        if (remoteConfig.delayButtonDoneLanguage) {
+        if (shouldDelayDoneButton) {
             binding.done.visibility = View.INVISIBLE
             doneHandler.removeCallbacksAndMessages(null)
             doneHandler.postDelayed({
                 binding.done.visibility = View.VISIBLE
-            }, remoteConfig.timeDelayLanguageDone)
+            }, timeDelayDoneButton)
         } else {
             binding.done.visibility = View.VISIBLE
         }

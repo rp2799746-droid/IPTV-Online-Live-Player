@@ -28,8 +28,6 @@ import kotlinx.coroutines.flow.StateFlow
 
 object AdsManager {
 
-    private const val WELCOME_TAG = "WelcomeFlow"
-
     private val _adStateFlow = MutableStateFlow<Map<String, NativeAdUiState>>(emptyMap())
 
     private val adLiveMap = mutableMapOf<String, MutableLiveData<NativeAdUiState>>()
@@ -59,6 +57,7 @@ object AdsManager {
     val nativeOnboarding1AdLive = MutableLiveData<ApNativeAd?>()
     val nativeOnboarding4AdLive = MutableLiveData<ApNativeAd?>()
     val nativeAdOnBoardingFullLive = MutableLiveData<ApNativeAd?>()
+    var interWelcomeAdLive = MutableLiveData<ApInterstitialAd?>()
     private val adConfigMap = mutableMapOf<ApNativeAd, AdUnitConfig>()
 
     fun getAdConfig(ad: ApNativeAd): AdUnitConfig? = adConfigMap[ad]
@@ -236,90 +235,70 @@ object AdsManager {
     private var interOnboarding: ApInterstitialAd? = null
 
     fun loadInterOnboarding(activity: Activity, ignoreLimit: Boolean = false) {
-        val config = RemoteConfigdata(activity)
-        val cfg = AdRemoteConfig.getInstance().inter_onboarding
-        if (!config.isNeedToShowADs
-            || !cfg.isEnable
-            || isPurchased(activity)
-            || !activity.isInternetAvailable()
-            || (!ignoreLimit && ERainAd.getInstance()
-                .getShouldDisplayInterOnboarding(cfg.enableUaCheck) != true)
-        ) {
-            interOnboarding = null
-            return
-        }
-        interOnboarding = ERainAd.getInstance()
-            .getInterstitialAds(activity, cfg.id, object : AdCallback() {})
+        interOnboarding = null
     }
 
     fun showInterOnboarding(activity: Activity, ignoreLimit: Boolean = false, onAction: () -> Unit) {
-        val interstitial = interOnboarding
-        if (interstitial != null
-            && interstitial.isReady
-            && RemoteConfigdata(activity).isNeedToShowADs
-            && !isPurchased(activity)
-            && activity.isInternetAvailable()
-            && (ignoreLimit || ERainAd.getInstance()
-                .getShouldDisplayInterOnboarding(AdRemoteConfig.getInstance().inter_onboarding.enableUaCheck) == true)
-        ) {
-            ERainAd.getInstance().forceShowInterstitial(activity, interstitial, object : AdCallback() {
-                override fun onNextAction() {
-                    super.onNextAction()
-                    interOnboarding = null
-                    onAction()
-                }
-            }, true)
-        } else {
-            onAction()
-        }
+        interOnboarding = null
+        onAction()
     }
 
-    private var interWelcomeBack: ApInterstitialAd? = null
+    fun loadInterWelcome(activity: Activity, ignoreLimit: Boolean = false) {
+        val cached = interWelcomeAdLive.value?.takeIf { it.isReady }
+        val request = MutableLiveData<ApInterstitialAd?>()
+        interWelcomeAdLive = request
+        fun emit(ad: ApInterstitialAd?) = request.postValue(ad)
 
-    fun loadInterWelcomeBack(activity: Activity, ignoreLimit: Boolean = false) {
         val config = RemoteConfigdata(activity)
         val cfg = AdRemoteConfig.getInstance().inter_welcome_back
         if (!config.isNeedToShowADs
             || !config.interwelcomeback
             || !cfg.isEnable
             || isPurchased(activity)
+            || !activity.isInternetAvailable()
             || (!ignoreLimit && !(ERainAd.getInstance()
                 .getShouldDisplayInterWelcomeBack(cfg.enableUaCheck) == true))
         ) {
-            interWelcomeBack = null
-            Log.d(WELCOME_TAG, "preload skipped: ads/config off or not eligible")
+            emit(null)
             return
         }
-        if (interWelcomeBack != null) {
-            Log.d(WELCOME_TAG, "preload skipped: already loaded")
+        if (cached != null) {
+            emit(cached)
             return
         }
-        interWelcomeBack = ERainAd.getInstance()
-            .getInterstitialAds(activity, cfg.id, object : AdCallback() {
+
+        var loaded: ApInterstitialAd? = null
+        loaded = ERainAd.getInstance().getInterstitialAds(
+            activity,
+            cfg.id,
+            object : AdCallback() {
                 override fun onApInterstitialLoad(apInterstitialAd: ApInterstitialAd?) {
                     super.onApInterstitialLoad(apInterstitialAd)
-                    interWelcomeBack = apInterstitialAd ?: interWelcomeBack
-                    Log.i(WELCOME_TAG, "Welcome back interstitial loaded")
+                    emit(apInterstitialAd ?: loaded)
                 }
 
                 override fun onAdFailedToLoad(adError: LoadAdError?) {
                     super.onAdFailedToLoad(adError)
-                    interWelcomeBack = null
-                    Log.d(WELCOME_TAG, "welcome back inter failed: ${adError?.message}")
+                    emit(null)
                 }
-            })
+            }
+        )
+        if (loaded?.isReady == true) emit(loaded)
     }
 
-    fun showInterWelcomeBack(
+    fun showInterWelcome(
         activity: Activity,
         ignoreLimit: Boolean = false,
         onAction: () -> Unit
     ) {
-        val interstitial = interWelcomeBack
+        val interstitial = interWelcomeAdLive.value
+        val remoteData = RemoteConfigdata(activity)
         val cfg = AdRemoteConfig.getInstance().inter_welcome_back
         if (interstitial != null
             && interstitial.isReady
-            && RemoteConfigdata(activity).isNeedToShowADs
+            && remoteData.isNeedToShowADs
+            && remoteData.interwelcomeback
+            && cfg.isEnable
             && !isPurchased(activity)
             && activity.isInternetAvailable()
             && (ignoreLimit || ERainAd.getInstance()
@@ -329,10 +308,10 @@ object AdsManager {
                 activity, interstitial, object : AdCallback() {
                     override fun onNextAction() {
                         super.onNextAction()
-                        interWelcomeBack = null
+                        interWelcomeAdLive = MutableLiveData()
                         onAction()
                     }
-                }, true
+                }, false
             )
         } else {
             onAction()

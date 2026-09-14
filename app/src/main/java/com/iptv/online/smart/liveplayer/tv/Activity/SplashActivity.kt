@@ -17,7 +17,6 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
-import android.os.SystemClock
 import android.provider.Settings
 import android.util.Base64
 import android.util.Log
@@ -27,7 +26,6 @@ import com.ads.module.admob.AppOpenManager
 import com.ads.module.ads.ERainAd
 import com.ads.module.funtion.AdCallback
 import com.ads.module.funtion.AdmobHelper.isPurchased
-import com.google.android.gms.ads.LoadAdError
 import com.google.android.play.core.appupdate.AppUpdateInfo
 import com.google.android.play.core.appupdate.AppUpdateManager
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
@@ -35,8 +33,6 @@ import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.UpdateAvailability
 import com.google.android.ump.ConsentInformation
 import com.google.android.ump.FormError
-import com.google.firebase.remoteconfig.FirebaseRemoteConfig
-import com.iptv.online.smart.liveplayer.tv.App
 import com.iptv.online.smart.liveplayer.tv.R
 import com.iptv.online.smart.liveplayer.tv.adsutils.AdRemoteConfig
 import com.iptv.online.smart.liveplayer.tv.adsutils.EasyPreferences
@@ -45,6 +41,9 @@ import com.iptv.online.smart.liveplayer.tv.Ads.AdsManager
 import com.iptv.online.smart.liveplayer.tv.BuildConfig
 import com.iptv.online.smart.liveplayer.tv.adsutils.LanguageAdVariant
 import com.iptv.online.smart.liveplayer.tv.adsutils.RemoteConfigdata
+import com.iptv.online.smart.liveplayer.tv.adsutils.RemoteConfigUtils
+import com.iptv.online.smart.liveplayer.tv.app.AppConstants
+import com.iptv.online.smart.liveplayer.tv.app.ResumeAdsEntryRule
 import com.iptv.online.smart.liveplayer.tv.databinding.ActivitySplashBinding
 import com.iptv.online.smart.liveplayer.tv.utils.gone
 import com.iptv.online.smart.liveplayer.tv.utils.visible
@@ -53,10 +52,11 @@ import com.itg.iaumodule.ITGAdConsent.loadAndShowConsent
 import com.itg.iaumodule.ITGAdConsent.resetConsentDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.security.MessageDigest
 
-class SplashActivity : Base__Activity<ActivitySplashBinding>() {
+internal fun shouldEnableAdsForPurchase(isPurchased: Boolean): Boolean = !isPurchased
+
+class SplashActivity : Base__Activity<ActivitySplashBinding>(), RemoteConfigUtils.Listener {
     private var isFlowStarted = false
     private var prefs: SharedPreferences? = null
     private var canPersonalized = true
@@ -68,10 +68,7 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
     private var splashResumed = false
     private var pendingProceed: (() -> Unit)? = null
     private var hasNavigated = false
-    private var langPreloaded = false
-    private var remoteConfigTimer: CountDownTimer? = null
-    private var remoteConfigStartedAt = 0L
-    private var remoteConfigHandled = false
+    private var getConfigSuccess = false
 
     private fun runWhenResumed(action: () -> Unit) {
         if (splashResumed) action() else pendingProceed = action
@@ -79,8 +76,6 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
 
     companion object {
         private const val KEY_LANG_DONE = "lang_flow_done"
-        private const val REMOTE_CONFIG_TIMEOUT_MS = 6_500L
-        private const val MIN_SPLASH_DURATION_MS = 5_000L
 
         fun isLanguageDone(context: Context): Boolean =
             context.getSharedPreferences(context.packageName, 0)
@@ -102,16 +97,18 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
         binding.btnSettings.isSelected = true
         appUpdate_Manager = AppUpdateManagerFactory.create(this)
 
-        lifecycleScope.launch(Dispatchers.Default) {
-            manageAppShortcuts()
-        }
     }
 
     override fun bindObjects() {
+        RemoteConfigUtils.init(this, this)
         handleIncomingLink(intent)
         prefs = EasyPreferences.defaultPrefs(this)
 
-        if (!prefs!!.getBoolean("KEY_IS_USER_GLOBAL", false) && !prefs!!.getBoolean("KEY_CONFIRM_CONSENT", false)) {
+        if (!prefs!!.getBoolean(
+                "KEY_IS_USER_GLOBAL",
+                false
+            ) && !prefs!!.getBoolean("KEY_CONFIRM_CONSENT", false)
+        ) {
             checkNeedToLoadConsent()
         } else {
             startAppFlow()
@@ -131,7 +128,9 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
             try {
                 val shortcutManager = getSystemService(ShortcutManager::class.java)
-                val shouldShowShortcuts = ERainAd.getInstance().getShouldDisplayWidgetUninstall(true) == true
+                val shouldShowShortcuts = ERainAd.getInstance().getShouldDisplayWidgetUninstall(
+                    RemoteConfigUtils.getOnEnableUninstallWidget()
+                ) == true
 
                 if (shouldShowShortcuts) {
                     val shortcutList = mutableListOf<ShortcutInfo>()
@@ -142,7 +141,8 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
                         .setIntent(Intent(this, MainActivity::class.java).apply {
                             action = Intent.ACTION_VIEW
                             putExtra("widget_flow", "flow_iptv")
-                            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_NO_ANIMATION
+                            flags =
+                                Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_NO_ANIMATION
                         })
                         .build()
 
@@ -153,7 +153,8 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
                             action = Intent.ACTION_VIEW
                             putExtra("ACTION_TYPE", "OPEN_IPTV")
                             putExtra("widget_flow", "flow_mirror")
-                            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_NO_ANIMATION
+                            flags =
+                                Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_NO_ANIMATION
                         })
                         .build()
 
@@ -213,15 +214,15 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
     }
 
     override fun onDestroy() {
-        remoteConfigTimer?.cancel()
-        App.onRemoteFetched = null
         super.onDestroy()
         try {
             if (networkCallback != null) {
-                val connectivityManager = getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
+                val connectivityManager =
+                    getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
                 connectivityManager.unregisterNetworkCallback(networkCallback!!)
             }
-        } catch (_: Exception) {}
+        } catch (_: Exception) {
+        }
     }
 
     private fun handleIncomingLink(intent: Intent?) {
@@ -293,12 +294,13 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
         }
 
         if (isFlowStarted && !hasNavigated) {
-            ERainAd.getInstance().onCheckShowSplashWhenFail(this@SplashActivity, object : AdCallback() {
-                override fun onNextAction() {
-                    super.onNextAction()
-                    goNextScreen()
-                }
-            }, 1000)
+            ERainAd.getInstance()
+                .onCheckShowSplashWhenFail(this@SplashActivity, object : AdCallback() {
+                    override fun onNextAction() {
+                        super.onNextAction()
+                        moveActivity()
+                    }
+                }, 1000)
         }
 
         if (isNetworkAvailable(this)) {
@@ -310,7 +312,8 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
     }
 
     fun isNetworkAvailable(context: Context): Boolean {
-        val connectivityManager = context.getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager?
+        val connectivityManager =
+            context.getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager?
         if (connectivityManager != null) {
             @Suppress("DEPRECATION")
             val activeNetworkInfo = connectivityManager.activeNetworkInfo
@@ -379,52 +382,31 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
     }
 
     private fun loadingRemoteConfig() {
-        if (remoteConfigHandled || isFlowStarted || remoteConfigTimer != null) return
-
-        remoteConfigStartedAt = SystemClock.elapsedRealtime()
-        remoteConfigTimer = object : CountDownTimer(REMOTE_CONFIG_TIMEOUT_MS, 100L) {
-            override fun onTick(millisUntilFinished: Long) = Unit
+        object : CountDownTimer(AppConstants.DEFAULT_TIME_SPLASH, 100L) {
+            override fun onTick(millisUntilFinished: Long) {
+                if (getConfigSuccess && millisUntilFinished < AppConstants.DEFAULT_LIMIT_TIME_SPLASH) {
+                    checkRemoteConfigResult()
+                    cancel()
+                }
+            }
 
             override fun onFinish() {
-                completeRemoteConfig(null)
+                if (!getConfigSuccess) {
+                    checkRemoteConfigResult()
+                }
             }
         }.start()
-
-        App.onRemoteFetched = { firebaseConfig ->
-            // Mirror the base flow: a successful response honours the splash
-            // minimum; a failed/empty response falls through at the timeout.
-            if (firebaseConfig != null) {
-                val elapsed = SystemClock.elapsedRealtime() - remoteConfigStartedAt
-                binding.root.postDelayed(
-                    { completeRemoteConfig(firebaseConfig) },
-                    (MIN_SPLASH_DURATION_MS - elapsed).coerceAtLeast(0L)
-                )
-            }
-        }
-        App.app?.initFirebaseConfigs(this)
     }
 
-    private fun completeRemoteConfig(firebaseConfig: FirebaseRemoteConfig?) {
-        if (remoteConfigHandled || isFlowStarted || isFinishing || isDestroyed) return
-        remoteConfigHandled = true
-        remoteConfigTimer?.cancel()
-        remoteConfigTimer = null
-
-        if (firebaseConfig != null) {
-            setConfigData(firebaseConfig)
-            check_AppUpdate()
-        } else {
-            if (isPurchased(this)) {
-                remoteData.isNeedToShowADs = false
-            }
-            App.app?.configureAppResume()
-            runWhenResumed { loadInfinityFlow() }
-        }
-    }
-
-    private fun loadInfinityFlow() {
-        if (isFlowStarted) return
+    private fun checkRemoteConfigResult() {
+        if (isFlowStarted || isFinishing || isDestroyed) return
         isFlowStarted = true
+
+        AdRemoteConfig.initialize(this, RemoteConfigUtils.getAdRemoteConfig())
+        RemoteConfigUtils.applyAppSpecificConfig(this)
+        remoteData.isNeedToShowADs = shouldEnableAdsForPurchase(isPurchased(this))
+        if (remoteData.isInAppUpdate) check_AppUpdate()
+        lifecycleScope.launch(Dispatchers.Default) { manageAppShortcuts() }
 
         val widgetFlow = intent.getStringExtra("widget_flow")
         var currentFlow = widgetFlow
@@ -434,67 +416,59 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
             currentFlow = null
         }
 
-        if (remoteData.isNeedToShowADs) {
-            val isUninstallFlow = currentFlow == "flow_uninstall"
-            val shouldShowBanner = if (isUninstallFlow) {
-                AdRemoteConfig.getInstance().banner_splash_uninstall.isEnable
-            } else {
-                AdRemoteConfig.getInstance().banner_splash.isEnable
-            }
 
-            if (shouldShowBanner) {
-                binding.bannerAdLayout.visible
-                val bannerIdToUse = if (isUninstallFlow) {
-                    AdRemoteConfig.getInstance().banner_splash_uninstall.id
-                } else {
-                    AdRemoteConfig.getInstance().banner_splash.id
-                }
-                ERainAd.getInstance().loadBanner(this@SplashActivity, bannerIdToUse)
-            } else {
-                binding.bannerAdLayout.gone
-            }
-
-            val splashInterConfig = if (widgetFlow == "flow_uninstall") {
-                AdRemoteConfig.getInstance().inter_splash_uninstall
-            } else {
-                AdRemoteConfig.getInstance().inter_splash
-            }
-            if (isGoingToLanguageScreen()) {
-                prepareLanguageAdState()
-                // A failed/disabled Splash inter must not reuse a previous
-                // process-static native or leave Language's observer pending.
-                // This publishes state only; the sole normal-native request
-                // remains inside the onAdLoaded callback below.
-                AdsManager.clearNativeLanguage()
-            }
-
-
-
-            if (splashInterConfig.isEnable) {
-                ERainAd.getInstance().loadSplashInterstitialAds(
-                    this, splashInterConfig.id, 30000 , 5000, object : AdCallback() {
-                        override fun onAdLoaded() {
-                            super.onAdLoaded()
-                            if (isGoingToLanguageScreen()) {
-                                preloadLanguageAdInApp()
-                            }
-                        }
-
-                        override fun onNextAction() {
-                            super.onNextAction()
-                            goNextScreen()
-                        }
-
-                        override fun onAdFailedToLoad(i: LoadAdError?) {
-                            super.onAdFailedToLoad(i)
-                            goNextScreen()
-                        }
-                    })
-            } else {
-                goNextScreen()
-            }
+        val isUninstallFlow = currentFlow == "flow_uninstall"
+        val shouldShowBanner = if (isUninstallFlow) {
+            AdRemoteConfig.getInstance().banner_splash_uninstall.isEnable
         } else {
-            goNextScreen()
+            AdRemoteConfig.getInstance().banner_splash.isEnable
+        }
+
+        if (remoteData.isNeedToShowADs && shouldShowBanner) {
+            binding.bannerAdLayout.visible
+            val bannerIdToUse = if (isUninstallFlow) {
+                AdRemoteConfig.getInstance().banner_splash_uninstall.id
+            } else {
+                AdRemoteConfig.getInstance().banner_splash.id
+            }
+            ERainAd.getInstance().loadBanner(this@SplashActivity, bannerIdToUse)
+        } else {
+            binding.bannerAdLayout.gone
+        }
+        if (isGoingToLanguageScreen()) {
+            loadNativeLanguage()
+        }
+        val splashInterConfig = if (currentFlow == "flow_uninstall") {
+            AdRemoteConfig.getInstance().inter_splash_uninstall
+        } else {
+            AdRemoteConfig.getInstance().inter_splash
+        }
+        if (remoteData.isNeedToShowADs && splashInterConfig.isEnable && isNetworkAvailable(this@SplashActivity)) {
+            ERainAd.getInstance().loadSplashInterstitialAds(
+                this,
+                splashInterConfig.id,
+                30000,
+                5000,
+                object : AdCallback() {
+                    override fun onNextAction() {
+                        super.onNextAction()
+                        moveActivity()
+                    }
+
+                    override fun onAdLoaded() {
+                        super.onAdLoaded()
+                    }
+                })
+        } else {
+            moveActivity()
+        }
+
+        if (ResumeAdsEntryRule.shouldEnableOpenResume()) {
+            AppOpenManager.getInstance()
+                .setAppResumeAdId(AdRemoteConfig.getInstance().open_resume.id)
+            AppOpenManager.getInstance().enableAppResume()
+        } else {
+            AppOpenManager.getInstance().disableAppResume()
         }
     }
 
@@ -504,12 +478,11 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
         } else {
             resetConsentDialog()
         }
-        loadingRemoteConfig()
     }
 
-    private fun goNextScreen() {
+    private fun moveActivity() {
         if (!splashResumed) {
-            pendingProceed = { goNextScreen() }
+            pendingProceed = { moveActivity() }
             return
         }
         if (hasNavigated) return
@@ -525,6 +498,7 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
             "flow_tv", "flow_iptv" -> Intent(this, MainActivity::class.java).apply {
                 putExtra("ACTION_TYPE", "OPEN_IPTV")
             }
+
             "flow_mirror" -> Intent(this, MirrorStepsActivity::class.java)
             else -> {
                 if (isPurchased(this)) {
@@ -560,14 +534,17 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
                     md.update(signature.toByteArray())
                     Log.d("KeyHash", Base64.encodeToString(md.digest(), Base64.DEFAULT))
                 }
-            } catch (_: Exception) {}
+            } catch (_: Exception) {
+            }
         }
     }
 
     override fun bindListener() = Unit
     override fun bindMethod() = Unit
+
     @Deprecated("Deprecated in Java")
-    override fun onBackPressed() {}
+    override fun onBackPressed() {
+    }
 
     private val remoteData: RemoteConfigdata by lazy {
         RemoteConfigdata(this)
@@ -584,9 +561,9 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
     private fun prepareLanguageAdState(): LanguageAdVariant {
         return LanguageAdVariant.fromLanguageCompleted(isLanguageDone(this))
     }
-    private fun preloadLanguageAdInApp() {
-        if (langPreloaded) return
-        langPreloaded = true
+
+    private fun loadNativeLanguage() {
+        AdsManager.clearNativeLanguage()
         val variant = prepareLanguageAdState()
         AdsManager.loadNativeLanguage(
             this,
@@ -595,45 +572,8 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>() {
             else R.layout.layout_native_ad_large
         )
     }
-    private fun setConfigData(config: FirebaseRemoteConfig) {
-        lifecycleScope.launch(Dispatchers.IO) {
-            val adRemoteJson = if (BuildConfig.DEBUG) config.getString("ad_rem_dup")
-            else config.getString("ad_remote_config")
 
-
-            AdRemoteConfig.initialize(this@SplashActivity, adRemoteJson)
-
-            withContext(Dispatchers.Main) {
-                remoteData.delayButtonDoneLanguage = config.getBoolean("delay_button_done_language")
-                remoteData.privacyLink = config.getString("privacy_policy")
-                remoteData.height_button_cta = config.getString("height_button_cta")
-
-                val introPageValue = config.getValue("is_intro_page")
-                if (introPageValue.source == FirebaseRemoteConfig.VALUE_SOURCE_REMOTE) {
-                    remoteData.isIntroPage = introPageValue.asBoolean()
-                }
-
-                val closeBtnValue = config.getValue("show_full_native_close_btn")
-                if (closeBtnValue.source == FirebaseRemoteConfig.VALUE_SOURCE_REMOTE) {
-                    remoteData.isFullNativeCloseBtn = closeBtnValue.asBoolean()
-                }
-
-                remoteData.isInAppUpdate = config.getBoolean("is_in_app_update")
-
-                val delayTimeValue = config.getValue("time_delay_show_language_done_button")
-                if (delayTimeValue.source == FirebaseRemoteConfig.VALUE_SOURCE_REMOTE) {
-                    remoteData.timeDelayLanguageDone = delayTimeValue.asLong()
-                }
-
-                remoteData.isAllAdsShow = config.getBoolean("is_all_ads_show")
-
-                if (isPurchased(this@SplashActivity)) {
-                    remoteData.isNeedToShowADs = false
-                }
-
-                App.app?.configureAppResume()
-                runWhenResumed { loadInfinityFlow() }
-            }
-        }
+    override fun loadSuccess() {
+        getConfigSuccess = true
     }
 }
