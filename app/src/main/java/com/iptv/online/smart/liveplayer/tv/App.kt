@@ -18,8 +18,7 @@ import com.iptv.online.smart.liveplayer.tv.Activity.SplashActivity
 import com.iptv.online.smart.liveplayer.tv.Activity.UninstallScreenActivity
 import com.iptv.online.smart.liveplayer.tv.Activity.UninstallSurveyActivity
 import com.iptv.online.smart.liveplayer.tv.Activity.WelcomeScreenActivity
-import com.iptv.online.smart.liveplayer.tv.BuildConfig
-import com.iptv.online.smart.liveplayer.tv.R
+
 import com.iptv.online.smart.liveplayer.tv.adsutils.AdRemoteConfig
 import com.iptv.online.smart.liveplayer.tv.app.AppActivityLifecycleCallbacks
 import com.iptv.online.smart.liveplayer.tv.app.AppLifecycleObserver

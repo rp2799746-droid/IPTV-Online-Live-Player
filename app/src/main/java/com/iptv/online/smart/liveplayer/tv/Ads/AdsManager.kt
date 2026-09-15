@@ -377,7 +377,10 @@ object AdsManager {
 
     fun showInterAddPlaylist(activity: Activity, onAction: () -> Unit) =
         showInterCentralized(activity, "interAddPlaylist", AdRemoteConfig.getInstance().inter_add_playlist.isEnable, onAction)
-
+    fun loadNativeMirroring(activity: Activity) {
+        val cfg = AdRemoteConfig.getInstance().native_mirroring
+        loadAd(activity, cfg.id, R.layout.layout_native_ad_large, "native_mirroring", cfg.isEnable)
+    }
     fun Activity.loadAndShowCollapsingBanner(adLayout: View) {
         val config = RemoteConfigdata(this)
         val cfg = AdRemoteConfig.getInstance().banner_collapsible_home

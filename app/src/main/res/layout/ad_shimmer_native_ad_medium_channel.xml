@@ -4,6 +4,7 @@
     android:id="@+id/shimmer_native_ad"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:padding="8dp"
     app:shimmer_auto_start="true"
     app:shimmer_duration="1000">
 
@@ -13,13 +14,13 @@
         android:minHeight="195dp"
         app:cardBackgroundColor="#EDEDED"
         app:cardCornerRadius="20dp"
-        app:cardElevation="5dp"
-        app:cardUseCompatPadding="true">
+        app:cardElevation="0dp"
+        app:cardUseCompatPadding="false">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="@dimen/_10sdp">
+            android:padding="@dimen/_15sdp">
 
             <View
                 android:id="@+id/shimmer_ad_icon"

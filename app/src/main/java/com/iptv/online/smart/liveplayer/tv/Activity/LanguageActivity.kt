@@ -224,8 +224,9 @@ class LanguageActivity : Base__Activity<ActivityLanguageBinding>(),
         }
         root.findViewById<View>(R.id.shimmer_card)?.let { card ->
             val lp = card.layoutParams as ViewGroup.MarginLayoutParams
-            val side = dp(if (large) 8 else 0)
-            lp.setMargins(side, dp(if (large) 8 else 2), side, if (large) dp(8) else 0)
+            // Both Language ad layouts now inset the card by the NativeAdView's 8dp padding.
+            val inset = dp(8)
+            lp.setMargins(inset, inset, inset, inset)
             card.layoutParams = lp
         }
     }
@@ -387,7 +388,7 @@ class LanguageActivity : Base__Activity<ActivityLanguageBinding>(),
         sp_editor!!.putBoolean("is_lang_btn_visible", true).apply()
 
         if (isFromSettings) {
-                      binding.done.visibility = View.VISIBLE
+            binding.done.visibility = View.VISIBLE
         } else {
             if (!isClickAdPhase) {
                 isClickAdPhase = true

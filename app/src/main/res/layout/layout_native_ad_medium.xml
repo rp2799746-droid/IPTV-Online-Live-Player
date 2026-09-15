@@ -55,11 +55,10 @@
                 android:textColor="@color/black"
                 android:textSize="14sp"
                 android:textStyle="bold"
-                app:layout_constraintBottom_toBottomOf="@id/ad_icon"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/ad_icon"
                 app:layout_constraintTop_toTopOf="@id/ad_icon"
-                tools:text="Unlock Caller Details New ClarityCheck" />
+                tools:text="Headline" />
 
             <TextView
                 android:id="@+id/ad_advertiser"

@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-    Language screen (screen 1 native_language_1 ANE screen 2 native_language_1_click)
-    mate no shimmer. Banne ad ni height same (media 80dp) chhe etle ek j shimmer chale.
-    ad_shimmer_native_ad_large (media 140dp) na badle aa vaparay -> ad aave tyare jump nahi.
--->
+
 <com.facebook.shimmer.ShimmerFrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/unified"
@@ -19,7 +15,7 @@
         android:layout_marginTop="8dp"
         app:cardBackgroundColor="#EDEDED"
         app:cardCornerRadius="20dp"
-        app:cardElevation="5dp">
+        app:cardElevation="0dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"

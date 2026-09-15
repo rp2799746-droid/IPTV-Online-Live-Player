@@ -65,6 +65,10 @@ class MirrorStepsActivity : Base__Activity<ActivityMirrorStepsBinding>() {
                     val handledAds = mutableSetOf<String>()
                     val tag = "native_mirroring"
 
+                    // Shortcut thi sidhu khulyu hoy to Main e ad mangyu nathi - ahi mango.
+                    if (isTaskRoot) {
+                        AdsManager.loadNativeMirroring(this@MirrorStepsActivity)
+                    }
                     AdsManager.getAdLive(tag).observe(this@MirrorStepsActivity) { state ->
                             if (state is NativeAdUiState.Success && !handledAds.contains(tag)) {
                                 handledAds.add(tag) // mark as handled
