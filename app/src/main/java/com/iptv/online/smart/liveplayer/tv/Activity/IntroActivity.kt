@@ -54,6 +54,7 @@ class IntroActivity : Base__Activity<ActivityIntroBinding>() {
         fragments = arrayListOf<Fragment>().apply {
             add(IntroFragment1())
             add(IntroFragment2())
+            add(IntroFragment3())
             if (fullCfg.canShowFullScreenAd() && isInternetAvailable() && configScript.isNeedToShowADs) {
 
                 add(IntroFragmentFullAd())
@@ -64,6 +65,7 @@ class IntroActivity : Base__Activity<ActivityIntroBinding>() {
 
         binding.pagerIntro.offscreenPageLimit = 5
     }
+
     private fun applyUninstallWidgetShortcutsFromRemoteConfig() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N_MR1) return
         if (ERainAd.getInstance().getShouldDisplayWidgetUninstall(true) == true) {

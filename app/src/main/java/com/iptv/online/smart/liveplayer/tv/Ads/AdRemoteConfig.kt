@@ -32,6 +32,7 @@ class AdRemoteConfig private constructor(
     val native_onboarding_fullscreen_1_2 get() = unit("native_onboarding_fullscreen_1_2")
     val native_onboarding_fullscreen_2_2 get() = unit("native_onboarding_fullscreen_2_2")
 
+
     // ---- Home ----
     val inter_home get() = unit("inter_home")
     val inter_back get() = unit("inter_back")
@@ -100,7 +101,9 @@ class AdRemoteConfig private constructor(
                 null
             }
         }
-
+        fun initializeFromAssets(context: Context) {
+            initialize(context)
+        }
         private fun fromAssets(context: Context, fileName: String): AdRemoteConfig {
             return try {
                 val json = context.assets.open(fileName).bufferedReader().use { it.readText() }
