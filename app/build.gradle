@@ -20,6 +20,10 @@ android {
         versionCode 20
         versionName "1.19"
 
+        buildConfigField "String", "ERAIN_STUDIO_VERSION", "\"2.1\""
+        buildConfigField "String", "PLAY_SERVICES_ADS_VERSION", "\"24.7.0\""
+        buildConfigField "String", "GDPR_MODULE_VERSION", "\"2.0.2\""
+
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildFeatures {

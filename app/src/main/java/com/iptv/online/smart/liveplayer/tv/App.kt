@@ -2,71 +2,72 @@ package com.iptv.online.smart.liveplayer.tv
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.os.SystemClock
 import android.util.Log
+import androidx.lifecycle.ProcessLifecycleOwner
 import com.ads.module.admob.Admob
 import com.ads.module.admob.AppOpenManager
 import com.ads.module.ads.ERainAd
 import com.ads.module.application.AdsMultiDexApplication
 import com.ads.module.config.AdjustConfig
 import com.ads.module.config.ERainAdConfig
-import com.google.firebase.Firebase
 import com.google.firebase.FirebaseApp
-import com.google.firebase.remoteconfig.FirebaseRemoteConfig
-import com.google.firebase.remoteconfig.remoteConfig
-import com.google.firebase.remoteconfig.remoteConfigSettings
+import com.google.android.gms.ads.MobileAds
+import com.iptv.online.smart.liveplayer.tv.Activity.IntroActivity
+import com.iptv.online.smart.liveplayer.tv.Activity.LanguageActivity
 import com.iptv.online.smart.liveplayer.tv.Activity.SplashActivity
+import com.iptv.online.smart.liveplayer.tv.Activity.UninstallScreenActivity
+import com.iptv.online.smart.liveplayer.tv.Activity.UninstallSurveyActivity
+import com.iptv.online.smart.liveplayer.tv.Activity.WelcomeScreenActivity
 import com.iptv.online.smart.liveplayer.tv.BuildConfig
 import com.iptv.online.smart.liveplayer.tv.R
 import com.iptv.online.smart.liveplayer.tv.adsutils.AdRemoteConfig
-import com.iptv.online.smart.liveplayer.tv.Ads.AppResumeWelcomeManager
+import com.iptv.online.smart.liveplayer.tv.app.AppActivityLifecycleCallbacks
+import com.iptv.online.smart.liveplayer.tv.app.AppLifecycleObserver
 import com.itg.devconfig.DevConfig
 import com.onesignal.OneSignal
 import dagger.hilt.android.HiltAndroidApp
 import io.github.inflationx.calligraphy3.CalligraphyConfig
 import io.github.inflationx.calligraphy3.CalligraphyInterceptor
 import io.github.inflationx.viewpump.ViewPump
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.launch
 
 @HiltAndroidApp
 class App : AdsMultiDexApplication() {
 
-    private val appScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-
     companion object {
         @SuppressLint("StaticFieldLeak")
         var app: App? = null
-        var onRemoteFetched: ((FirebaseRemoteConfig?) -> Unit)? = null
+        lateinit var instance: App
+        @SuppressLint("StaticFieldLeak")
+        var currentActivity: Activity? = null
         const val STARTUP_TAG = "AppStartup"
-    }
-
-    fun initFirebaseConfigs(mActivity: Activity) {
-        val remoteConfig: FirebaseRemoteConfig = Firebase.remoteConfig
-        val configSettings = remoteConfigSettings {
-            minimumFetchIntervalInSeconds = if (BuildConfig.DEBUG) 1 else 3600
-        }
-        remoteConfig.setConfigSettingsAsync(configSettings)
-
-        remoteConfig.fetchAndActivate().addOnCompleteListener(mActivity) { _ ->
-            if (!mActivity.isFinishing && !mActivity.isDestroyed) {
-                onRemoteFetched?.invoke(remoteConfig)
-            }
-        }.addOnFailureListener(mActivity) {
-            if (!mActivity.isFinishing && !mActivity.isDestroyed) {
-                onRemoteFetched?.invoke(null)
-            }
-        }
     }
 
     override fun onCreate() {
         super.onCreate()
-        app = this
+        MobileAds.initialize(this) {}
 
         try {
-            AdRemoteConfig.initialize(this)
+            DevConfig.init(
+                context = this,
+                nkhStudioVersion = BuildConfig.ERAIN_STUDIO_VERSION,
+                playServicesAdsVersion = BuildConfig.PLAY_SERVICES_ADS_VERSION,
+                gdprModuleVersion = BuildConfig.GDPR_MODULE_VERSION
+            )
+        } catch (e: Exception) {
+            Log.e(STARTUP_TAG, "DevConfig init error: ${e.message}")
+        }
+
+        app = this
+        instance = this
+
+        try {
+            FirebaseApp.initializeApp(this)
+        } catch (e: Exception) {
+            Log.e(STARTUP_TAG, "FirebaseApp init error: ${e.message}")
+        }
+
+        try {
+            AdRemoteConfig.initializeFromAssets(this)
         } catch (e: Exception) {
             Log.e(STARTUP_TAG, "AdRemoteConfig init error: ${e.message}")
         }
@@ -91,30 +92,13 @@ class App : AdsMultiDexApplication() {
 
         initAds()
 
+        ProcessLifecycleOwner.get().lifecycle.addObserver(AppLifecycleObserver())
+        registerActivityLifecycleCallbacks(AppActivityLifecycleCallbacks())
 
-        appScope.launch {
-            try {
-                FirebaseApp.initializeApp(this@App)
-            } catch (e: Exception) {
-                Log.e(STARTUP_TAG, "FirebaseApp init error: ${e.message}")
-            }
-
-            try {
-                OneSignal.initWithContext(this@App, "9971a8a0-4bb3-48ae-bac0-30af3026640d")
-            } catch (e: Exception) {
-                Log.e(STARTUP_TAG, "OneSignal init error: ${e.message}")
-            }
-
-            try {
-                DevConfig.init(
-                    context = this@App,
-                    nkhStudioVersion = "2.1",
-                    playServicesAdsVersion = "24.7.0",
-                    gdprModuleVersion = "2.0.2"
-                )
-            } catch (e: Exception) {
-                Log.e(STARTUP_TAG, "DevConfig init error: ${e.message}")
-            }
+        try {
+            OneSignal.initWithContext(this, "9971a8a0-4bb3-48ae-bac0-30af3026640d")
+        } catch (e: Exception) {
+            Log.e(STARTUP_TAG, "OneSignal init error: ${e.message}")
         }
     }
 
@@ -127,8 +111,7 @@ class App : AdsMultiDexApplication() {
             mERainAdConfig.facebookClientToken = resources.getString(R.string.facebook_client_token)
             mERainAdConfig.adjustTokenTiktok = resources.getString(R.string.tiktok_token)
 
-            val resumeId = AdRemoteConfig.getInstance()?.inter_welcome_back?.id ?: ""
-            mERainAdConfig.idAdResume = if (resumeId.isNotEmpty()) resumeId else "ca-app-pub-3940256099942544/9257395921" // Fallback Test ID if blank
+            mERainAdConfig.idAdResume = ""
 
             mERainAdConfig.intervalInterstitialAd = 35
 
@@ -138,8 +121,12 @@ class App : AdsMultiDexApplication() {
             Admob.getInstance().setOpenActivityAfterShowInterAds(true)
 
             AppOpenManager.getInstance().disableAppResumeWithActivity(SplashActivity::class.java)
+            AppOpenManager.getInstance().disableAppResumeWithActivity(LanguageActivity::class.java)
+            AppOpenManager.getInstance().disableAppResumeWithActivity(IntroActivity::class.java)
+            AppOpenManager.getInstance().disableAppResumeWithActivity(WelcomeScreenActivity::class.java)
+            AppOpenManager.getInstance().disableAppResumeWithActivity(UninstallScreenActivity::class.java)
+            AppOpenManager.getInstance().disableAppResumeWithActivity(UninstallSurveyActivity::class.java)
             AppOpenManager.getInstance().disableAppResume()
-            AppResumeWelcomeManager.init(this)
 
 
         } catch (e: Exception) {

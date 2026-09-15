@@ -1,39 +1,28 @@
 package com.iptv.online.smart.liveplayer.tv.Fregmnet
-import com.iptv.online.smart.liveplayer.tv.adsutils.populateNativeAdView
 
 import android.graphics.Color
 import android.graphics.PorterDuff
 import android.graphics.drawable.GradientDrawable
-import android.util.Log
 import android.view.View
-import androidx.core.content.ContextCompat
-import androidx.lifecycle.lifecycleScope
 import com.ads.module.ads.ERainAd
 import com.iptv.online.smart.liveplayer.tv.Activity.IntroActivity
 import com.iptv.online.smart.liveplayer.tv.Ads.AdsManager
 import com.iptv.online.smart.liveplayer.tv.R
-import com.iptv.online.smart.liveplayer.tv.adsutils.AdRemoteConfig
-import com.iptv.online.smart.liveplayer.tv.adsutils.canShowFullScreenAd
 import com.iptv.online.smart.liveplayer.tv.adsutils.LazyShowAds
-import com.iptv.online.smart.liveplayer.tv.adsutils.NativeAdUiState
 import com.iptv.online.smart.liveplayer.tv.adsutils.RemoteConfigdata
+import com.iptv.online.smart.liveplayer.tv.adsutils.populateNativeAdView
+import com.iptv.online.smart.liveplayer.tv.databinding.FragmentIntroFullAdBinding
 import com.iptv.online.smart.liveplayer.tv.utils.gone
-import com.iptv.online.smart.liveplayer.tv.utils.isIntroFlowDone
 import com.iptv.online.smart.liveplayer.tv.utils.triggerClick
 import com.iptv.online.smart.liveplayer.tv.utils.visible
-import com.iptv.online.smart.liveplayer.tv.databinding.FragmentIntroFullAdBinding
-import kotlinx.coroutines.delay
 
 class IntroFragmentFullAd : BaseFragment<FragmentIntroFullAdBinding>(), LazyShowAds {
 
-
-
-    private var configScript: RemoteConfigdata? = null
+    private var isObserving = false
 
     override fun setViewBinding() = FragmentIntroFullAdBinding.inflate(layoutInflater)
 
-    override fun bindObjects() {
-    }
+    override fun bindObjects() = Unit
 
     override fun bindListener() {
         binding.ivCloseAd.triggerClick {
@@ -41,130 +30,61 @@ class IntroFragmentFullAd : BaseFragment<FragmentIntroFullAdBinding>(), LazyShow
         }
     }
 
-    override fun bindMethod() {
-        configScript = context?.let { RemoteConfigdata(it) }
-    }
-
-    override fun bindObserver() {
-        super.bindObserver()
-
-    }
+    override fun bindMethod() = Unit
 
     override fun showAds() {
-        nativeAds()
+        if (isObserving) return
+        isObserving = true
+        val isFirst = (activity as? IntroActivity)?.isFirstOnboarding ?: true
+        AdsManager.nativeAdOnBoardingFullLive.observe(viewLifecycleOwner) { ad ->
+            renderNative(ad, isFirst)
+        }
     }
 
-    private fun nativeAds() {
-        val currentActivity = activity ?: return
-        val currentConfig = configScript ?: return
-
-        if (currentConfig.isNeedToShowADs) {
-
-            val fullCfg = if (currentActivity.isIntroFlowDone())
-                AdRemoteConfig.getInstance().native_onboarding_fullscreen_2_2
-            else AdRemoteConfig.getInstance().native_onboarding_fullscreen_1_2
-            if (fullCfg.canShowFullScreenAd()) {
-                val handledAds = mutableSetOf<String>()
-                val retriedTags = mutableSetOf<String>()
-                val activeActivity = activity ?: return
-                val tag = if (activeActivity.isIntroFlowDone())
-                    "native_onboarding_full_2"
-                else "native_onboarding_full_1"
-
-                AdsManager.getAdLive(tag).observe(viewLifecycleOwner) { state ->
-
-                        if (state is NativeAdUiState.Success && !handledAds.contains(tag)) {
-                            handledAds.add(tag)
-                            Log.d("AdManager123", "[$tag] Success, 🚀 showing full ad: [${state.adsID}]")
-
-                            binding.adShimmer.root.gone
-                            binding.frAds.visible
-                            binding.ivCloseAd.gone
-
-                            ERainAd.getInstance().populateNativeAdView(
-                                activeActivity,
-                                state.ad,
-                                binding.frAds,
-                                binding.adShimmer.root
-                            )
-
-                            if (currentConfig.isFullNativeCloseBtn) {
-                                lifecycleScope.launchWhenStarted {
-                                    delay(1000)
-                                    binding.ivCloseAd.visible
-                                }
-                            }
-
-                            //// Height cta
-                            val remoteHeightDp = state.ctaHeight
-                            val adBtn = binding.frAds.findViewById<View>(R.id.ad_call_to_action)
-
-                            if (adBtn != null) {
-                                val density = resources.displayMetrics.density
-                                val heightInPx = (remoteHeightDp * density).toInt()
-
-                                val params = adBtn.layoutParams
-                                params?.let {
-                                    it.height = heightInPx
-                                    adBtn.layoutParams = it
-                                    adBtn.requestLayout()
-                                    Log.d("AdManager123", "Height set to: $heightInPx px for tag: $tag")
-                                }
-
-                                if (tag == "native_onboarding_full_1") {
-                                    val bgColor = Color.parseColor("#EE6E17")
-                                    val bg = adBtn.background?.mutate()
-                                    if (bg is GradientDrawable) {
-                                        bg.setColor(bgColor)
-                                    } else if (bg != null) {
-                                        bg.mutate().setColorFilter(bgColor, PorterDuff.Mode.SRC_ATOP)
-                                    } else {
-                                        adBtn.setBackgroundColor(bgColor)
-                                    }
-
-                                    val adAttr = binding.frAds.findViewById<android.widget.TextView>(R.id.ad_attribution)
-                                    adAttr?.setTextColor(Color.parseColor("#FFFFFF"))
-                                    val adRoot = binding.frAds.findViewById<View>(R.id.ad_attribution)
-                                    adRoot?.setBackgroundColor(Color.parseColor("#EE6E17"))
-                                }
-
-                            } else {
-                                Log.e("AdManager123", "CTA Button not found in layout for tag: $tag")
-                            }
-                            //
-
-                        } else if (state is NativeAdUiState.Loading) {
-
-                            if (binding.frAds.visibility != View.VISIBLE) {
-                                binding.adShimmer.root.visible
-                                binding.ivCloseAd.gone
-                            }
-                        } else if (state == null || state is NativeAdUiState.Failed || state is NativeAdUiState.Empty) {
-                            if (retriedTags.add(tag)) {
-                                binding.adShimmer.root.visible
-                                binding.frAds.gone
-                                binding.ivCloseAd.gone
-                                val adId = if (activeActivity.isIntroFlowDone())
-                                    AdRemoteConfig.getInstance().native_onboarding_fullscreen_2_2.id else AdRemoteConfig.getInstance().native_onboarding_fullscreen_1_2.id
-                                AdsManager.loadAd(
-                                    activeActivity, adId, R.layout.layout_native_ad_full, tag
-                                )
-                                Log.d("AdManager123", "[$tag] fallback reload triggered")
-                            } else {
-                                binding.adShimmer.root.gone
-                                binding.frAds.gone
-                                binding.ivCloseAd.visible
-                            }
-                        }
-                }
-            } else {
-                binding.adShimmer.root.gone
-                binding.frAds.gone
-                binding.ivCloseAd.visible
-            }
-        } else {
+    private fun renderNative(ad: com.ads.module.ads.wrapper.ApNativeAd?, isFirst: Boolean) {
+        if (ad == null) {
             binding.adShimmer.root.gone
             binding.frAds.gone
             binding.ivCloseAd.visible
+            return
         }
-    }}
+
+        binding.frAds.removeAllViews()
+        binding.frAds.visible
+        binding.ivCloseAd.gone
+        ERainAd.getInstance().populateNativeAdView(
+            requireActivity(),
+            ad,
+            binding.frAds,
+            binding.adShimmer.root
+        )
+        binding.adShimmer.root.gone
+
+        if (RemoteConfigdata(requireContext()).isFullNativeCloseBtn) {
+            binding.root.postDelayed({
+                if (isAdded) binding.ivCloseAd.visible
+            }, 1_000L)
+        }
+
+        binding.frAds.findViewById<View>(R.id.ad_call_to_action)?.let { button ->
+            button.layoutParams?.let { params ->
+                params.height = (AdsManager.getCTAButtonHeight(requireContext()) * resources.displayMetrics.density).toInt()
+                button.layoutParams = params
+            }
+            if (isFirst) {
+                val background = button.background?.mutate()
+                if (background is GradientDrawable) {
+                    background.setColor(Color.parseColor("#EE6E17"))
+                } else if (background != null) {
+                    background.setColorFilter(Color.parseColor("#EE6E17"), PorterDuff.Mode.SRC_ATOP)
+                } else {
+                    button.setBackgroundColor(Color.parseColor("#EE6E17"))
+                }
+                binding.frAds.findViewById<android.widget.TextView>(R.id.ad_attribution)
+                    ?.setTextColor(Color.WHITE)
+                binding.frAds.findViewById<View>(R.id.ad_attribution)
+                    ?.setBackgroundColor(Color.parseColor("#EE6E17"))
+            }
+        }
+    }
+}

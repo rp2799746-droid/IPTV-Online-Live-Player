@@ -17,6 +17,7 @@ import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.LoadAdError
 import com.iptv.online.smart.liveplayer.tv.R
 import com.iptv.online.smart.liveplayer.tv.adsutils.AdRemoteConfig
+import com.iptv.online.smart.liveplayer.tv.adsutils.AdUnitConfig
 import com.iptv.online.smart.liveplayer.tv.adsutils.NativeAdUiState
 import com.iptv.online.smart.liveplayer.tv.adsutils.RemoteConfigdata
 import com.iptv.online.smart.liveplayer.tv.adsutils.isInternetAvailable
@@ -26,8 +27,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 object AdsManager {
-
-    private const val WELCOME_TAG = "WelcomeFlow"
 
     private val _adStateFlow = MutableStateFlow<Map<String, NativeAdUiState>>(emptyMap())
 
@@ -51,8 +50,65 @@ object AdsManager {
 
     private val currentAds = mutableMapOf<String, ApNativeAd?>()
 
-    fun onboarding1Tag(isDone: Boolean) =
-        if (isDone) "native_onboarding_2_1" else "native_onboarding_1_1"
+    // Base flow channels.  Startup/onboarding screens observe these directly;
+    // the tag-based state below remains only for unrelated legacy IPTV screens.
+    val nativeLanguageAdLive = MutableLiveData<ApNativeAd?>()
+    val nativeLanguageClickAdLive = MutableLiveData<ApNativeAd?>()
+    val nativeOnboarding1AdLive = MutableLiveData<ApNativeAd?>()
+    val nativeOnboarding4AdLive = MutableLiveData<ApNativeAd?>()
+    val nativeAdOnBoardingFullLive = MutableLiveData<ApNativeAd?>()
+    var interWelcomeAdLive = MutableLiveData<ApInterstitialAd?>()
+    private val adConfigMap = mutableMapOf<ApNativeAd, AdUnitConfig>()
+
+    fun getAdConfig(ad: ApNativeAd): AdUnitConfig? = adConfigMap[ad]
+
+    /** Clears a prior process-static Language native without issuing a load. */
+    fun clearNativeLanguage() {
+        nativeLanguageAdLive.postValue(null)
+    }
+
+    fun onboarding1Tag(isFirst: Boolean) =
+        if (isFirst) "native_onboarding_1_1" else "native_onboarding_2_1"
+
+    /**
+     * Single base-style native gate.  Every skipped or failed request emits
+     * null so the owner cannot be left waiting on a stale shimmer/state.
+     */
+    private fun loadNativeInternal(
+        activity: Activity,
+        config: AdUnitConfig,
+        layoutRes: Int,
+        liveData: MutableLiveData<ApNativeAd?>,
+        shouldDisplay: Boolean = true,
+    ) {
+        if (!RemoteConfigdata(activity).isNeedToShowADs
+            || !config.isEnable
+            || isPurchased(activity)
+            || !activity.isInternetAvailable()
+            || !shouldDisplay
+        ) {
+            liveData.postValue(null)
+            return
+        }
+
+        ERainAd.getInstance().loadNativeAdResultCallback(
+            activity,
+            config.id,
+            layoutRes,
+            object : AdCallback() {
+                override fun onNativeAdLoaded(nativeAd: ApNativeAd) {
+                    super.onNativeAdLoaded(nativeAd)
+                    adConfigMap[nativeAd] = config
+                    liveData.postValue(nativeAd)
+                }
+
+                override fun onAdFailedToLoad(adError: LoadAdError?) {
+                    super.onAdFailedToLoad(adError)
+                    liveData.postValue(null)
+                }
+            }
+        )
+    }
 
     fun loadAd(context: Activity, adId: String, layoutId: Int, adTag: String, shouldDisplay: Boolean = true,
     ) {
@@ -102,30 +158,51 @@ object AdsManager {
         }
     }
 
-    fun loadNativeLanguage(activity: Activity, screenCount: Int) {
-        val cfg = if (screenCount == 1) AdRemoteConfig.getInstance().native_language_1
-        else AdRemoteConfig.getInstance().native_language_2
-               val layoutRes = if (screenCount == 1) R.layout.layout_native_ad_lang_1
-        else R.layout.layout_native_ad_large
-        loadAd(activity, cfg.id, layoutRes, "native_lang_tag", cfg.isEnable)
+    fun loadNativeLanguage(activity: Activity, isFirst: Boolean, layoutRes: Int) {
+        val config =
+            if (isFirst) AdRemoteConfig.getInstance().native_language_1 else AdRemoteConfig.getInstance().native_language_2
+        loadNativeInternal(activity, config, layoutRes, nativeLanguageAdLive)
     }
 
-    fun loadNativeLanguageClick(activity: Activity, screenCount: Int) {
-        val cfg = if (screenCount == 1) AdRemoteConfig.getInstance().native_language_1_click
-        else AdRemoteConfig.getInstance().native_language_2_click
-
-
-        val layoutRes = if (screenCount == 1) R.layout.layout_native_ad_lang_click
-        else R.layout.layout_native_ad_lang_click_2
-
-        loadAd(activity, cfg.id, layoutRes, "native_lang_click_tag", cfg.isEnable)
+    fun loadNativeLanguageClick(activity: Activity, isFirst: Boolean, layoutRes: Int) {
+        val config =
+            if (isFirst) AdRemoteConfig.getInstance().native_language_1_click else AdRemoteConfig.getInstance().native_language_2_click
+        loadNativeInternal(activity, config, layoutRes, nativeLanguageClickAdLive)
     }
 
-    fun loadNativeOnboarding1(activity: Activity, isDone: Boolean) {
-        val cfg = if (isDone) AdRemoteConfig.getInstance().native_onboarding_2_1
-        else AdRemoteConfig.getInstance().native_onboarding_1_1
-        val tag = onboarding1Tag(isDone)
-        loadAd(activity, cfg.id, R.layout.layout_native_ad_large, tag, cfg.isEnable)
+    fun loadNativeOnboarding1(activity: Activity, isFirst: Boolean, layoutRes: Int) {
+        val config =
+            if (isFirst) AdRemoteConfig.getInstance().native_onboarding_1_1 else AdRemoteConfig.getInstance().native_onboarding_2_1
+        loadNativeInternal(
+            activity,
+            config,
+            layoutRes,
+            nativeOnboarding1AdLive
+        )
+    }
+
+    fun loadNativeOnboarding4(activity: Activity, isFirst: Boolean, layoutRes: Int) {
+        val config =
+            if (isFirst) AdRemoteConfig.getInstance().native_onboarding_1_4 else AdRemoteConfig.getInstance().native_onboarding_2_4
+        loadNativeInternal(
+            activity,
+            config,
+            layoutRes,
+            nativeOnboarding4AdLive,
+            ERainAd.getInstance().getShouldDisplayNativeOnboardingNormal2(config.enableUaCheck) == true
+        )
+    }
+
+    fun loadNativeOnboardingFull(activity: Activity, isFirst: Boolean, layoutRes: Int) {
+        val config =
+            if (isFirst) AdRemoteConfig.getInstance().native_onboarding_fullscreen_1_2 else AdRemoteConfig.getInstance().native_onboarding_fullscreen_2_2
+        loadNativeInternal(
+            activity,
+            config,
+            layoutRes,
+            nativeAdOnBoardingFullLive,
+            ERainAd.getInstance().getShouldDisplayNativeOnboardingFull1(config.enableUaCheck) == true
+        )
     }
 
     private fun updateAdState(tagName: String, state: NativeAdUiState) {
@@ -153,52 +230,75 @@ object AdsManager {
         }
     }
 
-    private var interWelcomeBack: ApInterstitialAd? = null
 
-    fun loadInterWelcomeBack(activity: Activity, ignoreLimit: Boolean = false) {
+
+    private var interOnboarding: ApInterstitialAd? = null
+
+    fun loadInterOnboarding(activity: Activity, ignoreLimit: Boolean = false) {
+        interOnboarding = null
+    }
+
+    fun showInterOnboarding(activity: Activity, ignoreLimit: Boolean = false, onAction: () -> Unit) {
+        interOnboarding = null
+        onAction()
+    }
+
+    fun loadInterWelcome(activity: Activity, ignoreLimit: Boolean = false) {
+        val cached = interWelcomeAdLive.value?.takeIf { it.isReady }
+        val request = MutableLiveData<ApInterstitialAd?>()
+        interWelcomeAdLive = request
+        fun emit(ad: ApInterstitialAd?) = request.postValue(ad)
+
         val config = RemoteConfigdata(activity)
         val cfg = AdRemoteConfig.getInstance().inter_welcome_back
         if (!config.isNeedToShowADs
             || !config.interwelcomeback
             || !cfg.isEnable
             || isPurchased(activity)
+            || !activity.isInternetAvailable()
             || (!ignoreLimit && !(ERainAd.getInstance()
                 .getShouldDisplayInterWelcomeBack(cfg.enableUaCheck) == true))
         ) {
-            interWelcomeBack = null
-            Log.d(WELCOME_TAG, "preload skipped: ads/config off or not eligible")
+            emit(null)
             return
         }
-        if (interWelcomeBack != null) {
-            Log.d(WELCOME_TAG, "preload skipped: already loaded")
+        if (cached != null) {
+            emit(cached)
             return
         }
-        interWelcomeBack = ERainAd.getInstance()
-            .getInterstitialAds(activity, cfg.id, object : AdCallback() {
+
+        var loaded: ApInterstitialAd? = null
+        loaded = ERainAd.getInstance().getInterstitialAds(
+            activity,
+            cfg.id,
+            object : AdCallback() {
                 override fun onApInterstitialLoad(apInterstitialAd: ApInterstitialAd?) {
                     super.onApInterstitialLoad(apInterstitialAd)
-                    interWelcomeBack = apInterstitialAd ?: interWelcomeBack
-                    Log.i(WELCOME_TAG, "Welcome back interstitial loaded")
+                    emit(apInterstitialAd ?: loaded)
                 }
 
                 override fun onAdFailedToLoad(adError: LoadAdError?) {
                     super.onAdFailedToLoad(adError)
-                    interWelcomeBack = null
-                    Log.d(WELCOME_TAG, "welcome back inter failed: ${adError?.message}")
+                    emit(null)
                 }
-            })
+            }
+        )
+        if (loaded?.isReady == true) emit(loaded)
     }
 
-    fun showInterWelcomeBack(
+    fun showInterWelcome(
         activity: Activity,
         ignoreLimit: Boolean = false,
         onAction: () -> Unit
     ) {
-        val interstitial = interWelcomeBack
+        val interstitial = interWelcomeAdLive.value
+        val remoteData = RemoteConfigdata(activity)
         val cfg = AdRemoteConfig.getInstance().inter_welcome_back
         if (interstitial != null
             && interstitial.isReady
-            && RemoteConfigdata(activity).isNeedToShowADs
+            && remoteData.isNeedToShowADs
+            && remoteData.interwelcomeback
+            && cfg.isEnable
             && !isPurchased(activity)
             && activity.isInternetAvailable()
             && (ignoreLimit || ERainAd.getInstance()
@@ -208,10 +308,10 @@ object AdsManager {
                 activity, interstitial, object : AdCallback() {
                     override fun onNextAction() {
                         super.onNextAction()
-                        interWelcomeBack = null
+                        interWelcomeAdLive = MutableLiveData()
                         onAction()
                     }
-                }, true
+                }, false
             )
         } else {
             onAction()

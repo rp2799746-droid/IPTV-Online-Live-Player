@@ -31,7 +31,9 @@ class AdRemoteConfig private constructor(
     val native_onboarding_2_4 get() = unit("native_onboarding_2_4")
     val native_onboarding_fullscreen_1_2 get() = unit("native_onboarding_fullscreen_1_2")
     val native_onboarding_fullscreen_2_2 get() = unit("native_onboarding_fullscreen_2_2")
-
+    // Inter onboarding is permanently disabled for this app.  Returning an
+    // empty unit prevents a remote ID from being loaded or shown accidentally.
+    val inter_onboarding get() = AdUnitConfig()
 
     // ---- Home ----
     val inter_home get() = unit("inter_home")
@@ -75,10 +77,16 @@ class AdRemoteConfig private constructor(
             }
         }
 
+        fun initializeFromAssets(context: Context) {
+            initialize(context)
+        }
+
         fun initialize(context: Context, json: String?) {
             synchronized(this) {
                 val fileName = if (BuildConfig.DEBUG) DEBUG_FILE else RELEASE_FILE
-                instance = if (!json.isNullOrBlank()) {
+                instance = if (BuildConfig.DEBUG) {
+                    fromAssets(context, DEBUG_FILE)
+                } else if (!json.isNullOrBlank()) {
                     fromJson(json) ?: fromAssets(context, fileName)
                 } else {
                     fromAssets(context, fileName)
@@ -101,9 +109,7 @@ class AdRemoteConfig private constructor(
                 null
             }
         }
-        fun initializeFromAssets(context: Context) {
-            initialize(context)
-        }
+
         private fun fromAssets(context: Context, fileName: String): AdRemoteConfig {
             return try {
                 val json = context.assets.open(fileName).bufferedReader().use { it.readText() }

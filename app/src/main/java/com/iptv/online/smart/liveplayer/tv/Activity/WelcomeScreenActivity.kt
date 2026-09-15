@@ -1,60 +1,62 @@
 package com.iptv.online.smart.liveplayer.tv.Activity
 
-import android.util.Log
 import androidx.activity.OnBackPressedCallback
 import com.iptv.online.smart.liveplayer.tv.Ads.AdsManager
-import com.iptv.online.smart.liveplayer.tv.adsutils.RemoteConfigdata
+import com.iptv.online.smart.liveplayer.tv.app.AppConstants
 import com.iptv.online.smart.liveplayer.tv.databinding.ActivityWelcomeScreenBinding
-
-
 
 class WelcomeScreenActivity : Base__Activity<ActivityWelcomeScreenBinding>() {
 
+    private var isStartReady = false
 
-    private val LOG = "WelcomeFlow"
-    private var configScript: RemoteConfigdata? = null
     override fun setViewBinding() = ActivityWelcomeScreenBinding.inflate(layoutInflater)
 
     override fun bindObjects() {
-        Log.d(LOG, "WelcomeScreen -> bindObjects (screen open thai)")
-
-        RemoteConfigdata(this@WelcomeScreenActivity).also { configScript = it }
-
         binding.txtWelcome.isSelected = true
-//        binding.txtDesc.isSelected = true
-
-        AdsManager.loadInterWelcomeBack(this)
-
+        AdsManager.loadInterWelcome(this)
+        stateUi()
     }
+
+    override fun bindObserver() {
+        AdsManager.interWelcomeAdLive.observe(this) { showStart(ready = true) }
+    }
+
     override fun bindListener() {
-        onBackPressedDispatcher.addCallback(owner = this, onBackPressedCallback = object : OnBackPressedCallback(enabled = true) {
-            override fun handleOnBackPressed() {
-                Log.d(LOG, "WelcomeScreen -> back pressed")
-                binding.btnNext.performClick()
-            }
-        })
+        onBackPressedDispatcher.addCallback(
+            owner = this,
+            onBackPressedCallback = object : OnBackPressedCallback(enabled = true) {
+                override fun handleOnBackPressed() {
+                    binding.btnNext.performClick()
+                }
+            },
+        )
 
         binding.btnNext.setOnClickListener {
-            Log.d(LOG, "WelcomeScreen -> btnNext click, show welcome-back inter")
-
-            AdsManager.showInterWelcomeBack(activity = this) {
-                Log.d(LOG, "WelcomeScreen -> inter done, finish()")
-
-                if (!isFinishing && !isDestroyed) {
-                    finish()
-                }
+            if (!isStartReady) return@setOnClickListener
+            AdsManager.showInterWelcome(this) {
+                if (!isFinishing && !isDestroyed) finish()
             }
         }
     }
 
-    override fun bindMethod() {
+    override fun bindMethod() = Unit
 
+    private fun stateUi() {
+        showStart(ready = false)
+        binding.btnNext.postDelayed(
+            { showStart(ready = true) },
+            AppConstants.DEFAULT_TIME_DELAY_LOAD_INTER_WELCOME,
+        )
     }
 
-    override fun onResume() {
-        super.onResume()
-        Log.d(LOG, "WelcomeScreen -> onResume")
+    private fun showStart(ready: Boolean) {
+        if (isFinishing || isDestroyed || (isStartReady && !ready)) return
+        isStartReady = ready
+        binding.btnNext.isEnabled = ready
     }
 
-
+    override fun onDestroy() {
+        binding.btnNext.handler?.removeCallbacksAndMessages(null)
+        super.onDestroy()
+    }
 }

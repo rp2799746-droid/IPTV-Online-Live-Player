@@ -5,9 +5,9 @@ import android.content.SharedPreferences
 import android.graphics.Color
 import android.graphics.LinearGradient
 import android.graphics.Shader
+import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -15,17 +15,16 @@ import androidx.recyclerview.widget.RecyclerView
 import com.ads.module.ads.ERainAd
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.iptv.online.smart.liveplayer.tv.Activity.SplashActivity.Companion.screenCount
 import com.iptv.online.smart.liveplayer.tv.Adapter.LanguageAdapter
 import com.iptv.online.smart.liveplayer.tv.Ads.AdsManager
 import com.iptv.online.smart.liveplayer.tv.Model.LanguageModel
 import com.iptv.online.smart.liveplayer.tv.R
 import com.iptv.online.smart.liveplayer.tv.ReadFile.BOOKER_Manager
 import com.iptv.online.smart.liveplayer.tv.ReadFile.PreferenceManager
-import com.iptv.online.smart.liveplayer.tv.adsutils.AdRemoteConfig
-import com.iptv.online.smart.liveplayer.tv.adsutils.NativeAdUiState
+import com.iptv.online.smart.liveplayer.tv.adsutils.LanguageAdVariant
 import com.iptv.online.smart.liveplayer.tv.adsutils.RemoteConfigdata
-import com.iptv.online.smart.liveplayer.tv.adsutils.isInternetAvailable
+import com.iptv.online.smart.liveplayer.tv.adsutils.RemoteConfigUtils
+import com.iptv.online.smart.liveplayer.tv.app.AppConstants.DEFAULT_TIME_DELAY_SHOW_LANGUAGE_DONE_BUTTON
 import com.iptv.online.smart.liveplayer.tv.adsutils.populateNativeAdView
 import com.iptv.online.smart.liveplayer.tv.databinding.ActivityLanguageBinding
 import com.iptv.online.smart.liveplayer.tv.utils.isIntroFlowDone
@@ -41,26 +40,34 @@ class LanguageActivity : Base__Activity<ActivityLanguageBinding>(),
     private var preferenceManager: PreferenceManager? = null
     private var sp: SharedPreferences? = null
     private var sp_editor: SharedPreferences.Editor? = null
-    private var configScript: RemoteConfigdata? = null
-
     private var isClickAdPhase = false
-
     private val doneHandler = Handler(Looper.getMainLooper())
+    private var languageVariant = LanguageAdVariant.FIRST
+    private var shouldDelayDoneButton = true
+    private var timeDelayDoneButton = DEFAULT_TIME_DELAY_SHOW_LANGUAGE_DONE_BUTTON
 
-    private val adHandler = Handler(Looper.getMainLooper())
+    private val isFirstLanguage: Boolean
+        get() = languageVariant == LanguageAdVariant.FIRST
 
     override val needBackInterAd: Boolean
         get() = intent.getBooleanExtra("settingss", false)
 
     companion object {
-        private const val TAG_LANG = "native_lang_tag"
-        private const val TAG_LANG_CLICK = "native_lang_click_tag"
+        private const val STATE_LANGUAGE_VARIANT = "state_language_variant"
+    }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        languageVariant = LanguageAdVariant.fromIntentValue(
+            savedInstanceState?.getString(STATE_LANGUAGE_VARIANT)
+                ?: intent.getStringExtra(LanguageAdVariant.EXTRA),
+            SplashActivity.isLanguageDone(this)
+        )
+        super.onCreate(savedInstanceState)
+    }
 
-        private const val AD_LOG = "LangAd"
-
-
-        private const val SHIMMER_TIMEOUT_MS = 10_000L
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putString(STATE_LANGUAGE_VARIANT, LanguageAdVariant.intentValue(languageVariant))
+        super.onSaveInstanceState(outState)
     }
 
     override fun setViewBinding(): ActivityLanguageBinding {
@@ -68,10 +75,8 @@ class LanguageActivity : Base__Activity<ActivityLanguageBinding>(),
     }
 
     override fun bindObjects() {
-        if (intent.hasExtra("screen_count")) {
-            screenCount = intent.getIntExtra("screen_count", 1)
-        }
-
+        shouldDelayDoneButton = RemoteConfigUtils.shouldDelayLanguageDoneButton()
+        timeDelayDoneButton = RemoteConfigUtils.getTimeDelayButtonDoneLanguage()
         sp = getSharedPreferences(getPackageName(), 0)
         sp_editor = sp!!.edit()
         val colors = intArrayOf(
@@ -106,8 +111,6 @@ class LanguageActivity : Base__Activity<ActivityLanguageBinding>(),
         }
         binding.textheader.setOnAdminAdToggleListener { restartSplash() }
 
-        configScript = RemoteConfigdata(this@LanguageActivity)
-
         val isFromSettings = intent.getBooleanExtra("settingss", false)
 
         if (isFromSettings) {
@@ -123,10 +126,6 @@ class LanguageActivity : Base__Activity<ActivityLanguageBinding>(),
             binding.textheader.text = getString(R.string.choose_your_language)
             binding.done.visibility = View.GONE
             binding.gradinttext.visibility = View.GONE
-
-            loadLanguageAd()
-
-
         }
 
 
@@ -137,12 +136,15 @@ class LanguageActivity : Base__Activity<ActivityLanguageBinding>(),
         loadSavedLanguage()
         setAdapter()
 
-        if (!isFromSettings) setupSwipeHint()
+        if (!isFromSettings) {
+            setupSwipeHint()
+            initAds()
+        }
 
     }
 
     private fun setupSwipeHint() {
-        if (screenCount != 1) return
+        if (!isFirstLanguage) return
 
         binding.swipeHint.visibility = View.VISIBLE
         binding.swipeHint.playAnimation()
@@ -167,65 +169,45 @@ class LanguageActivity : Base__Activity<ActivityLanguageBinding>(),
         binding.swipeHint.visibility = View.GONE
     }
 
-    private fun startShimmerTimeout(tag: String) {
-        adHandler.removeCallbacksAndMessages(null)
-        adHandler.postDelayed({
-            if (binding.frAds.visibility != View.VISIBLE) {
-                Log.d(AD_LOG, "[$tag] ${SHIMMER_TIMEOUT_MS}ms ma ad na aavyo -> ad slot band")
-                binding.adShimmer.root.visibility = View.GONE
-                binding.frAds.visibility = View.GONE
-            }
-        }, SHIMMER_TIMEOUT_MS)
-    }
-
-
-    private fun loadLanguageAd() {
-        Log.d(AD_LOG, "STEP 1 | screen khulyu (screenCount=$screenCount) -> [$TAG_LANG] observe")
+    private fun initAds() {
         adjustLangShimmerHeight()
-
-        startAdFlow(TAG_LANG)
-
-
-        Log.d(AD_LOG, "STEP 2 | [$TAG_LANG_CLICK] preload chalu (100ms delay)")
         binding.root.postDelayed({
             if (!isFinishing && !isDestroyed) {
-                AdsManager.loadNativeLanguageClick(this@LanguageActivity, screenCount)
-                AdsManager.loadNativeOnboarding1(this@LanguageActivity, isIntroFlowDone())
+                AdsManager.loadNativeLanguageClick(
+                    this@LanguageActivity,
+                    isFirstLanguage,
+                    if (isFirstLanguage) R.layout.layout_native_ad_lang_click else R.layout.layout_native_ad_lang_click_2
+                )
+                AdsManager.loadNativeOnboarding1(
+                    this@LanguageActivity,
+                    !isIntroFlowDone(),
+                    R.layout.layout_native_ad_large
+                )
             }
         }, 100)
     }
 
+    override fun bindObserver() {
+        if (!intent.getBooleanExtra("settingss", false)) listenLanguageAd()
+    }
 
-    private fun loadLanguageClickAd(): Boolean {
-        val cfg = AdRemoteConfig.getInstance()
-        val isClickAdEnabled = if (screenCount == 1) cfg.native_language_1_click.isEnable
-        else cfg.native_language_2_click.isEnable
-        if (configScript?.isNeedToShowADs != true || !isClickAdEnabled || !isInternetAvailable()) {
-            Log.d(
-                AD_LOG,
-                "STEP 4 | SWAP SKIP -> juno [$TAG_LANG] ad j rakhyo " +
-                        "(needToShowAds=${configScript?.isNeedToShowADs}, " +
-                        "clickAdEnable=$isClickAdEnabled, net=${isInternetAvailable()})"
-            )
-            return false
+    private fun listenLanguageAd() {
+        AdsManager.nativeLanguageClickAdLive.removeObservers(this)
+        AdsManager.nativeLanguageAdLive.observe(this) { ad ->
+            renderLanguageAd(ad)
         }
+    }
 
-        Log.d(AD_LOG, "STEP 4 | SWAP: [$TAG_LANG] observer band + juno ad view kadhyo")
-        AdsManager.getAdLive(TAG_LANG).removeObservers(this)
-
-        binding.frAds.removeAllViews()
-        binding.frAds.visibility = View.GONE
-        adjustLangShimmerHeight()
-        binding.adShimmer.root.visibility = View.VISIBLE
-
-        Log.d(AD_LOG, "STEP 5 | have [$TAG_LANG_CLICK] observe -> shimmer batavyu")
-        startAdFlow(TAG_LANG_CLICK)
-        return true
+    private fun listenLanguageClickAd() {
+        AdsManager.nativeLanguageAdLive.removeObservers(this)
+        AdsManager.nativeLanguageClickAdLive.observe(this) { ad ->
+            renderLanguageAd(ad)
+        }
     }
 
     private fun adjustLangShimmerHeight() {
         val d = resources.displayMetrics.density
-        val large = screenCount != 1
+        val large = !isFirstLanguage
         fun dp(v: Int) = (v * d).toInt()
         val root = binding.adShimmer.root
 
@@ -248,81 +230,27 @@ class LanguageActivity : Base__Activity<ActivityLanguageBinding>(),
         }
     }
 
+    private fun renderLanguageAd(ad: com.ads.module.ads.wrapper.ApNativeAd?) {
+        if (ad == null) {
+            binding.adShimmer.root.visibility = View.GONE
+            binding.frAds.visibility = View.GONE
+            return
+        }
 
-    private fun startAdFlow(tag: String) {
-        configScript?.let { config ->
+        binding.frAds.removeAllViews()
+        binding.frAds.visibility = View.VISIBLE
+        ERainAd.getInstance().populateNativeAdView(
+            this,
+            ad,
+            binding.frAds,
+            binding.adShimmer.root
+        )
+        binding.adShimmer.root.visibility = View.GONE
 
-            val ad = AdRemoteConfig.getInstance()
-            val isAdEnabled = if (tag == TAG_LANG) {
-                if (screenCount == 1) ad.native_language_1.isEnable else ad.native_language_2.isEnable
-            } else if (tag == TAG_LANG_CLICK) {
-                if (screenCount == 1) ad.native_language_1_click.isEnable else ad.native_language_2_click.isEnable
-            } else {
-                false
-            }
-
-            if (config.isNeedToShowADs && isAdEnabled) {
-
-
-                startShimmerTimeout(tag)
-
-                AdsManager.getAdLive(tag).observe(this@LanguageActivity) { state ->
-
-                    if (state is NativeAdUiState.Success) {
-                        Log.d(
-                            AD_LOG,
-                            "SHOW  | [$tag] ad screen par mukyo (id=${state.adsID})"
-                        )
-                        binding.adShimmer.root.visibility = View.GONE
-                        binding.frAds.visibility = View.VISIBLE
-
-                        ERainAd.getInstance().populateNativeAdView(
-                            this@LanguageActivity,
-                            state.ad,
-                            binding.frAds,
-                            binding.adShimmer.root
-                        )
-//// Height cta
-                        val remoteHeightDp = state.ctaHeight
-                        val adBtn = binding.frAds.findViewById<View>(R.id.ad_call_to_action)
-                        if (adBtn != null) {
-                            val density = resources.displayMetrics.density
-                            val heightInPx = (remoteHeightDp * density).toInt()
-
-                            val params = adBtn.layoutParams
-                            params?.let {
-                                it.height = heightInPx
-                                adBtn.layoutParams = it
-                                adBtn.requestLayout()
-                                Log.d(
-                                    "AdManager123",
-                                    "Height set to: $heightInPx px for tag: $tag"
-                                )
-                            }
-
-                        } else {
-                            Log.e(
-                                "AdManager123",
-                                "CTA Button not found in layout for tag: $tag"
-                            )
-                        }
-
-
-                    } else if (state is NativeAdUiState.Loading) {
-                        if (binding.frAds.visibility != View.VISIBLE) {
-                            binding.adShimmer.root.visibility = View.VISIBLE
-                        }
-                    } else if (state == null || state is NativeAdUiState.Failed || state is NativeAdUiState.Empty) {
-                        if (binding.frAds.visibility != View.VISIBLE) {
-                            Log.d(AD_LOG, "[$tag] fail -> ad slot band (retry nahi)")
-                            binding.adShimmer.root.visibility = View.GONE
-                            binding.frAds.visibility = View.GONE
-                        }
-                    }
-                }
-            } else {
-                binding.adShimmer.root.visibility = View.GONE
-                binding.frAds.visibility = View.GONE
+        binding.frAds.findViewById<View>(R.id.ad_call_to_action)?.let { button ->
+            button.layoutParams?.let { params ->
+                params.height = (AdsManager.getCTAButtonHeight(this) * resources.displayMetrics.density).toInt()
+                button.layoutParams = params
             }
         }
     }
@@ -461,26 +389,27 @@ class LanguageActivity : Base__Activity<ActivityLanguageBinding>(),
         if (isFromSettings) {
                       binding.done.visibility = View.VISIBLE
         } else {
-            Log.d(
-                AD_LOG,
-                "STEP 3 | language click: ${languageModel_?.s_lan_name} " +
-                        "(alreadySwapped=$isClickAdPhase)"
-            )
-
-            if (!isClickAdPhase && loadLanguageClickAd()) {
+            if (!isClickAdPhase) {
                 isClickAdPhase = true
+                AdsManager.nativeLanguageAdLive.removeObservers(this)
+                binding.frAds.removeAllViews()
+                binding.frAds.visibility = View.GONE
+                adjustLangShimmerHeight()
+                // The shimmer remains while the preloaded click native resolves.
+                binding.adShimmer.root.visibility = View.VISIBLE
+                listenLanguageClickAd()
             }
             showDoneButton()
         }
     }
 
     private fun showDoneButton() {
-        if (configScript?.delayButtonDoneLanguage == true) {
+        if (shouldDelayDoneButton) {
             binding.done.visibility = View.INVISIBLE
             doneHandler.removeCallbacksAndMessages(null)
             doneHandler.postDelayed({
                 binding.done.visibility = View.VISIBLE
-            }, configScript?.timeDelayLanguageDone ?: 2000L)
+            }, timeDelayDoneButton)
         } else {
             binding.done.visibility = View.VISIBLE
         }
@@ -488,7 +417,6 @@ class LanguageActivity : Base__Activity<ActivityLanguageBinding>(),
 
     override fun onDestroy() {
         doneHandler.removeCallbacksAndMessages(null)
-        adHandler.removeCallbacksAndMessages(null)
         super.onDestroy()
     }
 
