@@ -178,4 +178,7 @@
     <string name="we_do_not_support_or_encourage_streaming_copyrighted_content_without_proper_authorization">• Biz tegishli ruxsatisiz mualliflik huquqi bilan himoyalangan kontentni uzatishni qo llab-quvvatlamaymiz yoki rag\'batlantirmaymiz.</string>
     <string name="welcome_back">Xush kelibsiz 👋</string>
     <string name="continue_watching_your_favorite_live_tv_channels_movies_amp_series_anytime"><![CDATA[Sevimli jonli TV kanallaringiz, filmlar va seriallaringizni istalgan vaqtda tomosha qilishda davom eting]]></string>
+    <string name="stream_unavailable_title">Translyatsiya mavjud emas</string>
+    <string name="stream_unavailable_desc">Bu kanal vaqtincha ishlamayapti yoki hududingizda mavjud emas.</string>
+    <string name="next_channel">Keyingi kanal</string>
 </resources>

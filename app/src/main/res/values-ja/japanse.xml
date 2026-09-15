@@ -174,4 +174,7 @@
     <string name="we_do_not_support_or_encourage_streaming_copyrighted_content_without_proper_authorization">• 当社は、適切な承認なしに著作権で保護されたコンテンツをストリーミングすることを推奨または支持するものではありません。</string>
     <string name="welcome_back">おかえりなさい 👋</string>
     <string name="continue_watching_your_favorite_live_tv_channels_movies_amp_series_anytime"><![CDATA[お気に入りのライブテレビチャンネル、映画、シリーズをいつでも視聴できます]]></string>
+    <string name="stream_unavailable_title">ストリームを利用できません</string>
+    <string name="stream_unavailable_desc">このチャンネルは一時的に利用できないか、お住まいの地域では利用できません。</string>
+    <string name="next_channel">次のチャンネル</string>
 </resources>

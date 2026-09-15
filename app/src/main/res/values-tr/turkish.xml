@@ -174,4 +174,7 @@
     <string name="we_do_not_support_or_encourage_streaming_copyrighted_content_without_proper_authorization">• Gerekli izinler olmaksızın telif hakkıyla korunan içeriğin yayınlanmasını desteklemiyor veya teşvik etmiyoruz.</string>
     <string name="welcome_back">Tekrar hoş geldiniz 👋</string>
     <string name="continue_watching_your_favorite_live_tv_channels_movies_amp_series_anytime"><![CDATA[Favori canlı TV kanallarınızı, filmlerinizi ve dizilerinizi istediğiniz zaman izlemeye devam edin]]></string>
+    <string name="stream_unavailable_title">Yayın Kullanılamıyor</string>
+    <string name="stream_unavailable_desc">Bu kanal geçici olarak hizmet dışı veya bölgenizde kullanılamıyor.</string>
+    <string name="next_channel">Sonraki Kanal</string>
 </resources>

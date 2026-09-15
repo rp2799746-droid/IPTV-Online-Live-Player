@@ -178,4 +178,7 @@
     <string name="we_do_not_support_or_encourage_streaming_copyrighted_content_without_proper_authorization">• 당사는 적절한 승인 없이 저작권이 있는 콘텐츠를 스트리밍하는 것을 지원하거나 장려하지 않습니다.</string>
     <string name="welcome_back">다시 오신 것을 환영합니다 👋</string>
     <string name="continue_watching_your_favorite_live_tv_channels_movies_amp_series_anytime"><![CDATA[언제 어디서나 좋아하는 실시간 TV 채널, 영화, 시리즈를 계속 시청하세요]]></string>
+    <string name="stream_unavailable_title">스트림을 사용할 수 없음</string>
+    <string name="stream_unavailable_desc">이 채널은 일시적으로 서비스가 중단되었거나 해당 지역에서 이용할 수 없습니다.</string>
+    <string name="next_channel">다음 채널</string>
 </resources>

@@ -173,4 +173,7 @@
     <string name="we_do_not_support_or_encourage_streaming_copyrighted_content_without_proper_authorization">• Kami tidak mendukung atau menganjurkan streaming konten berhak cipta tanpa otorisasi yang tepat.</string>
     <string name="welcome_back">Selamat datang kembali 👋</string>
     <string name="continue_watching_your_favorite_live_tv_channels_movies_amp_series_anytime"><![CDATA[Lanjutkan menonton saluran TV langsung, film & serial favorit Anda kapan saja]]></string>
+    <string name="stream_unavailable_title">Streaming Tidak Tersedia</string>
+    <string name="stream_unavailable_desc">Saluran ini untuk sementara tidak berfungsi atau tidak tersedia di wilayah Anda.</string>
+    <string name="next_channel">Saluran Berikutnya</string>
 </resources>

@@ -178,4 +178,7 @@
     <string name="we_do_not_support_or_encourage_streaming_copyrighted_content_without_proper_authorization">• Hindi namin sinusuportahan o hinihikayat ang streaming ng copyrighted content nang walang kaukulang pahintulot.</string>
     <string name="welcome_back">Welcome back 👋</string>
     <string name="continue_watching_your_favorite_live_tv_channels_movies_amp_series_anytime"><![CDATA[Ipagpatuloy ang panonood ng iyong mga paboritong Live TV channel, pelikula, at serye anumang oras]]></string>
+    <string name="stream_unavailable_title">Hindi Available ang Stream</string>
+    <string name="stream_unavailable_desc">Pansamantalang hindi gumagana ang channel na ito o hindi available sa iyong rehiyon.</string>
+    <string name="next_channel">Susunod na Channel</string>
 </resources>

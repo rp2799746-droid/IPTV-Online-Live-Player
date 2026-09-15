@@ -32,8 +32,8 @@
 
             <View
                 android:id="@+id/shimmer_ad_label"
-                android:layout_width="25dp"
-                android:layout_height="14dp"
+                android:layout_width="17dp"
+                android:layout_height="17dp"
                 android:layout_marginStart="@dimen/_10sdp"
                 android:background="@color/darker_gray"
                 app:layout_constraintStart_toEndOf="@id/shimmer_ad_icon"

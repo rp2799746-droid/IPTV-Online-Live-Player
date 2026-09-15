@@ -179,4 +179,7 @@
 
     <string name="welcome_back">Chào mừng trở lại 👋</string>
     <string name="continue_watching_your_favorite_live_tv_channels_movies_amp_series_anytime"><![CDATA[Tiếp tục xem các kênh Truyền hình trực tiếp, phim & chương trình yêu thích của bạn mọi lúc mọi nơi]]></string>
+    <string name="stream_unavailable_title">Luồng không khả dụng</string>
+    <string name="stream_unavailable_desc">Kênh này tạm thời ngừng hoạt động hoặc không khả dụng tại khu vực của bạn.</string>
+    <string name="next_channel">Kênh tiếp theo</string>
 </resources>

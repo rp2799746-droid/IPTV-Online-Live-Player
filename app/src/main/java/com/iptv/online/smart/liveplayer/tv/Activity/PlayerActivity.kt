@@ -44,6 +44,7 @@ class PlayerActivity : Base__Activity<ActivityPlayerBinding>() {
     private var currentPosition: Int = 0
     private var countdownTime = 5
     private var nextAutoDialog: AlertDialog? = null
+    private var streamErrorDialog: AlertDialog? = null
     private var upNextAdapter: ChannelAdapter? = null
     private var RATE = 0
 
@@ -135,17 +136,7 @@ class PlayerActivity : Base__Activity<ActivityPlayerBinding>() {
             }
 
             override fun onPlayerError(error: PlaybackException) {
-                Toast.makeText(
-                    this@PlayerActivity,
-                    getString(R.string.link_error_skipping_to_next),
-                    Toast.LENGTH_SHORT
-                ).show()
-                Handler(Looper.getMainLooper()).postDelayed({
-                    if (player != null) {
-                        if (player!!.hasNextMediaItem()) playNext()
-                        else finish()
-                    }
-                }, 2000)
+                showStreamUnavailableDialog()
             }
         })
     }
@@ -342,6 +333,32 @@ class PlayerActivity : Base__Activity<ActivityPlayerBinding>() {
         }
     }
 
+    private fun showStreamUnavailableDialog() {
+        if (isFinishing || isDestroyed) return
+        if (streamErrorDialog?.isShowing == true) return
+
+        // Keep the rate dialog from opening on top of the error dialog.
+        ratingHandler.removeCallbacksAndMessages(null)
+        player?.pause()
+
+        val dialogView = layoutInflater.inflate(R.layout.layout_stream_unavailable, null)
+        streamErrorDialog = AlertDialog.Builder(this)
+            .setView(dialogView)
+            .setCancelable(false)
+            .create()
+        streamErrorDialog?.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+        dialogView.findViewById<View>(R.id.btnStreamNextChannel)?.setOnClickListener {
+            streamErrorDialog?.dismiss()
+            playNext()
+        }
+        dialogView.findViewById<View>(R.id.btnStreamCancel)?.setOnClickListener {
+            streamErrorDialog?.dismiss()
+        }
+
+        streamErrorDialog?.show()
+    }
+
     override fun onStop() {
         super.onStop()
         player?.pause()
@@ -352,6 +369,7 @@ class PlayerActivity : Base__Activity<ActivityPlayerBinding>() {
         countdownHandler.removeCallbacksAndMessages(null)
         ratingHandler.removeCallbacksAndMessages(null)
         nextAutoDialog?.dismiss()
+        streamErrorDialog?.dismiss()
         player?.let {
             it.stop()
             it.clearMediaItems()

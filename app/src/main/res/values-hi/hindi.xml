@@ -174,4 +174,7 @@
     <string name="we_do_not_support_or_encourage_streaming_copyrighted_content_without_proper_authorization">• हम उचित प्राधिकरण के बिना कॉपीराइट सामग्री को स्ट्रीम करने का समर्थन या प्रोत्साहन नहीं करते हैं।</string>
     <string name="welcome_back">वापस स्वागत है 👋</string>
     <string name="continue_watching_your_favorite_live_tv_channels_movies_amp_series_anytime"><![CDATA[अपने पसंदीदा लाइव टीवी चैनल, फिल्में और सीरीज़ कभी भी देखना जारी रखें]]></string>
+    <string name="stream_unavailable_title">स्ट्रीम उपलब्ध नहीं है</string>
+    <string name="stream_unavailable_desc">यह चैनल अस्थायी रूप से सेवा में नहीं है या आपके क्षेत्र में उपलब्ध नहीं है।</string>
+    <string name="next_channel">अगला चैनल</string>
 </resources>

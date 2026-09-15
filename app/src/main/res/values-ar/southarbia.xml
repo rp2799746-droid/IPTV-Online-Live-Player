@@ -178,4 +178,7 @@
     <string name="we_do_not_support_or_encourage_streaming_copyrighted_content_without_proper_authorization">• نحن لا ندعم ولا نشجع بث المحتوى المحمي بحقوق الطبع والنشر دون الحصول على إذن مناسب.</string>
     <string name="welcome_back">مرحباً بعودتك 👋</string>
     <string name="continue_watching_your_favorite_live_tv_channels_movies_amp_series_anytime"><![CDATA[تابع مشاهدة قنوات البث المباشر والأفلام والمسلسلات المفضلة لديك في أي وقت]]></string>
+    <string name="stream_unavailable_title">البث غير متاح</string>
+    <string name="stream_unavailable_desc">هذه القناة خارج الخدمة مؤقتًا أو غير متاحة في منطقتك.</string>
+    <string name="next_channel">القناة التالية</string>
 </resources>

@@ -172,4 +172,7 @@
     <string name="we_do_not_support_or_encourage_streaming_copyrighted_content_without_proper_authorization">• Vi stöder eller uppmuntrar inte streaming av upphovsrättsskyddat innehåll utan korrekt tillstånd.</string>
     <string name="welcome_back">Välkommen tillbaka 👋</string>
     <string name="continue_watching_your_favorite_live_tv_channels_movies_amp_series_anytime"><![CDATA[Fortsätt titta på dina favoritkanaler för live-TV, filmer och serier när som helst]]></string>
+    <string name="stream_unavailable_title">Strömmen är inte tillgänglig</string>
+    <string name="stream_unavailable_desc">Den här kanalen är tillfälligt ur funktion eller inte tillgänglig i din region.</string>
+    <string name="next_channel">Nästa kanal</string>
 </resources>

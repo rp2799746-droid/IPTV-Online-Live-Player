@@ -180,4 +180,7 @@
     <string name="welcome_back">Welcome Back 👋</string>
     <string name="continue_watching_your_favorite_live_tv_channels_movies_amp_series_anytime"><![CDATA[Continue watching your favorite Live TV channels, movies & series anytime]]></string>
 
+    <string name="stream_unavailable_title">Stream Unavailable</string>
+    <string name="stream_unavailable_desc">This channel is temporarily out of service or not available in your region.</string>
+    <string name="next_channel">Next Channel</string>
 </resources>

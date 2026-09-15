@@ -174,4 +174,7 @@
     <string name="we_do_not_support_or_encourage_streaming_copyrighted_content_without_proper_authorization">• Wir unterstützen oder fördern nicht das Streaming von urheberrechtlich geschützten Inhalten ohne entsprechende Genehmigung.</string>
     <string name="welcome_back">Willkommen zurück 👋</string>
     <string name="continue_watching_your_favorite_live_tv_channels_movies_amp_series_anytime"><![CDATA[Schauen Sie jederzeit Ihre Lieblings-Live-TV-Sender, Filme und Serien weiter]]></string>
+    <string name="stream_unavailable_title">Stream nicht verfügbar</string>
+    <string name="stream_unavailable_desc">Dieser Sender ist vorübergehend außer Betrieb oder in Ihrer Region nicht verfügbar.</string>
+    <string name="next_channel">Nächster Sender</string>
 </resources>

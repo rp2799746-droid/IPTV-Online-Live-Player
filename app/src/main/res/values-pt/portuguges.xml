@@ -173,4 +173,7 @@
     <string name="welcome_back">Bem-vindo de volta 👋</string>
     <string name="continue_watching_your_favorite_live_tv_channels_movies_amp_series_anytime"><![CDATA[Continue assistindo seus canais de TV ao vivo, filmes e séries favoritos a qualquer momento]]></string>
 
+    <string name="stream_unavailable_title">Transmissão indisponível</string>
+    <string name="stream_unavailable_desc">Este canal está temporariamente fora do ar ou não está disponível na sua região.</string>
+    <string name="next_channel">Próximo canal</string>
 </resources>
