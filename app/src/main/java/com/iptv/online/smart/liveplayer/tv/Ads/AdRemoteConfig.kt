@@ -84,9 +84,7 @@ class AdRemoteConfig private constructor(
         fun initialize(context: Context, json: String?) {
             synchronized(this) {
                 val fileName = if (BuildConfig.DEBUG) DEBUG_FILE else RELEASE_FILE
-                instance = if (BuildConfig.DEBUG) {
-                    fromAssets(context, DEBUG_FILE)
-                } else if (!json.isNullOrBlank()) {
+                instance = if (!json.isNullOrBlank()) {
                     fromJson(json) ?: fromAssets(context, fileName)
                 } else {
                     fromAssets(context, fileName)

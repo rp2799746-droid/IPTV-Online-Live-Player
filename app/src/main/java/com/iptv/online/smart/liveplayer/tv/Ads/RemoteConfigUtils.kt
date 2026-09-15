@@ -23,7 +23,8 @@ object RemoteConfigUtils {
     private const val TIME_DELAY_SHOW_LANGUAGE_DONE_BUTTON = "time_delay_show_language_done_button"
     private const val ON_SHOW_NAVIGATION_BUTTON = "on_show_navigation_button"
     private const val ON_ENABLE_UNINSTALL_WIDGET = "on_enable_uninstall_widget"
-    private const val AD_REMOTE_CONFIG = "ad_remote_config"
+    // Ad unit JSON published in Firebase Remote Config.
+    private val AD_REMOTE_CONFIG = if (BuildConfig.DEBUG) "ad_config_debug" else "ad_config"
     private const val PRIVACY_POLICY = "privacy_policy"
     private const val HEIGHT_BUTTON_CTA = "height_button_cta"
     private const val IS_INTRO_PAGE = "is_intro_page"

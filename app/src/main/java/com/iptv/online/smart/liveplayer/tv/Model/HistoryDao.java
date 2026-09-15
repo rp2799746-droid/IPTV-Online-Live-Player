@@ -22,6 +22,9 @@ public interface HistoryDao {
     @Query("SELECT * FROM history_table WHERE id = :channelId LIMIT 1")
     Channel getChannelById(String channelId);
 
+    @Query("DELETE FROM history_table WHERE id = :channelId")
+    void deleteById(String channelId);
+
     @Query("SELECT * FROM history_table WHERE playlistName = :pName")
     List<Channel> getChannelsByPlaylist(String pName);
 

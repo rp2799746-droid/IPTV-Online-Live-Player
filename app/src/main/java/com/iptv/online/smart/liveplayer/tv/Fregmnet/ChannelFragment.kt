@@ -325,6 +325,12 @@ class ChannelFragment : Fragment() {
             }
 
             if (channels.isNotEmpty()) {
+                // Remove cloud channels that are no longer in the Firebase playlist.
+                val newIds = channels.map { it.id }.toHashSet()
+                db.historyDao().getChannelsByPlaylist(CLOUD_PLAYLIST_NAME)
+                    .filter { it.id !in newIds }
+                    .forEach { db.historyDao().deleteById(it.id) }
+
                 for (item in channels) {
                     db.historyDao().insertHistory(item)
                 }
