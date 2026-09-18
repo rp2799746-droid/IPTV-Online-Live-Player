@@ -31,6 +31,8 @@ import com.google.android.play.core.appupdate.AppUpdateManager
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
 import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.UpdateAvailability
+import com.google.android.gms.ads.AdError
+import com.google.android.gms.ads.LoadAdError
 import com.google.android.ump.ConsentInformation
 import com.google.android.ump.FormError
 import com.iptv.online.smart.liveplayer.tv.R
@@ -76,6 +78,7 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>(), RemoteConfigUtil
 
     companion object {
         private const val KEY_LANG_DONE = "lang_flow_done"
+        private const val ADS_TAG = "AdManager123"
 
         fun isLanguageDone(context: Context): Boolean =
             context.getSharedPreferences(context.packageName, 0)
@@ -298,6 +301,7 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>(), RemoteConfigUtil
                 .onCheckShowSplashWhenFail(this@SplashActivity, object : AdCallback() {
                     override fun onNextAction() {
                         super.onNextAction()
+                        Log.d(ADS_TAG, "➡️ [inter_splash] onCheckShowSplashWhenFail -> moveActivity()")
                         moveActivity()
                     }
                 }, 1000)
@@ -410,14 +414,17 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>(), RemoteConfigUtil
 
         val widgetFlow = intent.getStringExtra("widget_flow")
         var currentFlow = widgetFlow
-        if (ERainAd.getInstance().getShouldDisplayWidgetUninstall(true) == true) {
-            Log.d("AdManager123", "Widget flow active: Options will be shown.")
-        } else {
-            currentFlow = null
-        }
-
+ 
 
         val isUninstallFlow = currentFlow == "flow_uninstall"
+        val bannerUnit = if (isUninstallFlow) "banner_splash_uninstall" else "banner_splash"
+        val interUnit = if (isUninstallFlow) "inter_splash_uninstall" else "inter_splash"
+        Log.d(
+            ADS_TAG,
+            "🚦 [splash] flow=${currentFlow ?: "normal"} | uninstallFlow=$isUninstallFlow | isNeedToShowADs=${remoteData.isNeedToShowADs} | " +
+                    "inter_splash(enable=${AdRemoteConfig.getInstance().inter_splash.isEnable}, id=${AdRemoteConfig.getInstance().inter_splash.id}) | " +
+                    "inter_splash_uninstall(enable=${AdRemoteConfig.getInstance().inter_splash_uninstall.isEnable}, id=${AdRemoteConfig.getInstance().inter_splash_uninstall.id})"
+        )
         val shouldShowBanner = if (isUninstallFlow) {
             AdRemoteConfig.getInstance().banner_splash_uninstall.isEnable
         } else {
@@ -431,8 +438,31 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>(), RemoteConfigUtil
             } else {
                 AdRemoteConfig.getInstance().banner_splash.id
             }
-            ERainAd.getInstance().loadBanner(this@SplashActivity, bannerIdToUse)
+            Log.d(ADS_TAG, "🔄 [$bannerUnit] Loading banner: id=$bannerIdToUse | uninstallFlow=$isUninstallFlow")
+            ERainAd.getInstance().loadBanner(this@SplashActivity, bannerIdToUse, object : AdCallback() {
+                override fun onAdLoaded() {
+                    super.onAdLoaded()
+                    Log.d(ADS_TAG, "✅ [$bannerUnit] Banner loaded: id=$bannerIdToUse")
+                }
+
+                override fun onAdFailedToLoad(i: LoadAdError?) {
+                    super.onAdFailedToLoad(i)
+                    Log.e(
+                        ADS_TAG,
+                        "❌ [$bannerUnit] Banner failed: id=$bannerIdToUse | code=${i?.code} | error=${i?.message}"
+                    )
+                }
+
+                override fun onAdClicked() {
+                    super.onAdClicked()
+                    Log.d(ADS_TAG, "👆 [$bannerUnit] Banner clicked: id=$bannerIdToUse")
+                }
+            })
         } else {
+            Log.w(
+                ADS_TAG,
+                "⏭️ [$bannerUnit] SKIP banner | reason=${if (!remoteData.isNeedToShowADs) "isNeedToShowADs=false" else "unit disabled in remote config"}"
+            )
             binding.bannerAdLayout.gone
         }
         if (isGoingToLanguageScreen()) {
@@ -444,6 +474,7 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>(), RemoteConfigUtil
             AdRemoteConfig.getInstance().inter_splash
         }
         if (remoteData.isNeedToShowADs && splashInterConfig.isEnable && isNetworkAvailable(this@SplashActivity)) {
+            Log.d(ADS_TAG, "🔄 [$interUnit] Loading splash inter: id=${splashInterConfig.id} | timeout=30000 delay=5000")
             ERainAd.getInstance().loadSplashInterstitialAds(
                 this,
                 splashInterConfig.id,
@@ -452,22 +483,55 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>(), RemoteConfigUtil
                 object : AdCallback() {
                     override fun onNextAction() {
                         super.onNextAction()
+                        Log.d(ADS_TAG, "➡️ [$interUnit] Next action -> moveActivity()")
                         moveActivity()
                     }
 
                     override fun onAdLoaded() {
                         super.onAdLoaded()
+                        Log.d(ADS_TAG, "✅ [$interUnit] Splash inter loaded: id=${splashInterConfig.id}")
+                    }
+
+                    override fun onAdSplashReady() {
+                        super.onAdSplashReady()
+                        Log.d(ADS_TAG, "🎬 [$interUnit] Splash ad ready to show")
+                    }
+
+                    override fun onAdFailedToLoad(i: LoadAdError?) {
+                        super.onAdFailedToLoad(i)
+                        Log.e(
+                            ADS_TAG,
+                            "❌ [$interUnit] Failed to load: id=${splashInterConfig.id} | code=${i?.code} | error=${i?.message}"
+                        )
+                    }
+
+                    override fun onAdFailedToShow(adError: AdError?) {
+                        super.onAdFailedToShow(adError)
+                        Log.e(ADS_TAG, "❌ [$interUnit] Failed to show: error=${adError?.message}")
+                    }
+
+                    override fun onAdClosed() {
+                        super.onAdClosed()
+                        Log.d(ADS_TAG, "🚪 [$interUnit] Splash inter closed")
                     }
                 })
         } else {
+            val reason = when {
+                !remoteData.isNeedToShowADs -> "isNeedToShowADs=false"
+                !splashInterConfig.isEnable -> "unit disabled in remote config"
+                else -> "no internet"
+            }
+            Log.w(ADS_TAG, "⏭️ [$interUnit] SKIP: id=${splashInterConfig.id} | reason=$reason -> moveActivity()")
             moveActivity()
         }
 
         if (ResumeAdsEntryRule.shouldEnableOpenResume()) {
+            Log.d(ADS_TAG, "✅ [open_resume] Enabled: id=${AdRemoteConfig.getInstance().open_resume.id}")
             AppOpenManager.getInstance()
                 .setAppResumeAdId(AdRemoteConfig.getInstance().open_resume.id)
             AppOpenManager.getInstance().enableAppResume()
         } else {
+            Log.w(ADS_TAG, "⏭️ [open_resume] Disabled by ResumeAdsEntryRule")
             AppOpenManager.getInstance().disableAppResume()
         }
     }

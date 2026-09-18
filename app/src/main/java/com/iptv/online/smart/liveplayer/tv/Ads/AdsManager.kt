@@ -28,6 +28,8 @@ import kotlinx.coroutines.flow.StateFlow
 
 object AdsManager {
 
+    private const val TAG = "AdManager123"
+
     private val _adStateFlow = MutableStateFlow<Map<String, NativeAdUiState>>(emptyMap())
 
     private val adLiveMap = mutableMapOf<String, MutableLiveData<NativeAdUiState>>()
@@ -80,17 +82,22 @@ object AdsManager {
         layoutRes: Int,
         liveData: MutableLiveData<ApNativeAd?>,
         shouldDisplay: Boolean = true,
+        name: String = "native",
     ) {
-        if (!RemoteConfigdata(activity).isNeedToShowADs
-            || !config.isEnable
-            || isPurchased(activity)
-            || !activity.isInternetAvailable()
-            || !shouldDisplay
-        ) {
+        val skipReasons = buildList {
+            if (!RemoteConfigdata(activity).isNeedToShowADs) add("isNeedToShowADs=false")
+            if (!config.isEnable) add("unit disabled in remote config")
+            if (isPurchased(activity)) add("user purchased")
+            if (!activity.isInternetAvailable()) add("no internet")
+            if (!shouldDisplay) add("shouldDisplay=false (UA/limit check)")
+        }
+        if (skipReasons.isNotEmpty()) {
+            Log.w(TAG, "⏭️ [$name] SKIP native: id=${config.id} | reason=${skipReasons.joinToString(", ")}")
             liveData.postValue(null)
             return
         }
 
+        Log.d(TAG, "🔄 [$name] Loading native: id=${config.id}")
         ERainAd.getInstance().loadNativeAdResultCallback(
             activity,
             config.id,
@@ -98,13 +105,33 @@ object AdsManager {
             object : AdCallback() {
                 override fun onNativeAdLoaded(nativeAd: ApNativeAd) {
                     super.onNativeAdLoaded(nativeAd)
+                    Log.d(TAG, "✅ [$name] Native loaded: id=${config.id}")
                     adConfigMap[nativeAd] = config
                     liveData.postValue(nativeAd)
                 }
 
                 override fun onAdFailedToLoad(adError: LoadAdError?) {
                     super.onAdFailedToLoad(adError)
+                    Log.e(
+                        TAG,
+                        "❌ [$name] Native failed: id=${config.id} | code=${adError?.code} | error=${adError?.message}"
+                    )
                     liveData.postValue(null)
+                }
+
+                override fun onAdFailedToShow(adError: AdError?) {
+                    super.onAdFailedToShow(adError)
+                    Log.e(TAG, "❌ [$name] Native failed to show: id=${config.id} | error=${adError?.message}")
+                }
+
+                override fun onAdClicked() {
+                    super.onAdClicked()
+                    Log.d(TAG, "👆 [$name] Native clicked: id=${config.id}")
+                }
+
+                override fun onAdImpression() {
+                    super.onAdImpression()
+                    Log.d(TAG, "👁️ [$name] Native impression: id=${config.id}")
                 }
             }
         )
@@ -152,22 +179,27 @@ object AdsManager {
                     }
                 })
         } else {
+            val reason = buildList {
+                if (!RemoteConfigdata(context).isNeedToShowADs) add("isNeedToShowADs=false")
+                if (!context.isInternetAvailable()) add("no internet")
+                if (!shouldDisplay) add("unit disabled / shouldDisplay=false")
+            }.joinToString(", ")
             currentAds[adTag] = null
             updateAdState(adTag, NativeAdUiState.Empty(adTag, adId))
-            Log.d("AdManager123", "Ads Close")
+            Log.w("AdManager123", "⏭️ [$adTag] SKIP native: id=$adId | reason=$reason")
         }
     }
 
     fun loadNativeLanguage(activity: Activity, isFirst: Boolean, layoutRes: Int) {
         val config =
             if (isFirst) AdRemoteConfig.getInstance().native_language_1 else AdRemoteConfig.getInstance().native_language_2
-        loadNativeInternal(activity, config, layoutRes, nativeLanguageAdLive)
+        loadNativeInternal(activity, config, layoutRes, nativeLanguageAdLive, name = "native_language")
     }
 
     fun loadNativeLanguageClick(activity: Activity, isFirst: Boolean, layoutRes: Int) {
         val config =
             if (isFirst) AdRemoteConfig.getInstance().native_language_1_click else AdRemoteConfig.getInstance().native_language_2_click
-        loadNativeInternal(activity, config, layoutRes, nativeLanguageClickAdLive)
+        loadNativeInternal(activity, config, layoutRes, nativeLanguageClickAdLive, name = "native_language_click")
     }
 
     fun loadNativeOnboarding1(activity: Activity, isFirst: Boolean, layoutRes: Int) {
@@ -177,7 +209,8 @@ object AdsManager {
             activity,
             config,
             layoutRes,
-            nativeOnboarding1AdLive
+            nativeOnboarding1AdLive,
+            name = "native_onboarding_1"
         )
     }
 
@@ -189,7 +222,8 @@ object AdsManager {
             config,
             layoutRes,
             nativeOnboarding4AdLive,
-            ERainAd.getInstance().getShouldDisplayNativeOnboardingNormal2(config.enableUaCheck) == true
+            ERainAd.getInstance().getShouldDisplayNativeOnboardingNormal2(config.enableUaCheck) == true,
+            name = "native_onboarding_4"
         )
     }
 
@@ -201,7 +235,8 @@ object AdsManager {
             config,
             layoutRes,
             nativeAdOnBoardingFullLive,
-            ERainAd.getInstance().getShouldDisplayNativeOnboardingFull1(config.enableUaCheck) == true
+            ERainAd.getInstance().getShouldDisplayNativeOnboardingFull1(config.enableUaCheck) == true,
+            name = "native_onboarding_full"
         )
     }
 
@@ -235,10 +270,12 @@ object AdsManager {
     private var interOnboarding: ApInterstitialAd? = null
 
     fun loadInterOnboarding(activity: Activity, ignoreLimit: Boolean = false) {
+        Log.w(TAG, "⏭️ [inter_onboarding] SKIP load: reason=disabled in code (stub)")
         interOnboarding = null
     }
 
     fun showInterOnboarding(activity: Activity, ignoreLimit: Boolean = false, onAction: () -> Unit) {
+        Log.w(TAG, "⏭️ [inter_onboarding] SKIP show: reason=disabled in code (stub)")
         interOnboarding = null
         onAction()
     }
@@ -251,22 +288,31 @@ object AdsManager {
 
         val config = RemoteConfigdata(activity)
         val cfg = AdRemoteConfig.getInstance().inter_welcome_back
-        if (!config.isNeedToShowADs
-            || !config.interwelcomeback
-            || !cfg.isEnable
-            || isPurchased(activity)
-            || !activity.isInternetAvailable()
-            || (!ignoreLimit && !(ERainAd.getInstance()
-                .getShouldDisplayInterWelcomeBack(cfg.enableUaCheck) == true))
-        ) {
+        val skipReasons = buildList {
+            if (!config.isNeedToShowADs) add("isNeedToShowADs=false")
+            if (!config.interwelcomeback) add("interwelcomeback=false")
+            if (!cfg.isEnable) add("unit disabled in remote config")
+            if (isPurchased(activity)) add("user purchased")
+            if (!activity.isInternetAvailable()) add("no internet")
+            if (!ignoreLimit && !(ERainAd.getInstance()
+                    .getShouldDisplayInterWelcomeBack(cfg.enableUaCheck) == true)
+            ) add("UA/limit check failed")
+        }
+        if (skipReasons.isNotEmpty()) {
+            Log.w(
+                TAG,
+                "⏭️ [inter_welcome_back] SKIP load: id=${cfg.id} | reason=${skipReasons.joinToString(", ")}"
+            )
             emit(null)
             return
         }
         if (cached != null) {
+            Log.d(TAG, "♻️ [inter_welcome_back] Using cached ready inter: id=${cfg.id}")
             emit(cached)
             return
         }
 
+        Log.d(TAG, "🔄 [inter_welcome_back] Loading inter: id=${cfg.id}")
         var loaded: ApInterstitialAd? = null
         loaded = ERainAd.getInstance().getInterstitialAds(
             activity,
@@ -274,16 +320,27 @@ object AdsManager {
             object : AdCallback() {
                 override fun onApInterstitialLoad(apInterstitialAd: ApInterstitialAd?) {
                     super.onApInterstitialLoad(apInterstitialAd)
+                    Log.d(
+                        TAG,
+                        "✅ [inter_welcome_back] Inter loaded: id=${cfg.id} | ready=${(apInterstitialAd ?: loaded)?.isReady}"
+                    )
                     emit(apInterstitialAd ?: loaded)
                 }
 
                 override fun onAdFailedToLoad(adError: LoadAdError?) {
                     super.onAdFailedToLoad(adError)
+                    Log.e(
+                        TAG,
+                        "❌ [inter_welcome_back] Inter failed: id=${cfg.id} | code=${adError?.code} | error=${adError?.message}"
+                    )
                     emit(null)
                 }
             }
         )
-        if (loaded?.isReady == true) emit(loaded)
+        if (loaded?.isReady == true) {
+            Log.d(TAG, "✅ [inter_welcome_back] Inter already ready on request: id=${cfg.id}")
+            emit(loaded)
+        }
     }
 
     fun showInterWelcome(
@@ -294,26 +351,48 @@ object AdsManager {
         val interstitial = interWelcomeAdLive.value
         val remoteData = RemoteConfigdata(activity)
         val cfg = AdRemoteConfig.getInstance().inter_welcome_back
-        if (interstitial != null
-            && interstitial.isReady
-            && remoteData.isNeedToShowADs
-            && remoteData.interwelcomeback
-            && cfg.isEnable
-            && !isPurchased(activity)
-            && activity.isInternetAvailable()
-            && (ignoreLimit || ERainAd.getInstance()
-                .getShouldDisplayInterWelcomeBack(cfg.enableUaCheck) == true)
-        ) {
+        val skipReasons = buildList {
+            if (interstitial == null) add("no ad instance")
+            else if (!interstitial.isReady) add("ad not ready")
+            if (!remoteData.isNeedToShowADs) add("isNeedToShowADs=false")
+            if (!remoteData.interwelcomeback) add("interwelcomeback=false")
+            if (!cfg.isEnable) add("unit disabled in remote config")
+            if (isPurchased(activity)) add("user purchased")
+            if (!activity.isInternetAvailable()) add("no internet")
+            if (!ignoreLimit && !(ERainAd.getInstance()
+                    .getShouldDisplayInterWelcomeBack(cfg.enableUaCheck) == true)
+            ) add("UA/limit check failed")
+        }
+        if (skipReasons.isEmpty() && interstitial != null) {
+            Log.d(TAG, "📺 [inter_welcome_back] Showing inter: id=${cfg.id}")
             ERainAd.getInstance().forceShowInterstitial(
                 activity, interstitial, object : AdCallback() {
+                    override fun onAdFailedToShow(adError: AdError?) {
+                        super.onAdFailedToShow(adError)
+                        Log.e(
+                            TAG,
+                            "❌ [inter_welcome_back] Failed to show: id=${cfg.id} | error=${adError?.message}"
+                        )
+                    }
+
+                    override fun onAdClosed() {
+                        super.onAdClosed()
+                        Log.d(TAG, "🚪 [inter_welcome_back] Inter closed: id=${cfg.id}")
+                    }
+
                     override fun onNextAction() {
                         super.onNextAction()
+                        Log.d(TAG, "➡️ [inter_welcome_back] Next action: id=${cfg.id}")
                         interWelcomeAdLive = MutableLiveData()
                         onAction()
                     }
                 }, false
             )
         } else {
+            Log.w(
+                TAG,
+                "⏭️ [inter_welcome_back] SKIP show: id=${cfg.id} | reason=${skipReasons.joinToString(", ")}"
+            )
             onAction()
         }
     }
@@ -323,25 +402,63 @@ object AdsManager {
     private fun loadInterCentralized(activity: Activity, key: String, adId: String, enabled: Boolean) {
         val config = RemoteConfigdata(activity)
         if (!config.isNeedToShowADs || !enabled) {
+            Log.w(
+                TAG,
+                "⏭️ [$key] SKIP load: id=$adId | reason=${if (!config.isNeedToShowADs) "isNeedToShowADs=false" else "unit disabled in remote config"}"
+            )
             interAdMap[key] = null
             return
         }
+        Log.d(TAG, "🔄 [$key] Loading inter: id=$adId")
         interAdMap[key] = ERainAd.getInstance()
-            .getInterstitialAds(activity, adId, object : AdCallback() {})
+            .getInterstitialAds(activity, adId, object : AdCallback() {
+                override fun onApInterstitialLoad(apInterstitialAd: ApInterstitialAd?) {
+                    super.onApInterstitialLoad(apInterstitialAd)
+                    Log.d(TAG, "✅ [$key] Inter loaded: id=$adId | ready=${apInterstitialAd?.isReady}")
+                }
+
+                override fun onAdFailedToLoad(adError: LoadAdError?) {
+                    super.onAdFailedToLoad(adError)
+                    Log.e(
+                        TAG,
+                        "❌ [$key] Inter failed: id=$adId | code=${adError?.code} | error=${adError?.message}"
+                    )
+                }
+            })
     }
 
     private fun showInterCentralized(
         activity: Activity, key: String, enabled: Boolean, onAction: () -> Unit
     ) {
         val ad = interAdMap[key]
-        if (ad != null && ad.isReady && RemoteConfigdata(activity).isNeedToShowADs && enabled) {
+        val needToShow = RemoteConfigdata(activity).isNeedToShowADs
+        if (ad != null && ad.isReady && needToShow && enabled) {
+            Log.d(TAG, "📺 [$key] Showing inter")
             ERainAd.getInstance().forceShowInterstitial(activity, ad, object : AdCallback() {
+                override fun onAdFailedToShow(adError: AdError?) {
+                    super.onAdFailedToShow(adError)
+                    Log.e(TAG, "❌ [$key] Failed to show: error=${adError?.message}")
+                }
+
+                override fun onAdClosed() {
+                    super.onAdClosed()
+                    Log.d(TAG, "🚪 [$key] Inter closed")
+                }
+
                 override fun onNextAction() {
                     super.onNextAction()
+                    Log.d(TAG, "➡️ [$key] Next action")
                     onAction()
                 }
             }, true)
         } else {
+            val reason = when {
+                ad == null -> "no ad instance (load not done / skipped)"
+                !ad.isReady -> "ad not ready"
+                !needToShow -> "isNeedToShowADs=false"
+                else -> "unit disabled in remote config"
+            }
+            Log.w(TAG, "⏭️ [$key] SKIP show: reason=$reason")
             onAction()
         }
     }
