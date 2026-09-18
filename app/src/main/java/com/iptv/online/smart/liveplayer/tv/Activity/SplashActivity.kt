@@ -176,6 +176,9 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>(), RemoteConfigUtil
                         .setIntent(Intent(this, SplashActivity::class.java).apply {
                             action = Intent.ACTION_VIEW
                             putExtra("widget_flow", "flow_uninstall")
+                            flags = Intent.FLAG_ACTIVITY_NEW_TASK or
+                                    Intent.FLAG_ACTIVITY_CLEAR_TASK or
+                                    Intent.FLAG_ACTIVITY_NO_ANIMATION
                         })
                         .build()
 
