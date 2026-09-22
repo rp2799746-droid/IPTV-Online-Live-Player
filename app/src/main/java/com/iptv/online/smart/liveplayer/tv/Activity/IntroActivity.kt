@@ -47,13 +47,17 @@ class IntroActivity : Base__Activity<ActivityIntroBinding>() {
         fragments = arrayListOf<Fragment>().apply {
             add(IntroFragment1()) // Index 0
             add(IntroFragment2())
+                if (isInternetAvailable()
+
+                    &&    ERainAd.getInstance().getOrganic() == fullConfig.enableUaCheck
+                )
+                {
+
+
+                    add(IntroFragmentFullAd())
+                }
             add(IntroFragment3())
-            if (isInternetAvailable()
-                && ERainAd.getInstance()
-                    .getShouldDisplayNativeOnboardingFull1(fullConfig.enableUaCheck) == true
-            ) {
-                add(IntroFragmentFullAd())
-            }
+
             add(IntroFragment4())
         }
 

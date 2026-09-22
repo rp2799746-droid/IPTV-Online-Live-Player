@@ -235,7 +235,7 @@ object AdsManager {
             config,
             layoutRes,
             nativeAdOnBoardingFullLive,
-            ERainAd.getInstance().getShouldDisplayNativeOnboardingFull1(config.enableUaCheck) == true,
+            ERainAd.getInstance().getOrganic() == config.enableUaCheck,
             name = "native_onboarding_full"
         )
     }
