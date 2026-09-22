@@ -36,6 +36,9 @@ android {
         release {
             minifyEnabled true
             shrinkResources true
+            firebaseCrashlytics {
+                mappingFileUploadEnabled false
+            }
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
         debug {
