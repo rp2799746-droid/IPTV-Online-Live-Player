@@ -53,7 +53,7 @@ class ChannelListActivity : Base__Activity<ActivityChannelListBinding>() {
                 if (configScript!!.nativeChannelList) {
 
                     val handledAds = mutableSetOf<String>()
-                    val tag = "native_channel_list"
+                    val tag = "native_channel_list_3009"
 
                     AdsManager.getAdLive(tag).observe(this@ChannelListActivity) { state ->
                             if (state is NativeAdUiState.Success && !handledAds.contains(tag)) {

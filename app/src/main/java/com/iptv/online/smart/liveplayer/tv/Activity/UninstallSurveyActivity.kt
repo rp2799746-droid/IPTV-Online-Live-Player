@@ -32,7 +32,7 @@ class UninstallSurveyActivity : Base__Activity<UninstallSurveyBinding>() {
             this@UninstallSurveyActivity,
             AdRemoteConfig.getInstance().native_survey_uninstall.id,
             R.layout.layout_native_ad_large,
-            "native_survey_uninstall"
+            "native_survey_uninstall_3009"
         )
         nativeAds()
 
@@ -44,7 +44,7 @@ class UninstallSurveyActivity : Base__Activity<UninstallSurveyBinding>() {
                 if (AdRemoteConfig.getInstance().native_survey_uninstall.isEnable) {
 
                     val handledAds = mutableSetOf<String>()
-                    val tag = "native_survey_uninstall"
+                    val tag = "native_survey_uninstall_3009"
 
                     AdsManager.getAdLive(tag).observe(this@UninstallSurveyActivity) { state ->
                             if (state is NativeAdUiState.Success && !handledAds.contains(tag)) {

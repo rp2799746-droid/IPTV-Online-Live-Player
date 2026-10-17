@@ -2,14 +2,17 @@
 
 <com.facebook.shimmer.ShimmerFrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/unified"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     app:shimmer_auto_start="true"
     app:shimmer_duration="1000">
 
+    <!-- Default shimmer: click ads (layout_native_ad_lang_click*) ane language 2 (layout_native_ad_large) mate -->
     <androidx.cardview.widget.CardView
         android:id="@+id/shimmer_card"
+        tools:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
@@ -105,4 +108,137 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
+
+    <!--
+        native_language_1 shimmer: layout_native_ad_lang_1 ni exact copy (same constraints ane maap),
+        fakt text/image ni jagyae gray bar. Etle ad load thay tyare size ke red line hale nahi.
+        Ad layout ma kai maap badlo to ahiya pan same badaljo.
+    -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/shimmer_lang1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="8dp"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <!-- ad_content_bg: header no full-width light gray background -->
+        <View
+            android:id="@+id/shimmer_l1_content_bg"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="#F2F2F2"
+            app:layout_constraintBottom_toBottomOf="@id/shimmer_l1_barrier_top"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- ad_app_icon: ad jevo j _44sdp -->
+        <View
+            android:id="@+id/shimmer_l1_app_icon"
+            android:layout_width="@dimen/_44sdp"
+            android:layout_height="@dimen/_44sdp"
+            android:layout_marginStart="@dimen/_10sdp"
+            android:layout_marginTop="@dimen/_8sdp"
+            android:background="@color/darker_gray"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- ad_headline: ad jevo j TextView (_11ssp, 1 line, same margins), text dekhay nahi,
+             etle bar ni height/width title jetli j. Logo ni upar ni dhaar sathe. -->
+        <TextView
+            android:id="@+id/shimmer_l1_headline"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/_8sdp"
+            android:layout_marginEnd="8dp"
+            android:background="@color/darker_gray"
+            android:includeFontPadding="false"
+            android:maxLines="1"
+            android:text=" "
+            android:textColor="@android:color/transparent"
+            android:textSize="@dimen/_11ssp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/shimmer_l1_app_icon"
+            app:layout_constraintTop_toTopOf="@id/shimmer_l1_app_icon" />
+
+        <!-- ad_body ni biji line (_9ssp): logo ni neechi dhaar sathe -->
+        <TextView
+            android:id="@+id/shimmer_l1_body_2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@color/darker_gray"
+            android:includeFontPadding="false"
+            android:maxLines="1"
+            android:text=" "
+            android:textColor="@android:color/transparent"
+            android:textSize="@dimen/_9ssp"
+            app:layout_constraintBottom_toBottomOf="@id/shimmer_l1_app_icon"
+            app:layout_constraintEnd_toEndOf="@id/shimmer_l1_headline"
+            app:layout_constraintStart_toStartOf="@id/shimmer_l1_body" />
+
+        <!-- ad_body ni pehli line (_9ssp): "Ad" badge na jamne; 1dp = ad nu lineSpacingExtra -->
+        <TextView
+            android:id="@+id/shimmer_l1_body"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:layout_marginBottom="1dp"
+            android:background="@color/darker_gray"
+            android:includeFontPadding="false"
+            android:maxLines="1"
+            android:text=" "
+            android:textColor="@android:color/transparent"
+            android:textSize="@dimen/_9ssp"
+            app:layout_constraintBottom_toTopOf="@id/shimmer_l1_body_2"
+            app:layout_constraintEnd_toEndOf="@id/shimmer_l1_headline"
+            app:layout_constraintStart_toEndOf="@id/shimmer_l1_ad_icon" />
+
+        <!-- ad_icon ("Ad" badge): ad jevo j 18x17dp, body ni pehli line sathe (+1dp) -->
+        <View
+            android:id="@+id/shimmer_l1_ad_icon"
+            android:layout_width="18dp"
+            android:layout_height="17dp"
+            android:layout_marginTop="1dp"
+            android:background="@color/darker_gray"
+            app:layout_constraintStart_toStartOf="@id/shimmer_l1_headline"
+            app:layout_constraintTop_toTopOf="@id/shimmer_l1_body" />
+
+        <!-- barrier_top: ad jevu j _8sdp margin -->
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/shimmer_l1_barrier_top"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:barrierDirection="bottom"
+            app:barrierMargin="@dimen/_8sdp"
+            app:constraint_referenced_ids="shimmer_l1_app_icon,shimmer_l1_body_2" />
+
+        <!-- ad_media: full width, _92sdp -->
+        <View
+            android:id="@+id/shimmer_l1_media"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/_92sdp"
+            android:layout_marginTop="@dimen/_5sdp"
+            android:background="@color/darker_gray"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/shimmer_l1_barrier_top" />
+
+        <!-- ad_call_to_action: _42sdp, ad jevo j shape -->
+        <View
+            android:id="@+id/shimmer_l1_call_to_action"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/_42sdp"
+            android:layout_marginHorizontal="8dp"
+            android:layout_marginTop="@dimen/_7sdp"
+            android:layout_marginBottom="4dp"
+            android:background="@drawable/bg_btn_native_cta_review"
+            android:backgroundTint="@color/darker_gray"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/shimmer_l1_media" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </com.facebook.shimmer.ShimmerFrameLayout>

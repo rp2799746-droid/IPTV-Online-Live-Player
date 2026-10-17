@@ -11,52 +11,55 @@ class AdRemoteConfig private constructor(
     val ads: Map<String, AdUnitConfig>
 ) {
 
-    fun unit(key: String): AdUnitConfig = ads[key] ?: AdUnitConfig()
+    // Ads script (PUB INFINITY x WEBIX) na naam (_3009). Firebase ma haju juno JSON hoy
+    // to legacy key thi fallback thay, etle ads bandh na thai jaay.
+    fun unit(key: String, legacyKey: String? = null): AdUnitConfig =
+        ads[key] ?: legacyKey?.let { ads[it] } ?: AdUnitConfig()
 
     // ---- Splash ----
-    val inter_splash get() = unit("inter_splash")
-    val banner_splash get() = unit("banner_splash")
+    val inter_splash get() = unit("inter_splash_3009", "inter_splash")
+    val banner_splash get() = unit("banner_splash_3009", "banner_splash")
     val open_resume get() = unit("open_resume")
 
     // ---- Language ----
-    val native_language_1 get() = unit("native_language_1")
-    val native_language_1_click get() = unit("native_language_1_click")
-    val native_language_2 get() = unit("native_language_2")
-    val native_language_2_click get() = unit("native_language_2_click")
+    val native_language_1 get() = unit("native_language_1_3009", "native_language_1")
+    val native_language_1_click get() = unit("native_language_1_click_3009", "native_language_1_click")
+    val native_language_2 get() = unit("native_language_2_3009", "native_language_2")
+    val native_language_2_click get() = unit("native_language_2_click_3009", "native_language_2_click")
 
     // ---- Onboarding ----
-    val native_onboarding_1_1 get() = unit("native_onboarding_1_1")
-    val native_onboarding_2_1 get() = unit("native_onboarding_2_1")
-    val native_onboarding_1_4 get() = unit("native_onboarding_1_4")
-    val native_onboarding_2_4 get() = unit("native_onboarding_2_4")
-    val native_onboarding_fullscreen_1_2 get() = unit("native_onboarding_fullscreen_1_2")
-    val native_onboarding_fullscreen_2_2 get() = unit("native_onboarding_fullscreen_2_2")
+    val native_onboarding_1_1 get() = unit("native_onboarding_1_1_3009", "native_onboarding_1_1")
+    val native_onboarding_2_1 get() = unit("native_onboarding_2_1_3009", "native_onboarding_2_1")
+    val native_onboarding_1_4 get() = unit("native_onboarding_1_4_3009", "native_onboarding_1_4")
+    val native_onboarding_2_4 get() = unit("native_onboarding_2_4_3009", "native_onboarding_2_4")
+    val native_onboarding_fullscreen_1_2 get() = unit("native_onboarding_fullscreen_1_2_3009", "native_onboarding_fullscreen_1_2")
+    val native_onboarding_fullscreen_2_2 get() = unit("native_onboarding_fullscreen_2_2_3009", "native_onboarding_fullscreen_2_2")
     // Inter onboarding is permanently disabled for this app.  Returning an
     // empty unit prevents a remote ID from being loaded or shown accidentally.
     val inter_onboarding get() = AdUnitConfig()
 
     // ---- Home ----
-    val inter_home get() = unit("inter_home")
-    val inter_back get() = unit("inter_back")
-    val banner_collapsible_home get() = unit("banner_collapsible_home")
-    val native_home get() = unit("native_home")
-    val native_channel get() = unit("native_channel")
+    val inter_home get() = unit("inter_home_3009", "inter_home")
+    val inter_back get() = unit("inter_back_3009", "inter_back")
+    val banner_collapsible_home get() = unit("banner_collap_home_3009", "banner_collapsible_home")
+    val native_home get() = unit("native_home_3009", "native_home")
+    val native_channel get() = unit("native_channel_3009", "native_channel")
     val native_favorite get() = unit("native_favorite")
     val native_history get() = unit("native_history")
 
     // ---- Playlist / Mirroring ----
-    val native_playlist get() = unit("native_playlist")
-    val native_channellist get() = unit("native_channellist")
-    val inter_add_playlist get() = unit("inter_add_playlist")
-    val inter_mirroring get() = unit("inter_mirroring")
-    val native_mirroring get() = unit("native_mirroring")
+    val native_playlist get() = unit("native_playlist_3009", "native_playlist")
+    val native_channellist get() = unit("native_channel_list_3009", "native_channellist")
+    val inter_add_playlist get() = unit("inter_add_playlist_3009", "inter_add_playlist")
+    val inter_mirroring get() = unit("inter_mirroring_3009", "inter_mirroring")
+    val native_mirroring get() = unit("native_mirroring_3009", "native_mirroring")
 
     // ---- Welcome-back / Uninstall ----
-    val inter_welcome_back get() = unit("inter_welcome_back")
-    val inter_splash_uninstall get() = unit("inter_splash_uninstall")
-    val banner_splash_uninstall get() = unit("banner_splash_uninstall")
-    val native_uninstall get() = unit("native_uninstall")
-    val native_survey_uninstall get() = unit("native_survey_uninstall")
+    val inter_welcome_back get() = unit("inter_welcome_back_3009", "inter_welcome_back")
+    val inter_splash_uninstall get() = unit("inter_splash_uninstall_3009", "inter_splash_uninstall")
+    val banner_splash_uninstall get() = unit("banner_splash_uninstall_3009", "banner_splash_uninstall")
+    val native_uninstall get() = unit("native_uninstall_3009", "native_uninstall")
+    val native_survey_uninstall get() = unit("native_survey_uninstall_3009", "native_survey_uninstall")
 
     companion object {
         private const val RELEASE_FILE = "ad_config.json"

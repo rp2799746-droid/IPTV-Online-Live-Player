@@ -169,7 +169,7 @@ class PlaylistFragment : Fragment() {
 
                     val handledAds = mutableSetOf<String>()
                     val retriedTags = mutableSetOf<String>()
-                    val tag = "native_home_2005"
+                    val tag = "native_home_3009"
 
                     AdsManager.getAdLive(tag).observe(viewLifecycleOwner) { state ->
                             if (state is NativeAdUiState.Success && !handledAds.contains(tag)) {

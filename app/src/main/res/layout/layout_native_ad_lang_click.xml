@@ -40,7 +40,7 @@
                 android:layout_marginStart="@dimen/_10sdp"
                 android:layout_marginTop="@dimen/_10sdp"
                 android:background="#2D7BFF"
-               android:gravity="center"
+                android:gravity="center"
                 android:text="Ad"
                 android:textColor="@color/white"
                 android:textSize="@dimen/_8sdp"

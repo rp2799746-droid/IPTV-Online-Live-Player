@@ -169,16 +169,16 @@ class MainActivity : Base__Activity<ActivityMainBinding>() {
         }
 
 
-        if (AdsManager.getAdLive("native_home_2005").value == null) {
-            queue(AdRemoteConfig.getInstance().native_home, R.layout.layout_native_ad_medium, "native_home_2005")
+        if (AdsManager.getAdLive("native_home_3009").value == null) {
+            queue(AdRemoteConfig.getInstance().native_home, R.layout.layout_native_ad_medium, "native_home_3009")
         }
 
-        queue(AdRemoteConfig.getInstance().native_playlist, R.layout.layout_native_ad_large, "native_playlist")
-        queue(AdRemoteConfig.getInstance().native_channel, R.layout.layout_native_ad_medium_channel, "native_channel_1409")
-        queue(AdRemoteConfig.getInstance().native_channellist, R.layout.layout_native_ad_large, "native_channel_list")
+        queue(AdRemoteConfig.getInstance().native_playlist, R.layout.layout_native_ad_large, "native_playlist_3009")
+        queue(AdRemoteConfig.getInstance().native_channel, R.layout.layout_native_ad_medium_channel, "native_channel_3009")
+        queue(AdRemoteConfig.getInstance().native_channellist, R.layout.layout_native_ad_large, "native_channel_list_3009")
         queue(AdRemoteConfig.getInstance().native_favorite, R.layout.layout_native_ad_small, "native_favorite_2005")
         queue(AdRemoteConfig.getInstance().native_history, R.layout.layout_native_ad_small, "native_history_2005")
-        queue(AdRemoteConfig.getInstance().native_mirroring, R.layout.layout_native_ad_large, "native_mirroring")
+        queue(AdRemoteConfig.getInstance().native_mirroring, R.layout.layout_native_ad_large, "native_mirroring_3009")
 
         AdsManager.preloadStaggered(this@MainActivity, preloads)
     }

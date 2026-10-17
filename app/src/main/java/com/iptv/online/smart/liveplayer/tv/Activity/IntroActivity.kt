@@ -90,7 +90,7 @@ class IntroActivity : Base__Activity<ActivityIntroBinding>() {
                 this,
                 nativeHome.id,
                 R.layout.layout_native_ad_medium,
-                "native_home_2005"
+                "native_home_3009"
             )
         }
     }

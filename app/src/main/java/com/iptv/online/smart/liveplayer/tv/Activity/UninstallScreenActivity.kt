@@ -28,7 +28,7 @@ class UninstallScreenActivity : Base__Activity<UninstallScreeenBinding>() {
             this@UninstallScreenActivity,
             AdRemoteConfig.getInstance().native_uninstall.id,
             R.layout.layout_native_ad_large,
-            "native_uninstall"
+            "native_uninstall_3009"
         )
         nativeAds()
 
@@ -40,7 +40,7 @@ class UninstallScreenActivity : Base__Activity<UninstallScreeenBinding>() {
                 if (AdRemoteConfig.getInstance().native_uninstall.isEnable) {
 
                     val handledAds = mutableSetOf<String>()
-                    val tag = "native_uninstall"
+                    val tag = "native_uninstall_3009"
 
                     AdsManager.getAdLive(tag).observe(this@UninstallScreenActivity) { state ->
                             if (state is NativeAdUiState.Success && !handledAds.contains(tag)) {

@@ -82,7 +82,7 @@ class ChannelFragment : Fragment() {
                 if (configScript!!.nativechannel1409) {
 
                     val handledAds = mutableSetOf<String>()
-                    val tag = "native_channel_1409"
+                    val tag = "native_channel_3009"
 
                     AdsManager.getAdLive(tag).observe(viewLifecycleOwner) { state ->
                             if (state is NativeAdUiState.Success && !handledAds.contains(tag)) {

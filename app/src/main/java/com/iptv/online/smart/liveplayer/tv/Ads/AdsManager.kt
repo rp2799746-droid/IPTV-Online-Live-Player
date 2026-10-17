@@ -64,13 +64,21 @@ object AdsManager {
 
     fun getAdConfig(ad: ApNativeAd): AdUnitConfig? = adConfigMap[ad]
 
+    // Je LiveData mate native request haju chalu chhe (loaded/failed nathi thayu).
+    // Screen ne khabar pade ke null "haju loading" chhe ke "sacho fail", etle loading vakhte shimmer rahe.
+    private val loadingLives = java.util.Collections.newSetFromMap(
+        java.util.concurrent.ConcurrentHashMap<MutableLiveData<ApNativeAd?>, Boolean>()
+    )
+
+    fun isNativeLoading(liveData: MutableLiveData<ApNativeAd?>): Boolean = liveData in loadingLives
+
     /** Clears a prior process-static Language native without issuing a load. */
     fun clearNativeLanguage() {
         nativeLanguageAdLive.postValue(null)
     }
 
     fun onboarding1Tag(isFirst: Boolean) =
-        if (isFirst) "native_onboarding_1_1" else "native_onboarding_2_1"
+        if (isFirst) "native_onboarding_1_1_3009" else "native_onboarding_2_1_3009"
 
     /**
      * Single base-style native gate.  Every skipped or failed request emits
@@ -93,10 +101,12 @@ object AdsManager {
         }
         if (skipReasons.isNotEmpty()) {
             Log.w(TAG, "⏭️ [$name] SKIP native: id=${config.id} | reason=${skipReasons.joinToString(", ")}")
+            loadingLives.remove(liveData)
             liveData.postValue(null)
             return
         }
 
+        loadingLives.add(liveData)
         Log.d(TAG, "🔄 [$name] Loading native: id=${config.id}")
         ERainAd.getInstance().loadNativeAdResultCallback(
             activity,
@@ -107,6 +117,7 @@ object AdsManager {
                     super.onNativeAdLoaded(nativeAd)
                     Log.d(TAG, "✅ [$name] Native loaded: id=${config.id}")
                     adConfigMap[nativeAd] = config
+                    loadingLives.remove(liveData)
                     liveData.postValue(nativeAd)
                 }
 
@@ -116,6 +127,7 @@ object AdsManager {
                         TAG,
                         "❌ [$name] Native failed: id=${config.id} | code=${adError?.code} | error=${adError?.message}"
                     )
+                    loadingLives.remove(liveData)
                     liveData.postValue(null)
                 }
 
@@ -193,13 +205,13 @@ object AdsManager {
     fun loadNativeLanguage(activity: Activity, isFirst: Boolean, layoutRes: Int) {
         val config =
             if (isFirst) AdRemoteConfig.getInstance().native_language_1 else AdRemoteConfig.getInstance().native_language_2
-        loadNativeInternal(activity, config, layoutRes, nativeLanguageAdLive, name = "native_language")
+        loadNativeInternal(activity, config, layoutRes, nativeLanguageAdLive, name = if (isFirst) "native_language_1_3009" else "native_language_2_3009")
     }
 
     fun loadNativeLanguageClick(activity: Activity, isFirst: Boolean, layoutRes: Int) {
         val config =
             if (isFirst) AdRemoteConfig.getInstance().native_language_1_click else AdRemoteConfig.getInstance().native_language_2_click
-        loadNativeInternal(activity, config, layoutRes, nativeLanguageClickAdLive, name = "native_language_click")
+        loadNativeInternal(activity, config, layoutRes, nativeLanguageClickAdLive, name = if (isFirst) "native_language_1_click_3009" else "native_language_2_click_3009")
     }
 
     fun loadNativeOnboarding1(activity: Activity, isFirst: Boolean, layoutRes: Int) {
@@ -210,7 +222,7 @@ object AdsManager {
             config,
             layoutRes,
             nativeOnboarding1AdLive,
-            name = "native_onboarding_1"
+            name = if (isFirst) "native_onboarding_1_1_3009" else "native_onboarding_2_1_3009"
         )
     }
 
@@ -223,7 +235,7 @@ object AdsManager {
             layoutRes,
             nativeOnboarding4AdLive,
             ERainAd.getInstance().getShouldDisplayNativeOnboardingNormal2(config.enableUaCheck) == true,
-            name = "native_onboarding_4"
+            name = if (isFirst) "native_onboarding_1_4_3009" else "native_onboarding_2_4_3009"
         )
     }
 
@@ -236,7 +248,7 @@ object AdsManager {
             layoutRes,
             nativeAdOnBoardingFullLive,
             ERainAd.getInstance().getOrganic() == config.enableUaCheck,
-            name = "native_onboarding_full"
+            name = if (isFirst) "native_onboarding_fullscreen_1_2_3009" else "native_onboarding_fullscreen_2_2_3009"
         )
     }
 
@@ -496,7 +508,7 @@ object AdsManager {
         showInterCentralized(activity, "interAddPlaylist", AdRemoteConfig.getInstance().inter_add_playlist.isEnable, onAction)
     fun loadNativeMirroring(activity: Activity) {
         val cfg = AdRemoteConfig.getInstance().native_mirroring
-        loadAd(activity, cfg.id, R.layout.layout_native_ad_large, "native_mirroring", cfg.isEnable)
+        loadAd(activity, cfg.id, R.layout.layout_native_ad_large, "native_mirroring_3009", cfg.isEnable)
     }
     fun Activity.loadAndShowCollapsingBanner(adLayout: View) {
         val config = RemoteConfigdata(this)

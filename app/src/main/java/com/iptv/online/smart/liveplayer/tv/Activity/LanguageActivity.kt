@@ -54,6 +54,9 @@ class LanguageActivity : Base__Activity<ActivityLanguageBinding>(),
 
     companion object {
         private const val STATE_LANGUAGE_VARIANT = "state_language_variant"
+
+        // TEMP: true = debug build ma native_language_1 nu shimmer chalu j rahe (ad na dekhay). Check pachhi false karo.
+        private const val DEBUG_HOLD_LANG1_SHIMMER = false
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -192,8 +195,13 @@ class LanguageActivity : Base__Activity<ActivityLanguageBinding>(),
     }
 
     private fun listenLanguageAd() {
+        // TEMP: shimmer check mate - lang_1 nu ad render nathi thatu etle shimmer chalu j rahe.
+        // Fakt debug build ma; check pachhi DEBUG_HOLD_LANG1_SHIMMER = false karo athva aa line kaadho.
+        if (com.iptv.online.smart.liveplayer.tv.BuildConfig.DEBUG && DEBUG_HOLD_LANG1_SHIMMER && isFirstLanguage) return
         AdsManager.nativeLanguageClickAdLive.removeObservers(this)
         AdsManager.nativeLanguageAdLive.observe(this) { ad ->
+            // null pan request haju chalu hoy (splash nu clearNativeLanguage) to shimmer chalu rahe.
+            if (ad == null && AdsManager.isNativeLoading(AdsManager.nativeLanguageAdLive)) return@observe
             renderLanguageAd(ad)
         }
     }
@@ -201,6 +209,7 @@ class LanguageActivity : Base__Activity<ActivityLanguageBinding>(),
     private fun listenLanguageClickAd() {
         AdsManager.nativeLanguageAdLive.removeObservers(this)
         AdsManager.nativeLanguageClickAdLive.observe(this) { ad ->
+            if (ad == null && AdsManager.isNativeLoading(AdsManager.nativeLanguageClickAdLive)) return@observe
             renderLanguageAd(ad)
         }
     }
@@ -210,6 +219,12 @@ class LanguageActivity : Base__Activity<ActivityLanguageBinding>(),
         val large = !isFirstLanguage
         fun dp(v: Int) = (v * d).toInt()
         val root = binding.adShimmer.root
+        // native_language_1 (layout_native_ad_lang_1) mate shimmer ma ad ni exact copy (shimmer_lang1) chhe,
+        // etle e vakhte fakt e dekhay; baki (click / language 2) mate junu shimmer_card.
+        val lang1 = isFirstLanguage && !isClickAdPhase
+        root.findViewById<View>(R.id.shimmer_lang1)?.visibility = if (lang1) View.VISIBLE else View.GONE
+        root.findViewById<View>(R.id.shimmer_card)?.visibility = if (lang1) View.GONE else View.VISIBLE
+        if (lang1) return
 
         root.findViewById<View>(R.id.shimmer_ad_media)?.let { media ->
             val lp = media.layoutParams as ViewGroup.MarginLayoutParams
@@ -219,15 +234,17 @@ class LanguageActivity : Base__Activity<ActivityLanguageBinding>(),
         }
         root.findViewById<View>(R.id.shimmer_ad_call_to_action)?.let { cta ->
             val lp = cta.layoutParams as ViewGroup.MarginLayoutParams
+            lp.height = dp(40)
             lp.topMargin = dp(if (large) 16 else 8)
             cta.layoutParams = lp
         }
         root.findViewById<View>(R.id.shimmer_card)?.let { card ->
             val lp = card.layoutParams as ViewGroup.MarginLayoutParams
-            // Both Language ad layouts now inset the card by the NativeAdView's 8dp padding.
+            // Click layouts inset the card by the NativeAdView's 8dp padding.
             val inset = dp(8)
             lp.setMargins(inset, inset, inset, inset)
             card.layoutParams = lp
+            (card as? androidx.cardview.widget.CardView)?.radius = 20 * d
         }
     }
 
@@ -248,7 +265,10 @@ class LanguageActivity : Base__Activity<ActivityLanguageBinding>(),
         )
         binding.adShimmer.root.visibility = View.GONE
 
-        binding.frAds.findViewById<View>(R.id.ad_call_to_action)?.let { button ->
+        // native_language_1 nu CTA XML ni fixed height (52dp) vapre chhe, remote override nahi.
+        binding.frAds.findViewById<View>(R.id.ad_call_to_action)
+            ?.takeIf { it.tag != "fixed_cta_height" }
+            ?.let { button ->
             button.layoutParams?.let { params ->
                 params.height = (AdsManager.getCTAButtonHeight(this) * resources.displayMetrics.density).toInt()
                 button.layoutParams = params

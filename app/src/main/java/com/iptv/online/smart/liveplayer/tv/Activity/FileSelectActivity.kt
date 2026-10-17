@@ -72,7 +72,7 @@ class FileSelectActivity : Base__Activity<ActivityFileSelectBinding>() {
                 if (configScript!!.nativePlaylist) {
 
                     val handledAds = mutableSetOf<String>()
-                    val tag = "native_playlist"
+                    val tag = "native_playlist_3009"
 
                     AdsManager.getAdLive(tag).observe(this@FileSelectActivity) { state ->
                             if (state is NativeAdUiState.Success && !handledAds.contains(tag)) {

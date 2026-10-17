@@ -420,8 +420,8 @@ class SplashActivity : Base__Activity<ActivitySplashBinding>(), RemoteConfigUtil
  
 
         val isUninstallFlow = currentFlow == "flow_uninstall"
-        val bannerUnit = if (isUninstallFlow) "banner_splash_uninstall" else "banner_splash"
-        val interUnit = if (isUninstallFlow) "inter_splash_uninstall" else "inter_splash"
+        val bannerUnit = if (isUninstallFlow) "banner_splash_uninstall_3009" else "banner_splash_3009"
+        val interUnit = if (isUninstallFlow) "inter_splash_uninstall_3009" else "inter_splash_3009"
         Log.d(
             ADS_TAG,
             "🚦 [splash] flow=${currentFlow ?: "normal"} | uninstallFlow=$isUninstallFlow | isNeedToShowADs=${remoteData.isNeedToShowADs} | " +

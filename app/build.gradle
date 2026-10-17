@@ -17,8 +17,8 @@ android {
         applicationId "com.iptv.online.smart.liveplayer.tv"
         minSdk 24
         targetSdk 36
-        versionCode 20
-        versionName "1.19"
+        versionCode 22
+        versionName "1.21"
 
         buildConfigField "String", "ERAIN_STUDIO_VERSION", "\"2.1\""
         buildConfigField "String", "PLAY_SERVICES_ADS_VERSION", "\"24.7.0\""
